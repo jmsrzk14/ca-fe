@@ -1,0 +1,73 @@
+'use client';
+
+import * as React from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
+import { Badge } from '@/shared/ui/badge';
+import { useRecentApplications } from '../hooks/use-dashboard-data';
+import { Skeleton } from '@/shared/ui/skeleton';
+
+export function RecentApplications() {
+    const { data, isLoading } = useRecentApplications();
+
+    if (isLoading) {
+        return <Skeleton className="h-[400px] w-full rounded-xl" />;
+    }
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'Funded': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+            case 'Approved': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+            case 'In Review': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+            case 'Declined': return 'bg-rose-500/10 text-rose-500 border-rose-500/20';
+            default: return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
+        }
+    };
+
+    return (
+        <Card className="col-span-1 lg:col-span-4 border-border bg-card/50 backdrop-blur-sm">
+            <CardHeader>
+                <CardTitle className="text-lg font-bold">Pengajuan Saya</CardTitle>
+                <CardDescription>Pengajuan pinjaman yang baru ditugaskan</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow className="hover:bg-transparent border-border/50">
+                            <TableHead className="text-[10px] font-bold uppercase tracking-wider">Peminjam</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-wider">Produk</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-wider">Jumlah</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-wider text-right">Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {data?.map((app) => (
+                            <TableRow key={app.id} className="border-border/40 hover:bg-muted/30 transition-colors">
+                                <TableCell>
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-8 w-8 border border-border/50">
+                                            <AvatarImage src={app.borrower.avatar} alt={app.borrower.name} />
+                                            <AvatarFallback>{app.borrower.name[0]}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-semibold">{app.borrower.name}</span>
+                                            <span className="text-[10px] text-muted-foreground uppercase">{app.id}</span>
+                                        </div>
+                                    </div>
+                                </TableCell>
+                                <TableCell className="text-sm font-medium">{app.product}</TableCell>
+                                <TableCell className="text-sm font-mono font-bold">${app.amount.toLocaleString()}</TableCell>
+                                <TableCell className="text-right">
+                                    <Badge variant="outline" className={getStatusColor(app.status)}>
+                                        {app.status}
+                                    </Badge>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    );
+}
