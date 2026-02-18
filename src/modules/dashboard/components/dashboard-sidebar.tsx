@@ -52,7 +52,22 @@ import {
     CollapsibleTrigger,
 } from '@/shared/ui/collapsible';
 
-const NAV_ITEMS = [
+interface NavItem {
+    title: string;
+    url: string;
+    icon: React.ElementType;
+    items?: {
+        title: string;
+        url: string;
+    }[];
+}
+
+interface NavGroup {
+    title: string;
+    items: NavItem[];
+}
+
+const NAV_ITEMS: NavGroup[] = [
     {
         title: 'Overview',
         items: [
