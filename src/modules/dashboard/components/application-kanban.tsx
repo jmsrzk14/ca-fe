@@ -307,19 +307,6 @@ export function ApplicationKanban() {
                         />
                     </div>
 
-                    <div className="flex -space-x-2 mr-2">
-                        {['AK', 'AD', 'BV', 'JJ', 'KA', 'NC'].map((initials, i) => (
-                            <Avatar key={i} className="h-8 w-8 border-2 border-background ring-2 ring-primary/5 hover:ring-primary/20 transition-all cursor-pointer hover:-translate-y-1">
-                                <AvatarFallback className="text-[10px] font-bold bg-muted text-muted-foreground">
-                                    {initials}
-                                </AvatarFallback>
-                            </Avatar>
-                        ))}
-                        <div className="h-8 w-8 rounded-full border-2 border-background bg-muted flex items-center justify-center ring-2 ring-primary/5 cursor-pointer hover:bg-muted/80 transition-colors">
-                            <span className="text-[10px] font-bold text-muted-foreground">+3</span>
-                        </div>
-                    </div>
-
                     <div className="flex items-center gap-2 border-l border-border/50 pl-4">
                         <Button
                             variant="ghost"

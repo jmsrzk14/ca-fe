@@ -60,50 +60,51 @@ const NAV_ITEMS = [
             { title: 'Application', url: '/applications', icon: ClipboardList },
             { title: 'Pinjaman', url: '/loans', icon: Banknote },
             { title: 'SLIK', url: '/slik', icon: FileText },
+            { title: 'Pengaturan', url: '/settings', icon: Settings },
         ],
     },
-    {
-        title: 'Process',
-        items: [
-            {
-                title: 'Survey',
-                url: '/survey',
-                icon: ClipboardList,
-                items: [
-                    { title: 'Data Umum', url: '/survey/general' },
-                    { title: 'Analisa Keuangan Usaha', url: '/survey/financial-analysis' },
-                    { title: 'Finansial', url: '/survey/financial' },
-                    { title: 'Agunan', url: '/survey/collateral' },
-                    { title: 'CRR', url: '/survey/crr' },
-                ]
-            },
-            { title: 'Verifikasi Data', url: '/verification', icon: ClipboardCheck },
-            { title: 'Kepatuhan', url: '/compliance', icon: ShieldCheck },
-            { title: 'Manajemen Risiko', url: '/risk', icon: AlertCircle },
-        ],
-    },
-    {
-        title: 'Decisioning',
-        items: [
-            { title: 'Komite', url: '/committee', icon: Users },
-            { title: 'Keputusan', url: '/decision', icon: Gavel },
-            { title: 'Cetak Laporan', url: '/reports', icon: Printer },
-        ],
-    },
-    {
-        title: 'Configuration',
-        items: [
-            {
-                title: 'Pengaturan',
-                url: '/settings',
-                icon: Settings,
-                items: [
-                    { title: 'Profile', url: '/settings/profile' },
-                    { title: 'Security', url: '/settings/security' },
-                ]
-            },
-        ],
-    },
+    // {
+    //     title: 'Process',
+    //     items: [
+    //         {
+    //             title: 'Survey',
+    //             url: '/survey',
+    //             icon: ClipboardList,
+    //             items: [
+    //                 { title: 'Data Umum', url: '/survey/general' },
+    //                 { title: 'Analisa Keuangan Usaha', url: '/survey/financial-analysis' },
+    //                 { title: 'Finansial', url: '/survey/financial' },
+    //                 { title: 'Agunan', url: '/survey/collateral' },
+    //                 { title: 'CRR', url: '/survey/crr' },
+    //             ]
+    //         },
+    //         { title: 'Verifikasi Data', url: '/verification', icon: ClipboardCheck },
+    //         { title: 'Kepatuhan', url: '/compliance', icon: ShieldCheck },
+    //         { title: 'Manajemen Risiko', url: '/risk', icon: AlertCircle },
+    //     ],
+    // },
+    // {
+    //     title: 'Decisioning',
+    //     items: [
+    //         { title: 'Komite', url: '/committee', icon: Users },
+    //         { title: 'Keputusan', url: '/decision', icon: Gavel },
+    //         { title: 'Cetak Laporan', url: '/reports', icon: Printer },
+    //     ],
+    // },
+    // {
+    //     title: 'Configuration',
+    //     items: [
+    //         {
+    //             title: 'Pengaturan',
+    //             url: '/settings',
+    //             icon: Settings,
+    //             items: [
+    //                 { title: 'Profile', url: '/settings/profile' },
+    //                 { title: 'Security', url: '/settings/security' },
+    //             ]
+    //         },
+    //     ],
+    // },
 ];
 
 export function DashboardSidebar() {
@@ -123,25 +124,26 @@ export function DashboardSidebar() {
             collapsible="icon"
             className="border-r border-sidebar-border bg-sidebar"
         >
-            <SidebarHeader className="h-20 flex items-center px-6">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-                        <Command className="h-6 w-6" />
-                    </div>
-                    <div className="flex flex-col leading-none group-data-[collapsible=icon]:hidden">
-                        <span className="text-xl font-bold tracking-tight text-foreground flex items-center gap-1">
-                            dots <span className="text-primary text-[10px] border border-primary rounded px-1 px-0.5">CA</span>
-                        </span>
+            <SidebarHeader className="h-16 flex items-center justify-center md:group-data-[collapsible=icon]:px-0 px-6 transition-all duration-200 border-b border-sidebar-border bg-sidebar">
+                <div className="flex items-center justify-center w-full">
+                    <div className="flex items-center justify-center rounded-xl text-primary-foreground">
+                        <img
+                            src="/dots_CA.png"
+                            alt="Logo Expanded"
+                            className="h-12 w-24 object-contain group-data-[collapsible=icon]:hidden"
+                        />
+                        <img
+                            src="/dots.png"
+                            alt="Logo Collapsed"
+                            className="h-10 w-10 object-contain hidden group-data-[collapsible=icon]:block"
+                        />
                     </div>
                 </div>
             </SidebarHeader>
 
             <SidebarContent className="px-4 pt-6 space-y-6">
                 {NAV_ITEMS.map((group) => (
-                    <SidebarGroup key={group.title} className="p-0">
-                        <SidebarGroupLabel className="px-4 mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 group-data-[collapsible=icon]:hidden">
-                            {group.title}
-                        </SidebarGroupLabel>
+                    <SidebarGroup className="p-0">
                         <SidebarMenu>
                             {group.items.map((item) => {
                                 const hasSubItems = item.items && item.items.length > 0;
@@ -161,13 +163,13 @@ export function DashboardSidebar() {
                                                         tooltip={item.title}
                                                         isActive={isActive}
                                                         className={cn(
-                                                            "h-11 px-4 transition-all duration-200",
-                                                            isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted/50"
+                                                            "h-11 px-4 md:group-data-[collapsible=icon]:px-0 transition-all duration-200",
+                                                            isActive ? "bg-white/20 text-white font-bold" : "text-white/70 hover:bg-white/10 hover:text-white"
                                                         )}
                                                     >
                                                         <item.icon className={cn(
-                                                            "h-5 w-5 mr-3",
-                                                            isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                                            "h-5 w-5 md:group-data-[collapsible=icon]:mr-0 mr-3 shrink-0",
+                                                            isActive ? "text-white" : "text-white/60 group-hover:text-white"
                                                         )} />
                                                         <span className="font-semibold flex-1 group-data-[collapsible=icon]:hidden">
                                                             {item.title}
@@ -185,8 +187,8 @@ export function DashboardSidebar() {
                                                                     className={cn(
                                                                         "h-9 px-4 rounded-lg transition-all",
                                                                         pathname === subItem.url
-                                                                            ? "text-primary font-bold bg-primary/5"
-                                                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                                                                            ? "text-white font-bold bg-white/15"
+                                                                            : "text-white/60 hover:text-white hover:bg-white/10"
                                                                     )}
                                                                 >
                                                                     <Link href={subItem.url}>
@@ -209,8 +211,8 @@ export function DashboardSidebar() {
                                             tooltip={item.title}
                                             isActive={isActive}
                                             className={cn(
-                                                "h-11 px-4 transition-all duration-200",
-                                                isActive ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:bg-muted/50"
+                                                "h-11 px-4 md:group-data-[collapsible=icon]:px-0 transition-all duration-200",
+                                                isActive ? "bg-white/20 text-white font-bold" : "text-white/70 hover:bg-white/10 hover:text-white"
                                             )}
                                         >
                                             <Link
@@ -218,8 +220,8 @@ export function DashboardSidebar() {
                                                 className="flex items-center w-full"
                                             >
                                                 <item.icon className={cn(
-                                                    "h-5 w-5 mr-3",
-                                                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                                    "h-5 w-5 md:group-data-[collapsible=icon]:mr-0 mr-3 shrink-0",
+                                                    isActive ? "text-white" : "text-white/60 group-hover:text-white"
                                                 )} />
                                                 <span className="font-semibold flex-1 group-data-[collapsible=icon]:hidden">
                                                     {item.title}
@@ -227,7 +229,7 @@ export function DashboardSidebar() {
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
-                                );
+                                ); ``
                             })}
                         </SidebarMenu>
                     </SidebarGroup>

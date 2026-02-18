@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Horizon | Enterprise Dashboard",
-  description: "Advanced Clean Architecture React Dashboard",
+  title: "Credit Analysis",
+  description: "Credit Analysis for the banking system",
 };
 
 export default function RootLayout({

@@ -31,13 +31,9 @@ export function DashboardHeader() {
     const title = getPageTitle();
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background px-6">
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background px-6 lg:px-8">
             <div className="flex items-center gap-4">
                 <SidebarTrigger className="text-muted-foreground hover:bg-accent" />
-                <div className="h-6 w-px bg-border hidden md:block" />
-                <h2 className="text-sm font-semibold text-foreground hidden md:block">
-                    {title.main}: <span className="text-muted-foreground font-normal">{title.sub}</span>
-                </h2>
             </div>
 
 

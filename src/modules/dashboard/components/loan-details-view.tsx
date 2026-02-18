@@ -23,29 +23,37 @@ import { CRRTab } from './loan-details/tabs/crr-tab';
 import { HistoryTab } from './loan-details/tabs/history-tab';
 
 const TABS = [
-    'Verifikasi Data',
+    'Profil Peminjam',
+    'Pinjaman',
+    'Riwayat Hutang',
+    'Kelengkapan Dokumen',
+    'Finansial',
+    'CRR',
     'Manajemen Risiko',
-    'Komite'
+    'Komite',
+    'History'
 ];
 
 export function LoanDetailsView() {
-    const [activeTab, setActiveTab] = React.useState('Verifikasi Data');
+    const [activeTab, setActiveTab] = React.useState('Profil Peminjam');
     const router = useRouter();
 
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'Verifikasi Data':
+            case 'Profil Peminjam':
                 return (
                     <div className="flex flex-col gap-12">
                         <BorrowerProfileTab />
-                        <LoanInfoTab />
-                        <DebtHistoryTab />
-                        <DocumentCompletenessTab />
-                        <FinancialInfoTab />
                     </div>
                 );
+            case 'Pinjaman': return <LoanInfoTab />;
+            case 'Riwayat Hutang': return <DebtHistoryTab />;
+            case 'Kelengkapan Dokumen': return <DocumentCompletenessTab />;
+            case 'Finansial': return <FinancialInfoTab />;
+            case 'CRR': return <CRRTab />;
             case 'Manajemen Risiko': return <CRRTab />;
             case 'Komite': return <HistoryTab />;
+            case 'History': return <HistoryTab />;
             default: return <LoanInfoTab />;
         }
     };

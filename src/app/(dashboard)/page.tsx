@@ -13,7 +13,6 @@ export default function Page() {
     );
 }
 
-
 function DashboardLoadingSkeleton() {
     return (
         <div className="flex flex-col gap-8 animate-pulse">

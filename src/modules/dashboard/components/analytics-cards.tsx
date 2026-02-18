@@ -30,32 +30,24 @@ export function AnalyticsCards() {
 
     const cards = [
         {
-            title: 'Active Loans',
+            title: 'Total Data Pengajuan',
             value: data.totalActiveLoans.toLocaleString(),
-            change: `+${data.loansChange}% from prev month`,
             icon: Landmark,
-            trend: 'up',
         },
         {
-            title: 'Applications',
+            title: 'Total Kredit yang ada',
             value: data.activeApplications.toLocaleString(),
-            change: `+${data.appsChange}% from prev month`,
             icon: FileText,
-            trend: 'up',
         },
         {
-            title: 'Total Funded',
+            title: 'Total Kredit di bulan ini',
             value: `$${(data.totalFunded / 1000000).toFixed(1)}M`,
-            change: `+${data.fundedChange}% from prev month`,
             icon: Banknote,
-            trend: 'up',
         },
         {
-            title: 'Pending Tasks',
+            title: 'Pending Bulan ini',
             value: data.pendingTasks.toLocaleString(),
-            change: `${data.tasksChange}% since yesterday`,
             icon: ListTodo,
-            trend: data.tasksChange < 0 ? 'down' : 'up',
         },
     ];
 
@@ -73,18 +65,6 @@ export function AnalyticsCards() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold tracking-tight">{card.value}</div>
-                        <div className="mt-2 flex items-center gap-1.5">
-                            <span className={cn(
-                                "flex items-center text-xs font-bold",
-                                card.trend === 'up' ? "text-emerald-500" : "text-amber-500"
-                            )}>
-                                {card.trend === 'up' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                                {Math.abs(parseFloat(card.change.split('%')[0]))}%
-                            </span>
-                            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-                                {card.change.split('%')[1].trim()}
-                            </span>
-                        </div>
                     </CardContent>
                 </Card>
             ))}
