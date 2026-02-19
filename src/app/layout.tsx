@@ -14,7 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Credit Analysis",
+  title: {
+    template: "Credit Analytics | %s",
+    default: "Credit Analytics",
+  },
   description: "Credit Analysis for the banking system",
 };
 

@@ -72,54 +72,22 @@ const NAV_ITEMS: NavGroup[] = [
         title: 'Overview',
         items: [
             { title: 'Dashboards', url: '/', icon: Home },
-            { title: 'Application', url: '/applications', icon: ClipboardList },
-            { title: 'Pinjaman', url: '/loans', icon: Banknote },
+            { title: 'Peminjam', url: '/borrowers', icon: Users },
+            { title: 'Pinjaman', url: '/loans', icon: ClipboardList },
             { title: 'SLIK', url: '/slik', icon: FileText },
-            { title: 'Pengaturan', url: '/settings', icon: Settings },
+            {
+                title: 'Pengaturan',
+                url: ROUTES.SETTINGS,
+                icon: Settings,
+                items: [
+                    { title: 'Produk Peminjaman', url: ROUTES.SETTINGS_LOAN_PRODUCTS },
+                    { title: 'Komponen CRR', url: ROUTES.SETTINGS_CRR_COMPONENTS },
+                    { title: 'Penilaian CRR', url: ROUTES.SETTINGS_CRR_ASSESSMENT },
+                    { title: 'Status Peminjaman', url: ROUTES.SETTINGS_LOAN_STATUS },
+                ]
+            },
         ],
     },
-    // {
-    //     title: 'Process',
-    //     items: [
-    //         {
-    //             title: 'Survey',
-    //             url: '/survey',
-    //             icon: ClipboardList,
-    //             items: [
-    //                 { title: 'Data Umum', url: '/survey/general' },
-    //                 { title: 'Analisa Keuangan Usaha', url: '/survey/financial-analysis' },
-    //                 { title: 'Finansial', url: '/survey/financial' },
-    //                 { title: 'Agunan', url: '/survey/collateral' },
-    //                 { title: 'CRR', url: '/survey/crr' },
-    //             ]
-    //         },
-    //         { title: 'Verifikasi Data', url: '/verification', icon: ClipboardCheck },
-    //         { title: 'Kepatuhan', url: '/compliance', icon: ShieldCheck },
-    //         { title: 'Manajemen Risiko', url: '/risk', icon: AlertCircle },
-    //     ],
-    // },
-    // {
-    //     title: 'Decisioning',
-    //     items: [
-    //         { title: 'Komite', url: '/committee', icon: Users },
-    //         { title: 'Keputusan', url: '/decision', icon: Gavel },
-    //         { title: 'Cetak Laporan', url: '/reports', icon: Printer },
-    //     ],
-    // },
-    // {
-    //     title: 'Configuration',
-    //     items: [
-    //         {
-    //             title: 'Pengaturan',
-    //             url: '/settings',
-    //             icon: Settings,
-    //             items: [
-    //                 { title: 'Profile', url: '/settings/profile' },
-    //                 { title: 'Security', url: '/settings/security' },
-    //             ]
-    //         },
-    //     ],
-    // },
 ];
 
 export function DashboardSidebar() {

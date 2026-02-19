@@ -1,7 +1,7 @@
 import { SlikView } from '@/modules/slik';
 
 export const metadata = {
-    title: 'SLIK | dots CA',
+    title: 'SLIK',
     description: 'Daftar peminjaman pending SLIK',
 };
 

@@ -2,6 +2,11 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { ErrorBoundary } from '@/shared/components/error-boundary';
 import { LoanListView } from '@/modules/dashboard';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Pinjaman',
+};
 
 export default function LoansPage() {
     return (

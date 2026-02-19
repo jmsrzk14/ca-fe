@@ -1,7 +1,7 @@
 export const APP_CONFIG = {
   NAME: 'Horizon Admin',
   DESCRIPTION: 'Premium Clean Architecture Dashboard',
-  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.example.com',
+  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://creditanalyticsbackend-production.up.railway.app',
 } as const;
 
 export const ROUTES = {
@@ -11,6 +11,10 @@ export const ROUTES = {
   CUSTOMERS: '/customers',
   ORDERS: '/orders',
   SETTINGS: '/settings',
+  SETTINGS_LOAN_PRODUCTS: '/settings/loan-products',
+  SETTINGS_CRR_COMPONENTS: '/settings/crr-components',
+  SETTINGS_CRR_ASSESSMENT: '/settings/crr-assessment',
+  SETTINGS_LOAN_STATUS: '/settings/loan-status',
 } as const;
 
 export const THEME_CONFIG = {
