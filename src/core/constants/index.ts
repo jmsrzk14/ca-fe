@@ -7,9 +7,8 @@ export const APP_CONFIG = {
 export const ROUTES = {
   DASHBOARD: '/',
   APPLICATIONS: '/applications',
-  ANALYTICS: '/analytics',
-  CUSTOMERS: '/customers',
-  ORDERS: '/orders',
+  BORROWERS: '/borrowers',
+  SLIK: '/slik',
   SETTINGS: '/settings',
   SETTINGS_LOAN_PRODUCTS: '/settings/loan-products',
   SETTINGS_CRR_COMPONENTS: '/settings/crr-components',

@@ -53,7 +53,9 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         );
     }
 
-    const data = applicant as any;
+    const response = applicant as any;
+    // Handle both cases: { applicant: { ... } } and directly { ... }
+    const data = response?.applicant || response || {};
     const attributes = data.attributes || [];
 
     // Helper to get attribute value
@@ -90,7 +92,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                                     {data.fullName?.charAt(0) || 'A'}
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                                    Updated Feb 19, 2026, 8:40 AM
+                                    {data.updatedAt ? `Updated ${new Date(data.updatedAt).toLocaleDateString()}` : 'No update info'}
                                     <LinkIcon className="h-3 w-3 text-cyan-500 ml-1" />
                                 </div>
                             </div>
@@ -136,43 +138,74 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                         >
                             Digital Lending Portal
                         </TabsTrigger>
-                        <TabsTrigger
-                            value="emails"
-                            className="bg-transparent p-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-600 data-[state=active]:bg-transparent data-[state=active]:text-foreground text-base font-bold transition-all text-muted-foreground/60 hover:text-muted-foreground"
-                        >
-                            Emails
-                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="profile" className="pt-10 space-y-16">
                         {/* Profile Section Header */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-between gap-4">
                             <h2 className="text-3xl font-bold text-foreground">Profile</h2>
-                            <Button variant="link" className="text-cyan-600 font-bold p-0 h-auto flex gap-2 items-center hover:no-underline hover:text-cyan-500">
-                                <Edit3 className="h-4 w-4" />
-                                Edit Profile
-                            </Button>
+                            <div className="flex gap-4">
+                                <Badge variant={data.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="px-4 py-1.5 rounded-full font-bold">
+                                    {data.applicantType}
+                                </Badge>
+                                <Button variant="link" className="text-cyan-600 font-bold p-0 h-auto flex gap-2 items-center hover:no-underline hover:text-cyan-500">
+                                    <Edit3 className="h-4 w-4" />
+                                    Edit Profile
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Basic Information */}
                         <div className="space-y-8">
-                            <h3 className="text-xl font-bold text-foreground">Basic Information</h3>
+                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                <User className="h-5 w-5 text-orange-600" />
+                                Basic Information
+                            </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
-                                <DetailRow label="First Name" value={data.fullName?.split(' ')[0] || '-'} />
-                                <DetailRow label="Date Of Birth" value={getAttr('birthDate')} />
-                                <DetailRow label="Last Name" value={data.fullName?.split(' ').slice(1).join(' ') || '-'} />
-                                <DetailRow label="Personal ID Number" value={data.identityNumber} />
+                                <DetailRow label="Full Name" value={data.fullName || '-'} />
+                                <DetailRow label="ID (NIK)" value={getAttr('id_nik')} />
+                                <DetailRow label="Birth Date" value={data.birthDate || '-'} />
+                                <DetailRow label="Marital Status" value={getAttr('id_status_kawin')} />
+                                {getAttr('id_status_kawin') === 'Kawin' && (
+                                    <DetailRow label="Spouse Name" value={getAttr('sp_nama')} />
+                                )}
                             </div>
                         </div>
 
                         {/* Contact Details */}
                         <div className="space-y-8">
-                            <h3 className="text-xl font-bold text-foreground">Contact Details</h3>
+                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                <Phone className="h-5 w-5 text-orange-600" />
+                                Contact Details
+                            </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
-                                <DetailRow label="Home Address" value={getAttr('address')} />
-                                <DetailRow label="Mailing Address" value={getAttr('address')} />
-                                <DetailRow label="Email" value={getAttr('email')} isLink />
-                                <DetailRow label="Phone" value={getAttr('phone')} />
+                                <DetailRow label="Primary Phone" value={getAttr('c_hp1')} />
+                                <DetailRow label="Email Address" value={getAttr('c_email')} isLink />
+                                <DetailRow label="Residential Address" value={getAttr('addr_residence')} />
+                            </div>
+                        </div>
+
+                        {/* Employment & Financials */}
+                        <div className="space-y-8">
+                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                <Building2 className="h-5 w-5 text-orange-600" />
+                                Employment & Financials
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
+                                <DetailRow label="Job Status" value={getAttr('job_status')} />
+                                <DetailRow label="Net Salary" value={getAttr('job_gaji_bersih') !== '-' ? `Rp ${Number(getAttr('job_gaji_bersih')).toLocaleString()}` : '-'} />
+                                <DetailRow label="Company Name" value={getAttr('job_instansi_nama')} />
+                            </div>
+                        </div>
+
+                        {/* Behavioral Information */}
+                        <div className="space-y-8">
+                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                <Fingerprint className="h-5 w-5 text-orange-600" />
+                                Behavioral Records
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
+                                <DetailRow label="Discipline Level" value={getAttr('beh_disiplin')} />
                             </div>
                         </div>
                     </TabsContent>
