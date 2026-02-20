@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import { SidebarTrigger } from '@/shared/ui/sidebar';
 import { Button } from '@/shared/ui/button';
+import { LanguageSwitcher } from '@/shared/components/language-switcher';
 
 export function DashboardHeader() {
     const { setTheme, theme } = useTheme();
@@ -38,6 +39,7 @@ export function DashboardHeader() {
 
 
             <div className="flex items-center gap-4">
+                <LanguageSwitcher />
                 <Button
                     variant="ghost"
                     size="icon"

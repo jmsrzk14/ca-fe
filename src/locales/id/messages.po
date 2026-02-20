@@ -1,0 +1,296 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-02-20 14:15+0700\n"
+"PO-Revision-Date: 2026-02-20 14:15+0700\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+
+msgid "First Name"
+msgstr "Nama Depan"
+
+msgid "Last Name"
+msgstr "Nama Belakang"
+
+msgid "Company Name"
+msgstr "Nama Perusahaan"
+
+msgid "Date of Birth"
+msgstr "Tanggal Lahir"
+
+msgid "Establishment Date"
+msgstr "Tanggal Pendirian"
+
+msgid "Personal ID Number (NIK)"
+msgstr "Nomor NIK"
+
+msgid "Business Registration Number"
+msgstr "Nomor Registrasi Bisnis"
+
+msgid "Home Address"
+msgstr "Alamat Rumah"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Phone"
+msgstr "Telepon"
+
+msgid "Save Borrower"
+msgstr "Simpan Peminjam"
+
+msgid "Cancel"
+msgstr "Batal"
+
+msgid "Basic Information"
+msgstr "Informasi Dasar"
+
+msgid "Contact Details"
+msgstr "Detail Kontak"
+
+msgid "Person"
+msgstr "Perorangan"
+
+msgid "Company"
+msgstr "Perusahaan"
+
+msgid "Identitas"
+msgstr "Identitas"
+
+msgid "Pasangan"
+msgstr "Pasangan"
+
+msgid "Kontak & Alamat"
+msgstr "Kontak & Alamat"
+
+msgid "Profil Rumah Tangga"
+msgstr "Profil Rumah Tangga"
+
+msgid "Pendidikan & Sosial"
+msgstr "Pendidikan & Sosial"
+
+msgid "Pekerjaan"
+msgstr "Pekerjaan"
+
+msgid "Usaha"
+msgstr "Usaha"
+
+msgid "Karakter & Perilaku"
+msgstr "Karakter & Perilaku"
+
+msgid "Nama lengkap sesuai dengan KTP"
+msgstr "Nama lengkap sesuai KTP"
+
+msgid "NIK"
+msgstr "NIK"
+
+msgid "Tempat lahir"
+msgstr "Tempat Lahir"
+
+msgid "Tanggal lahir"
+msgstr "Tanggal Lahir"
+
+msgid "Jenis kelamin"
+msgstr "Jenis Kelamin"
+
+msgid "Kewarganegaraan"
+msgstr "Kewarganegaraan"
+
+msgid "Status perkawinan"
+msgstr "Status Perkawinan"
+
+msgid "Nama ibu kandung"
+msgstr "Nama Ibu Kandung"
+
+msgid "NPWP"
+msgstr "NPWP"
+
+msgid "Laki-laki"
+msgstr "Laki-laki"
+
+msgid "Perempuan"
+msgstr "Perempuan"
+
+msgid "Pilih jenis kelamin"
+msgstr "Pilih Jenis Kelamin"
+
+msgid "Belum Menikah"
+msgstr "Belum Menikah"
+
+msgid "Menikah"
+msgstr "Menikah"
+
+msgid "Cerai"
+msgstr "Cerai"
+
+msgid "Nama lengkap pasangan sesuai KTP"
+msgstr "Nama Lengkap Pasangan"
+
+msgid "NIK Pasangan"
+msgstr "NIK Pasangan"
+
+msgid "Tempat lahir pasangan"
+msgstr "Tempat Lahir Pasangan"
+
+msgid "Tanggal lahir pasangan"
+msgstr "Tanggal Lahir Pasangan"
+
+msgid "Nama ibu kandung pasangan"
+msgstr "Nama Ibu Pasangan"
+
+msgid "Perkawinan ke"
+msgstr "Perkawinan Ke"
+
+msgid "Pusat Kontak"
+msgstr "Pusat Kontak"
+
+msgid "No HP Utama"
+msgstr "No HP Utama"
+
+msgid "No HP Alternatif"
+msgstr "No HP Alternatif"
+
+msgid "Alamat Sesuai KTP"
+msgstr "Alamat Sesuai KTP"
+
+msgid "Alamat Lengkap (KTP)"
+msgstr "Alamat Lengkap (KTP)"
+
+msgid "Kota/Kabupaten"
+msgstr "Kota/Kabupaten"
+
+msgid "Kode Pos"
+msgstr "Kode Pos"
+
+msgid "Domisili & Properti"
+msgstr "Domisili & Properti"
+
+msgid "Status kepemilikan rumah"
+msgstr "Status Kepemilikan Rumah"
+
+msgid "Lama tinggal (Tahun)"
+msgstr "Lama Tinggal (Tahun)"
+
+msgid "Milik Sendiri"
+msgstr "Milik Sendiri"
+
+msgid "Sewa/Kontrak"
+msgstr "Sewa/Kontrak"
+
+msgid "Milik Keluarga"
+msgstr "Milik Keluarga"
+
+msgid "Rumah Dinas"
+msgstr "Rumah Dinas"
+
+msgid "Jumlah tanggungan"
+msgstr "Jumlah Tanggungan"
+
+msgid "Total penghasilan rumah tangga"
+msgstr "Total Penghasilan Rumah Tangga"
+
+msgid "Total pengeluaran rumah tangga"
+msgstr "Total Pengeluaran Rumah Tangga"
+
+msgid "Pendidikan terakhir"
+msgstr "Pendidikan Terakhir"
+
+msgid "Pilih Pendidikan"
+msgstr "Pilih Pendidikan"
+
+msgid "SMA/Sederajat"
+msgstr "SMA / Sederajat"
+
+msgid "D3"
+msgstr "D3"
+
+msgid "S1"
+msgstr "S1"
+
+msgid "S2"
+msgstr "S2"
+
+msgid "Jurusan pendidikan"
+msgstr "Jurusan Pendidikan"
+
+msgid "Status pekerjaan"
+msgstr "Status Pekerjaan"
+
+msgid "Karyawan Tetap"
+msgstr "Karyawan Tetap"
+
+msgid "Karyawan Kontrak"
+msgstr "Karyawan Kontrak"
+
+msgid "Wiraswasta"
+msgstr "Wiraswasta"
+
+msgid "Nama perusahaan"
+msgstr "Nama Perusahaan"
+
+msgid "Gaji bersih bulanan"
+msgstr "Gaji Bersih Bulanan"
+
+msgid "Nama usaha"
+msgstr "Nama Usaha"
+
+msgid "Lama berusaha (Tahun)"
+msgstr "Lama Berusaha (Tahun)"
+
+msgid "Penghasilan bulanan"
+msgstr "Penghasilan Bulanan"
+
+msgid "Persepsi kedisiplinan bayar"
+msgstr "Persepsi Kedisiplinan Bayar"
+
+msgid "Sangat Disiplin"
+msgstr "Sangat Disiplin"
+
+msgid "Cukup Disiplin"
+msgstr "Cukup Disiplin"
+
+msgid "Kurang Disiplin"
+msgstr "Kurang Disiplin"
+
+msgid "Indikasi fraud"
+msgstr "Indikasi Fraud"
+
+msgid "Tidak Ada"
+msgstr "Tidak Ada"
+
+msgid "Rendah"
+msgstr "Rendah"
+
+msgid "Tinggi"
+msgstr "Tinggi"
+
+msgid "Step"
+msgstr "Langkah"
+
+msgid "of"
+msgstr "dari"
+
+msgid "Submit Application"
+msgstr "Ajukan Pinjaman"
+
+msgid "Previous"
+msgstr "Sebelumnya"
+
+msgid "Next Step"
+msgstr "Langkah Berikutnya"
+
+msgid "NAME"
+msgstr "NAMA"
+
+msgid "TYPE"
+msgstr "TIPE"
+
+msgid "CONTACT"
+msgstr "KONTAK"
+
+msgid "CREATED"
+msgstr "DIBUAT"

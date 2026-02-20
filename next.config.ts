@@ -2,6 +2,28 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    swcPlugins: [
+      ["@lingui/swc-plugin", {}],
+    ],
+  },
+  turbopack: {
+    rules: {
+      "*.po": {
+        loaders: ["@lingui/loader"],
+        as: "*.js",
+      },
+    },
+  },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.po$/,
+      use: {
+        loader: "@lingui/loader",
+      },
+    });
+    return config;
+  },
 };
 
 export default nextConfig;

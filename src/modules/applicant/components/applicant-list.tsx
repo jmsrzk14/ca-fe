@@ -14,8 +14,12 @@ import {
     Calendar,
     LayoutGrid,
     List,
-    X
+    X,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown
 } from 'lucide-react';
+import { t } from '@lingui/macro';
 
 import { applicantService } from '@/core/api';
 import { Applicant } from '@/shared/types/api';
@@ -49,6 +53,10 @@ export function ApplicantList() {
     const [search, setSearch] = React.useState('');
     const [isFormOpen, setIsFormOpen] = React.useState(false);
     const [viewMode, setViewMode] = React.useState<'table' | 'kanban'>('table');
+    const [sortConfig, setSortConfig] = React.useState<{ key: string; direction: 'asc' | 'desc' | null }>({
+        key: 'createdAt',
+        direction: 'desc',
+    });
 
     const { data: response, isLoading, error } = useQuery({
         queryKey: ['applicants'],
@@ -59,16 +67,56 @@ export function ApplicantList() {
         return ((response as any)?.applicants || response?.items || []) as Applicant[];
     }, [response]);
 
-    const filteredApplicants = React.useMemo(() => {
-        return applicants.filter((app) =>
-            app.fullName?.toLowerCase().includes(search.toLowerCase()) ||
-            app.identityNumber?.includes(search)
-        );
-    }, [applicants, search]);
+    const sortedApplicants = React.useMemo(() => {
+        let items = [...applicants];
+
+        // Search Filter
+        if (search) {
+            items = items.filter((app) =>
+                app.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+                app.identityNumber?.includes(search)
+            );
+        }
+
+        // Sorting
+        if (sortConfig.key && sortConfig.direction) {
+            items.sort((a: any, b: any) => {
+                let aVal = a[sortConfig.key];
+                let bVal = b[sortConfig.key];
+
+                // Handle nested or special cases if needed
+                if (sortConfig.key === 'createdAt') {
+                    aVal = aVal ? new Date(aVal).getTime() : 0;
+                    bVal = bVal ? new Date(bVal).getTime() : 0;
+                }
+
+                if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        return items;
+    }, [applicants, search, sortConfig]);
+
+    const handleSort = (key: string) => {
+        let direction: 'asc' | 'desc' | null = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        } else if (sortConfig.key === key && sortConfig.direction === 'desc') {
+            direction = null;
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const SortIcon = ({ column }: { column: string }) => {
+        if (sortConfig.key !== column || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 opacity-50" />;
+        return sortConfig.direction === 'asc' ? <ArrowUp className="h-4 w-4 text-orange-600" /> : <ArrowDown className="h-4 w-4 text-orange-600" />;
+    };
 
     const renderContent = () => {
         if (viewMode === 'kanban') {
-            return <ApplicantKanban applicants={filteredApplicants} />;
+            return <ApplicantKanban applicants={sortedApplicants} />;
         }
 
         return (
@@ -76,16 +124,37 @@ export function ApplicantList() {
                 <Table>
                     <TableHeader className="bg-muted/50">
                         <TableRow className="hover:bg-transparent border-border/50">
-                            <TableHead className="py-4 font-bold text-foreground">NAME</TableHead>
-                            <TableHead className="py-4 font-bold text-foreground">TYPE</TableHead>
-                            <TableHead className="py-4 font-bold text-foreground">CONTACT</TableHead>
-                            <TableHead className="py-4 font-bold text-foreground">CREATED</TableHead>
+                            <TableHead
+                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                onClick={() => handleSort('fullName')}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {t`NAME`} <SortIcon column="fullName" />
+                                </div>
+                            </TableHead>
+                            <TableHead
+                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                onClick={() => handleSort('applicantType')}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {t`TYPE`} <SortIcon column="applicantType" />
+                                </div>
+                            </TableHead>
+                            <TableHead className="py-4 font-bold text-foreground outline-none">{t`CONTACT`}</TableHead>
+                            <TableHead
+                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                onClick={() => handleSort('createdAt')}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {t`CREATED`} <SortIcon column="createdAt" />
+                                </div>
+                            </TableHead>
                             <TableHead className="py-4 text-right"></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredApplicants.length > 0 ? (
-                            filteredApplicants.map((app: any) => (
+                        {sortedApplicants.length > 0 ? (
+                            sortedApplicants.map((app: any) => (
                                 <TableRow key={app.id} className="group hover:bg-white/5 border-border/50 transition-colors">
                                     <TableCell className="py-4">
                                         <div className="flex items-center gap-3">
@@ -206,10 +275,12 @@ export function ApplicantList() {
                     </Button>
                     <Button
                         className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl gap-2 font-semibold shadow-lg shadow-orange-600/20"
-                        onClick={() => setIsFormOpen(true)}
+                        asChild
                     >
-                        <Plus className="h-5 w-5" />
-                        Add Applicant
+                        <Link href="/borrowers/add">
+                            <Plus className="h-5 w-5" />
+                            Add Applicant
+                        </Link>
                     </Button>
                 </div>
             </div>
