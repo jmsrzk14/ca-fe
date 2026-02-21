@@ -33,6 +33,14 @@ import { Label } from '@/shared/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { cn } from '@/shared/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/shared/ui/dialog';
 
 interface ApplicantFormProps {
     onSuccess?: () => void;
@@ -50,10 +58,22 @@ const STEPS = [
     { id: 'karakter', title: t`Karakter & Perilaku`, icon: Activity },
 ];
 
+const STEP_FIELDS: Record<number, string[]> = {
+    0: ['fullName', 'identityNumber', 'birthPlace', 'birthDate', 'gender', 'nationality', 'maritalStatus', 'motherName', 'taxId'],
+    1: ['spouseFullName', 'spouseIdentityNumber', 'spouseBirthPlace', 'spouseBirthDate', 'spouseGender', 'spouseNationality', 'spouseMotherName', 'spouseTaxId', 'marriageOrder'],
+    2: ['phoneDay', 'phoneAlt', 'email', 'addressKtp', 'subdistrictKtp', 'districtKtp', 'cityKtp', 'provinceKtp', 'postalCodeKtp', 'addressDom', 'subdistrictDom', 'districtDom', 'cityDom', 'provinceDom', 'postalCodeDom', 'stayDuration', 'homeOwnership', 'branchDistance'],
+    3: ['dependentsCount', 'householdMemberCount', 'earningMemberCount', 'debtorMemberCount', 'spouseJobStatus', 'spouseIncome', 'totalHouseholdIncome', 'totalHouseholdExpense'],
+    4: ['lastEducation', 'major', 'certification', 'socialRole', 'isKnownInArea'],
+    5: ['jobStatus', 'companyName', 'companyIndustry', 'workAddress', 'position', 'workDuration', 'workPhone', 'monthlyNetSalary', 'otherRegularIncome', 'salaryPaymentMethod', 'workVerificationStatus'],
+    6: ['businessName', 'businessType', 'businessSector', 'businessDuration', 'businessAddress', 'businessOwnership', 'employeeCount', 'monthlyBusinessIncome'],
+    7: ['paymentDisciplinePerception', 'internalDefaultHistory', 'jobChangeFrequency', 'addressChangeFrequency', 'lifestyleIndication', 'fraudIndication'],
+};
+
 export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
     const queryClient = useQueryClient();
     const [currentStep, setCurrentStep] = React.useState(0);
     const [type, setType] = React.useState<ApplicantType>('PERSONAL');
+    const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
 
     // Form state to persist data across steps
     const [formData, setFormData] = React.useState<Record<string, any>>({
@@ -78,15 +98,30 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
         mutationFn: (data: any) => applicantService.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['applicants'] });
-            toast.success('Applicant created successfully');
+            toast.success(t`Applicant created successfully`);
             onSuccess?.();
         },
         onError: (error: any) => {
-            toast.error(error.message || 'Failed to create applicant');
+            toast.error(error.message || t`Failed to create applicant`);
         },
     });
 
+    const validateStep = (stepIndex: number) => {
+        const fields = STEP_FIELDS[stepIndex];
+        if (!fields) return true;
+
+        const missingFields = fields.filter(f => !formData[f] || (typeof formData[f] === 'string' && formData[f].trim() === ''));
+
+        if (missingFields.length > 0) {
+            toast.error(t`Harap isi semua kolom sebelum melanjutkan`);
+            return false;
+        }
+        return true;
+    };
+
     const nextStep = () => {
+        if (!validateStep(currentStep)) return;
+
         if (currentStep < STEPS.length - 1) {
             setCurrentStep(prev => prev + 1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -100,9 +135,21 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
 
+        // If it's the final submission and dialog not shown yet
+        if (!isConfirmOpen) {
+            if (!validateStep(currentStep)) return;
+            setIsConfirmOpen(true);
+            return;
+        }
+
+        performSubmit();
+    };
+
+    const performSubmit = () => {
+        setIsConfirmOpen(false);
         // Map everything else to attributes (EAV)
         const coreFields = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'applicantType'];
         const attributes = Object.entries(formData)
@@ -332,7 +379,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="stayDuration" className="text-sm font-medium">{t`Lama tinggal di alamat ini`}</Label>
-                                    <Input id="stayDuration" name="stayDuration" value={formData.stayDuration} onChange={handleInputChange} className="rounded-xl h-11" placeholder="Misal: 5 Tahun" />
+                                    <Input id="stayDuration" name="stayDuration" value={formData.stayDuration} onChange={handleInputChange} className="rounded-xl h-11" placeholder={t`Misal: 5 Tahun`} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium">{t`Status kepemilikan rumah`}</Label>
@@ -740,6 +787,26 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                     )}
                 </div>
             </div>
+
+            <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t`Konfirmasi Pengajuan`}</DialogTitle>
+                        <DialogDescription>
+                            {t`Apakah Anda yakin data yang diisi sudah benar? Data akan segera diproses.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => setIsConfirmOpen(false)} disabled={mutation.isPending}>
+                            {t`Batal`}
+                        </Button>
+                        <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => performSubmit()} disabled={mutation.isPending}>
+                            {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                            {t`Ya, Ajukan Sekarang`}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

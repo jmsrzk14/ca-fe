@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { t } from '@lingui/macro';
 import { User, Building2 } from 'lucide-react';
 import { Applicant } from '@/shared/types/api';
 import ApplicantCard from './applicant-card';
@@ -17,7 +18,7 @@ export function ApplicantKanban({ applicants }: ApplicantKanbanProps) {
         <div className="flex gap-6 overflow-x-auto pb-6 -mx-2 px-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
             {/* Personal Column */}
             <KanbanColumn
-                title="Personal"
+                title={t`Personal`}
                 count={personalApplicants.length}
                 icon={<User className="h-4 w-4 text-primary" />}
                 color="bg-primary/10"
@@ -29,7 +30,7 @@ export function ApplicantKanban({ applicants }: ApplicantKanbanProps) {
 
             {/* Corporate Column */}
             <KanbanColumn
-                title="Corporate"
+                title={t`Corporate`}
                 count={corporateApplicants.length}
                 icon={<Building2 className="h-4 w-4 text-blue-500" />}
                 color="bg-blue-500/10"
@@ -42,7 +43,7 @@ export function ApplicantKanban({ applicants }: ApplicantKanbanProps) {
             {/* Placeholder for empty state if needed */}
             {applicants.length === 0 && (
                 <div className="w-full h-64 flex flex-col items-center justify-center text-muted-foreground bg-muted/5 rounded-2xl border-2 border-dashed border-border/50">
-                    <p>No applicants found matching your criteria.</p>
+                    <p>{t`No applicants found matching your criteria.`}</p>
                 </div>
             )}
         </div>

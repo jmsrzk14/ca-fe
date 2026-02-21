@@ -274,14 +274,29 @@ msgstr "Langkah"
 msgid "of"
 msgstr "dari"
 
-msgid "Submit Application"
+msgid "Ajukan Pinjaman"
 msgstr "Ajukan Pinjaman"
 
-msgid "Previous"
+msgid "Sebelumnya"
 msgstr "Sebelumnya"
 
-msgid "Next Step"
+msgid "Langkah Berikutnya"
 msgstr "Langkah Berikutnya"
+
+msgid "Harap isi semua kolom sebelum melanjutkan"
+msgstr "Harap isi semua kolom sebelum melanjutkan"
+
+msgid "Konfirmasi Pengajuan"
+msgstr "Konfirmasi Pengajuan"
+
+msgid "Apakah Anda yakin data yang diisi sudah benar? Data akan segera diproses."
+msgstr "Apakah Anda yakin data yang diisi sudah benar? Data akan segera diproses."
+
+msgid "Ya, Ajukan Sekarang"
+msgstr "Ya, Ajukan Sekarang"
+
+msgid "Batal"
+msgstr "Batal"
 
 msgid "NAME"
 msgstr "NAMA"

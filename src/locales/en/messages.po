@@ -83,7 +83,7 @@ msgid "Karakter & Perilaku"
 msgstr "Character & Behavior"
 
 msgid "Nama lengkap sesuai dengan KTP"
-msgstr "Full Name as per ID"
+msgstr "Full Name"
 
 msgid "NIK"
 msgstr "ID Number (NIK)"
@@ -127,7 +127,7 @@ msgstr "Married"
 msgid "Cerai"
 msgstr "Divorced"
 
-msgid "Nama lengkap pasangan sesuai KTP"
+msgid "Nama lengkap pasangan sesuai dengan KTP"
 msgstr "Spouse Full Name"
 
 msgid "NIK Pasangan"
@@ -139,8 +139,17 @@ msgstr "Spouse Place of Birth"
 msgid "Tanggal lahir pasangan"
 msgstr "Spouse Date of Birth"
 
+msgid "Jenis kelamin pasangan"
+msgstr "Spouse Gender"
+
+msgid "Kewarganegaraan pasangan"
+msgstr "Spouse Nationality"
+
 msgid "Nama ibu kandung pasangan"
 msgstr "Spouse Mother's Name"
+
+msgid "NPWP Pasangan"
+msgstr "Spouse Tax ID (NPWP)"
 
 msgid "Perkawinan ke"
 msgstr "Marriage Order"
@@ -157,44 +166,62 @@ msgstr "Alternative Phone"
 msgid "Alamat Sesuai KTP"
 msgstr "ID Address"
 
-msgid "Alamat Lengkap (KTP)"
-msgstr "Full ID Address"
+msgid "Kelurahan sesuai KTP"
+msgstr "Village"
 
-msgid "Kota/Kabupaten"
-msgstr "City/Regency"
+msgid "Kecamatan sesuai KTP"
+msgstr "Sub-district"
 
-msgid "Kode Pos"
+msgid "Kota sesuai KTP"
+msgstr "City"
+
+msgid "Provinsi sesuai KTP"
+msgstr "Province"
+
+msgid "Kode Pos sesuai KTP"
 msgstr "Postal Code"
 
-msgid "Domisili & Properti"
-msgstr "Domicile & Property"
+msgid "Alamat sesuai Domisili"
+msgstr "Domicile Address"
 
-msgid "Status kepemilikan rumah"
-msgstr "Home Ownership Status"
+msgid "Kelurahan sesuai Domisili"
+msgstr "Domicile Village"
 
-msgid "Lama tinggal (Tahun)"
-msgstr "Duration of Stay (Years)"
+msgid "Kecamatan sesuai Domisili"
+msgstr "Domicile Sub-district"
 
-msgid "Milik Sendiri"
-msgstr "Owner"
+msgid "Kota sesuai Domisili"
+msgstr "Domicile City"
 
-msgid "Sewa/Kontrak"
-msgstr "Renter"
+msgid "Provinsi sesuai Domisili"
+msgstr "Domicile Province"
 
-msgid "Milik Keluarga"
-msgstr "Family-owned"
+msgid "Kode Pos"
+msgstr "Domicile Postal Code"
 
-msgid "Rumah Dinas"
-msgstr "Office-provided"
+msgid "Lama tinggal di alamat ini"
+msgstr "Duration of Stay at this Address"
+
+msgid "Perkiraan jarak kantor cabang (km)"
+msgstr "Estimated Distance to Branch (km)"
 
 msgid "Jumlah tanggungan"
 msgstr "Number of Dependents"
 
-msgid "Total penghasilan rumah tangga"
-msgstr "Total Household Income"
+msgid "Jumlah anggota rumah tangga"
+msgstr "Number of Household Members"
 
-msgid "Total pengeluaran rumah tangga"
-msgstr "Total Household Expense"
+msgid "Jumlah anggota rumah tangga berpenghasilan"
+msgstr "Number of Household Members with Income"
+
+msgid "Jumlah anggota rumah tangga berhutang"
+msgstr "Number of Household Members with Debt"
+
+msgid "Status pekerjaan pasangan"
+msgstr "Spouse Employment Status"
+
+msgid "Penghasilan pasangan"
+msgstr "Spouse Income"
 
 msgid "Pendidikan terakhir"
 msgstr "Last Education"
@@ -217,6 +244,15 @@ msgstr "Master's Degree (S2)"
 msgid "Jurusan pendidikan"
 msgstr "Major"
 
+msgid "Sertifikasi profesi"
+msgstr "Professional Certification"
+
+msgid "Peran sosial di masyarakat"
+msgstr "Social Role in Community"
+
+msgid "Apakah dikenal lingkungan setempat"
+msgstr "Known by Local Community"
+
 msgid "Status pekerjaan"
 msgstr "Employment Status"
 
@@ -232,20 +268,77 @@ msgstr "Self-employed"
 msgid "Nama perusahaan"
 msgstr "Company Name"
 
+msgid "Industri perusahaan"
+msgstr "Company Industry"
+
+msgid "Alamat tempat kerja"
+msgstr "Workplace Address"
+
+msgid "Jabatan"
+msgstr "Position"
+
+msgid "Lama bekerja (Tahun)"
+msgstr "Duration of Employment (Years)"
+
+msgid "No telp perusahaan"
+msgstr "Company Phone Number"
+
 msgid "Gaji bersih bulanan"
 msgstr "Monthly Net Salary"
+
+msgid "Penghasilan lain rutin"
+msgstr "Other Routine Income"
+
+msgid "Metode pembayaran gaji"
+msgstr "Salary Payment Method"
+
+msgid "Status verifikasi pekerjaan"
+msgstr "Employment Verification Status"
 
 msgid "Nama usaha"
 msgstr "Business Name"
 
-msgid "Lama berusaha (Tahun)"
+msgid "Jenis usaha"
+msgstr "Business Type"
+
+msgid "Sektor usaha"
+msgstr "Business Sector"
+
+msgid "lama berusaha (Tahun)"
 msgstr "Business Duration (Years)"
+
+msgid "Alamat usaha"
+msgstr "Business Address"
+
+msgid "Status kepemilikan tempat usaha"
+msgstr "Business Ownership Status"
+
+msgid "Jumlah karyawan"
+msgstr "Number of Employees"
 
 msgid "Penghasilan bulanan"
 msgstr "Monthly Income"
 
 msgid "Persepsi kedisiplinan bayar"
 msgstr "Payment Discipline Perception"
+
+msgid "Riwayat gagal bayar (internal)"
+msgstr "Internal Default History"
+
+msgid "Frekuensi pindah kerja"
+msgstr "Frequency of Job Change"
+
+msgid "Frekuensi pindah alamat"
+msgstr "Frequency of Address Change"
+
+msgid "Indikasi gaya hidup lebih besar dari penghasilan"
+msgstr "Indication of Lifestyle Greater Than Income"
+
+msgid "Ya"
+msgstr "Yes"
+
+msgid "Tidak"
+msgstr "No"
 
 msgid "Sangat Disiplin"
 msgstr "Very Disciplined"
@@ -274,14 +367,29 @@ msgstr "Step"
 msgid "of"
 msgstr "of"
 
-msgid "Submit Application"
-msgstr "Submit Application"
+msgid "Ajukan Pinjaman"
+msgstr "Submit Loan"
 
-msgid "Previous"
+msgid "Sebelumnya"
 msgstr "Previous"
 
-msgid "Next Step"
+msgid "Langkah Berikutnya"
 msgstr "Next Step"
+
+msgid "Harap isi semua kolom sebelum melanjutkan"
+msgstr "Please fill in all fields before proceeding"
+
+msgid "Konfirmasi Pengajuan"
+msgstr "Submission Confirmation"
+
+msgid "Apakah Anda yakin data yang diisi sudah benar? Data akan segera diproses."
+msgstr "Are you sure the entered data is correct? The data will be processed immediately."
+
+msgid "Ya, Ajukan Sekarang"
+msgstr "Yes, Submit Now"
+
+msgid "Batal"
+msgstr "Cancel"
 
 msgid "NAME"
 msgstr "NAME"

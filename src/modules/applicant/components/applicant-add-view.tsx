@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, UserPlus } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { t } from '@lingui/macro';
 import { ApplicantForm } from './applicant-form';
 
 export function ApplicantAddView() {
@@ -20,7 +21,7 @@ export function ApplicantAddView() {
                         className="group -ml-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ChevronLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                        Kembali
+                        {t`Kembali`}
                     </Button>
                 </div>
 
@@ -29,7 +30,7 @@ export function ApplicantAddView() {
                         <UserPlus className="h-6 w-6 text-orange-600" />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-foreground">Tambah Peminjam Baru</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t`Tambah Peminjam Baru`}</h1>
                     </div>
                 </div>
             </div>

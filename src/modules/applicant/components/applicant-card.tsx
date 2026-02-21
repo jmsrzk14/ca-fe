@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { t } from '@lingui/macro';
 import { Mail, Phone, MoreHorizontal, ExternalLink, User, Building2 } from 'lucide-react';
 import { Applicant } from '@/shared/types/api';
 import { Card, CardContent, CardFooter, CardHeader } from '@/shared/ui/card';
@@ -44,7 +45,7 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
                             <DropdownMenuItem asChild className="gap-2 rounded-lg cursor-pointer">
                                 <Link href={`/borrowers/${applicant.id}`}>
                                     <ExternalLink className="h-4 w-4" />
-                                    View Details
+                                    {t`View Details`}
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -62,7 +63,7 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
                         )}
                     </div>
                     <p className="text-xs text-muted-foreground font-mono flex items-center gap-1.5">
-                        ID: {applicant.id.slice(0, 12)}...
+                        {t`ID`}: {applicant.id.slice(0, 12)}...
                     </p>
                 </div>
             </CardHeader>
@@ -89,7 +90,7 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
             </CardContent>
             <CardFooter className="p-5 pt-0">
                 <Button asChild variant="outline" className="w-full rounded-xl h-9 text-xs font-bold border-border/50 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all">
-                    <Link href={`/borrowers/${applicant.id}`}>View Profile</Link>
+                    <Link href={`/borrowers/${applicant.id}`}>{t`View Profile`}</Link>
                 </Button>
             </CardFooter>
         </Card>

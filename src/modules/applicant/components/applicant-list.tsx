@@ -207,7 +207,7 @@ export function ApplicantList() {
                                                 <DropdownMenuItem asChild className="gap-2 rounded-lg cursor-pointer">
                                                     <Link href={`/borrowers/${app.id}`}>
                                                         <ExternalLink className="h-4 w-4" />
-                                                        View Details
+                                                        {t`View Details`}
                                                     </Link>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -220,9 +220,9 @@ export function ApplicantList() {
                                 <TableCell colSpan={6} className="h-64 text-center">
                                     <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                                         <Search className="h-8 w-8 opacity-20" />
-                                        <p>No applicants found.</p>
+                                        <p>{t`No applicants found.`}</p>
                                         <Button variant="link" className="text-orange-600 font-bold" onClick={() => setSearch('')}>
-                                            Clear search
+                                            {t`Clear search`}
                                         </Button>
                                     </div>
                                 </TableCell>
@@ -256,9 +256,9 @@ export function ApplicantList() {
                 <div className="p-4 bg-destructive/10 text-destructive rounded-full">
                     <X className="h-10 w-10" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground">Failed to load applicants</h2>
-                <p className="text-muted-foreground">There was an error fetching the data. Please try again later.</p>
-                <Button onClick={() => window.location.reload()}>Retry</Button>
+                <h2 className="text-xl font-bold text-foreground">{t`Failed to load applicants`}</h2>
+                <p className="text-muted-foreground">{t`There was an error fetching the data. Please try again later.`}</p>
+                <Button onClick={() => window.location.reload()}>{t`Retry`}</Button>
             </div>
         );
     }
@@ -267,7 +267,7 @@ export function ApplicantList() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Peminjam</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{t`Peminjam`}</h1>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="icon" className="rounded-xl">
@@ -279,7 +279,7 @@ export function ApplicantList() {
                     >
                         <Link href="/borrowers/add">
                             <Plus className="h-5 w-5" />
-                            Add Applicant
+                            {t`Add Applicant`}
                         </Link>
                     </Button>
                 </div>
@@ -291,7 +291,7 @@ export function ApplicantList() {
                 <div className="relative w-full md:w-96">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                        placeholder="Search by name or ID number..."
+                        placeholder={t`Search by name or ID number...`}
                         className="pl-10 bg-background/50 border-border/50 rounded-xl focus-visible:ring-orange-500/50"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}

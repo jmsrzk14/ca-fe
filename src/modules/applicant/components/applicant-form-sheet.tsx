@@ -8,6 +8,7 @@ import {
     SheetTitle,
     SheetDescription,
 } from '@/shared/ui/sheet';
+import { t } from '@lingui/macro';
 import { ApplicantForm } from './applicant-form';
 
 interface ApplicantFormSheetProps {
@@ -23,9 +24,9 @@ export function ApplicantFormSheet({ open, onOpenChange }: ApplicantFormSheetPro
                     <SheetHeader className="p-8 border-b border-border/50 bg-muted/30">
                         <div className="flex items-center justify-between">
                             <div>
-                                <SheetTitle className="text-2xl font-bold tracking-tight">Add Borrower</SheetTitle>
+                                <SheetTitle className="text-2xl font-bold tracking-tight">{t`Add Borrower`}</SheetTitle>
                                 <SheetDescription className="mt-2">
-                                    Fill in the details below to register a new borrower in the system.
+                                    {t`Fill in the details below to register a new borrower in the system.`}
                                 </SheetDescription>
                             </div>
                         </div>
