@@ -64,7 +64,8 @@ export function ApplicantList() {
     });
 
     const applicants: Applicant[] = React.useMemo(() => {
-        return ((response as any)?.applicants || response?.items || []) as Applicant[];
+        const data = response as any;
+        return (data?.applicants || data?.items || []) as Applicant[];
     }, [response]);
 
     const sortedApplicants = React.useMemo(() => {
