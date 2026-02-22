@@ -1,4 +1,5 @@
-import { LoanAnalytics, LoanApplication, Task, ApplicationStatusData } from '../types';
+import { LoanAnalytics, ApplicationSummary, Task, ApplicationStatusData } from '../types';
+import { applicationService } from '@/core/api/services/application-service';
 
 export const dashboardService = {
     getAnalytics: async (): Promise<LoanAnalytics> => {
@@ -24,41 +25,26 @@ export const dashboardService = {
         ];
     },
 
-    getRecentApplications: async (): Promise<LoanApplication[]> => {
-        return [
-            {
-                id: 'L-1001',
-                borrower: { name: 'Olivia Martin', email: 'olivia@email.com', avatar: 'https://github.com/shadcn.png' },
-                amount: 25000,
-                product: 'Personal Loan',
-                status: 'In Review',
-                createdAt: '2024-02-14',
-            },
-            {
-                id: 'L-1002',
-                borrower: { name: 'Jackson Lee', email: 'jackson@email.com', avatar: 'https://github.com/shadcn.png' },
-                amount: 150000,
-                product: 'Mortgage',
-                status: 'Approved',
-                createdAt: '2024-02-13',
-            },
-            {
-                id: 'L-1003',
-                borrower: { name: 'Isabella Nguyen', email: 'isabella@email.com', avatar: 'https://github.com/shadcn.png' },
-                amount: 12000,
-                product: 'Auto Loan',
-                status: 'Draft',
-                createdAt: '2024-02-14',
-            },
-            {
-                id: 'L-1004',
-                borrower: { name: 'William Kim', email: 'will@email.com', avatar: 'https://github.com/shadcn.png' },
-                amount: 45000,
-                product: 'Business Loan',
-                status: 'Funded',
-                createdAt: '2024-02-12',
-            },
-        ];
+    getRecentApplications: async (): Promise<ApplicationSummary[]> => {
+        try {
+            const response = await applicationService.list();
+            return (response.applications || []).slice(0, 5).map((app: any) => ({
+                id: app.id,
+                applicantId: app.applicantId,
+                applicant: {
+                    name: app.applicantId ? `Applicant ${app.applicantId.slice(0, 6)}` : 'Unknown Applicant',
+                    email: '-',
+                    avatar: 'https://github.com/shadcn.png'
+                },
+                amount: Number(app.loanAmount) || 0,
+                product: 'Loan',
+                status: app.status || 'UNKNOWN',
+                createdAt: app.createdAt || new Date().toISOString()
+            }));
+        } catch (error) {
+            console.error('Failed to fetch recent applications:', error);
+            return [];
+        }
     },
 
     getPendingTasks: async (): Promise<Task[]> => {

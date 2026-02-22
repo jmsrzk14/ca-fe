@@ -57,12 +57,16 @@ export function KanbanColumn({ column }: KanbanColumnProps) {
                             <ApplicationCard
                                 application={{
                                     id: 'placeholder',
-                                    borrowerName: '',
+                                    applicantId: '',
+                                    productId: '',
+                                    aoId: '',
                                     refNumber: '',
                                     date: '',
                                     amount: 0,
-                                    status: column.id,
-                                    assignees: []
+                                    tenorMonths: 0,
+                                    branchCode: '',
+                                    status: column.id as any,
+                                    loanPurpose: ''
                                 }}
                             />
                             <span className="text-[10px] font-bold uppercase tracking-widest">Empty Stage</span>

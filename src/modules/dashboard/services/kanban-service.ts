@@ -1,138 +1,65 @@
-import { ApplicationCardData, KanbanColumnData } from '../types/kanban';
+import { ApplicationListResponse, Application } from '@/shared/types/api';
+import { applicationService } from '@/core/api/services/application-service';
+import {
+    ApplicationCardData,
+    APPLICATION_STATUS_COLUMNS,
+    KanbanColumnData,
+    ApplicationStatus,
+} from '../types/kanban';
+
+function formatDate(iso: string): string {
+    try {
+        return new Date(iso).toLocaleDateString('id-ID', {
+            day: '2-digit', month: 'short', year: 'numeric',
+        });
+    } catch {
+        return iso;
+    }
+}
+
+function mapToCardData(app: any): ApplicationCardData {
+    return {
+        id: app.id || "unknown",
+        applicantId: app.applicantId || "unknown",
+        productId: app.productId || "",
+        aoId: app.aoId || "",
+        refNumber: (app.id || "").slice(0, 8).toUpperCase() || "NEW",
+        date: formatDate(app.createdAt),
+        amount: parseFloat(app.loanAmount || "0") || 0,
+        tenorMonths: app.tenorMonths || 0,
+        branchCode: app.branchCode || "",
+        status: app.status || "INTAKE",
+        loanPurpose: app.loanPurpose || "",
+    };
+}
 
 export const kanbanService = {
     getBoardData: async (): Promise<KanbanColumnData[]> => {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 800));
+        const response = await applicationService.list();
 
-        return [
-            {
-                id: 'Collect Additional Data',
-                title: 'Collect Additional Data',
-                count: 2,
-                totalAmount: 100000.00,
-                applications: [
-                    {
-                        id: '1',
-                        borrowerName: 'Lily Loaf',
-                        refNumber: '#100066',
-                        date: 'May 27, 2025',
-                        amount: 0,
-                        status: 'Collect Additional Data',
-                        assignees: [{ name: 'AK', avatar: 'https://github.com/shadcn.png' }]
-                    },
-                    {
-                        id: '2',
-                        borrowerName: 'Olivia Cooper',
-                        refNumber: '#100065',
-                        date: 'Apr 10, 2025',
-                        amount: 100000.00,
-                        status: 'Collect Additional Data',
-                        assignees: [{ name: 'AK', avatar: 'https://github.com/shadcn.png' }]
-                    }
-                ]
-            },
-            {
-                id: 'Application in Progress',
-                title: 'Application in Progress',
-                count: 2,
-                totalAmount: 0.00,
-                applications: [
-                    {
-                        id: '3',
-                        borrowerName: 'Anna K',
-                        refNumber: '#100067',
-                        date: 'Jul 23, 2025',
-                        amount: 0,
-                        status: 'Application in Progress',
-                        assignees: [{ name: 'AK', avatar: 'https://github.com/shadcn.png' }]
-                    },
-                    {
-                        id: '4',
-                        borrowerName: 'John Doe',
-                        refNumber: '#100064',
-                        date: 'Mar 03, 2025',
-                        amount: 0,
-                        status: 'Application in Progress',
-                        assignees: [{ name: 'AD', avatar: 'https://github.com/shadcn.png' }]
-                    }
-                ]
-            },
-            {
-                id: 'Review Required',
-                title: 'Review Required',
-                count: 2,
-                totalAmount: 13000.00,
-                applications: [
-                    {
-                        id: '5',
-                        borrowerName: 'James Martin',
-                        refNumber: '#100016',
-                        date: 'May 31, 2024',
-                        amount: 7000.00,
-                        status: 'Review Required',
-                        assignees: [{ name: 'AK', avatar: 'https://github.com/shadcn.png' }]
-                    },
-                    {
-                        id: '6',
-                        borrowerName: 'Olivia Cooper',
-                        refNumber: '#100012',
-                        date: 'May 31, 2024',
-                        amount: 6000.00,
-                        status: 'Review Required',
-                        assignees: [
-                            { name: 'AK', avatar: 'https://github.com/shadcn.png' },
-                            { name: 'TL', avatar: 'https://github.com/shadcn.png' }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 'Automated Decisioning',
-                title: 'Automated Decisioning',
-                count: 0,
-                totalAmount: 0.00,
-                applications: []
-            },
-            {
-                id: 'Offers Available',
-                title: 'Offers Available',
-                count: 5,
-                totalAmount: 27500.00,
-                applications: [
-                    {
-                        id: '7',
-                        borrowerName: 'Viktor Mane',
-                        refNumber: '#100014',
-                        date: 'May 31, 2024',
-                        amount: 5500.00,
-                        status: 'Offers Available',
-                        assignees: [{ name: 'AK', avatar: 'https://github.com/shadcn.png' }]
-                    },
-                    {
-                        id: '8',
-                        borrowerName: 'Lily Choi',
-                        refNumber: '#100013',
-                        date: 'May 31, 2024',
-                        amount: 5000.00,
-                        status: 'Offers Available',
-                        assignees: [
-                            { name: 'AK', avatar: 'https://github.com/shadcn.png' },
-                            { name: 'TL', avatar: 'https://github.com/shadcn.png' },
-                            { name: 'JJ', avatar: 'https://github.com/shadcn.png' }
-                        ]
-                    },
-                    {
-                        id: '9',
-                        borrowerName: 'Oscar Poole',
-                        refNumber: '#100011',
-                        date: 'May 31, 2024',
-                        amount: 5500.00,
-                        status: 'Offers Available',
-                        assignees: [{ name: 'AK', avatar: 'https://github.com/shadcn.png' }]
-                    }
-                ]
+        // Build a map of status -> cards
+        const cardsByStatus: Record<string, ApplicationCardData[]> = {};
+        const applications = response.applications || [];
+        for (const app of applications) {
+            const status = app.status || "INTAKE";
+            if (!cardsByStatus[status]) {
+                cardsByStatus[status] = [];
             }
-        ];
-    }
+            cardsByStatus[status].push(mapToCardData(app));
+        }
+
+        // Build columns in fixed order, filling in empty ones
+        return APPLICATION_STATUS_COLUMNS.map(col => {
+            const apps = cardsByStatus[col.id] ?? [];
+            const totalAmount = apps.reduce((sum, a) => sum + a.amount, 0);
+            return {
+                id: col.id,
+                title: col.title,
+                color: col.color,
+                count: apps.length,
+                totalAmount,
+                applications: apps,
+            };
+        });
+    },
 };

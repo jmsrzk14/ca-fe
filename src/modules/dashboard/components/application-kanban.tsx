@@ -32,11 +32,11 @@ import {
 } from '@/shared/ui/table';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { Badge } from '@/shared/ui/badge';
 import { KanbanColumn } from './kanban-column';
 import { kanbanService } from '../services/kanban-service';
 import { KanbanColumnData, ApplicationStatus, ApplicationCardData } from '../types/kanban';
+import { applicationService } from '@/core/api/services/application-service';
 import { Skeleton } from '@/shared/ui/skeleton';
 import {
     DndContext,
@@ -56,7 +56,7 @@ import { cn } from '@/shared/lib/utils';
 import { ApplicationFormSheet } from './application-form-sheet';
 
 export function ApplicationKanban() {
-    const [loanType, setLoanType] = React.useState('Personal Loan');
+    const [loanType, setLoanType] = React.useState('Personal');
     const [viewMode, setViewMode] = React.useState<'board' | 'list'>('board');
     const [data, setData] = React.useState<KanbanColumnData[] | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -98,13 +98,12 @@ export function ApplicationKanban() {
 
     const handleSort = () => {
         if (!data) return;
-        toast.info('Sorting toggled');
-        // Simple toggle sort by name for demo
+        toast.info('Sorting by amount');
         setData(prev => {
             if (!prev) return prev;
             return prev.map(col => ({
                 ...col,
-                applications: [...col.applications].sort((a, b) => a.borrowerName.localeCompare(b.borrowerName))
+                applications: [...col.applications].sort((a, b) => b.amount - a.amount)
             }));
         });
     };
@@ -191,7 +190,7 @@ export function ApplicationKanban() {
         }
     };
 
-    const onDragEnd = (event: DragEndEvent) => {
+    const onDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
         setActiveApp(null);
 
@@ -223,10 +222,22 @@ export function ApplicationKanban() {
         }
 
         if (activeCol.id !== overCol.id) {
-            toast.success(`Application stage updated`, {
-                description: `${active.data.current?.application.borrowerName} moved to ${overCol.title}`,
-                duration: 3000,
-            });
+            const loadingToastId = toast.loading(`Updating application status...`);
+            try {
+                await applicationService.updateStatus(activeId as string, overCol.id as ApplicationStatus);
+                toast.success(`Application stage updated`, {
+                    id: loadingToastId,
+                    description: `${active.data.current?.application.borrowerName ?? 'Application'} moved to ${overCol.title}`,
+                    duration: 3000,
+                });
+            } catch (error) {
+                toast.error(`Failed to update application status`, {
+                    id: loadingToastId,
+                    description: 'Reverting changes...',
+                });
+                // Revert the data on error
+                fetchData(true);
+            }
         }
     };
 
@@ -256,43 +267,29 @@ export function ApplicationKanban() {
             {/* Top Header */}
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between px-2">
                 <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground text-gradient">Application</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground text-gradient">Pinjaman</h1>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="flex items-center gap-2 px-3 h-8 bg-muted/50 border-border/50 hover:bg-muted text-primary font-semibold transition-all hover:scale-105 active:scale-95">
-                                {loanType === 'Personal Loan' && <User className="h-3.5 w-3.5" />}
-                                {loanType === 'Mortgage' && <Home className="h-3.5 w-3.5" />}
-                                {loanType === 'Auto Loan' && <Car className="h-3.5 w-3.5" />}
-                                {loanType === 'Business Loan' && <Briefcase className="h-3.5 w-3.5" />}
+                                {loanType === 'Personal' && <User className="h-3.5 w-3.5" />}
+                                {loanType === 'Company' && <Briefcase className="h-3.5 w-3.5" />}
                                 <span className="text-xs">{loanType}</span>
                                 <ChevronDown className="h-3 w-3 opacity-50" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="w-56 rounded-xl p-1.5 shadow-2xl border-border/50 backdrop-blur-2xl bg-popover/80">
-                            <DropdownMenuItem onClick={() => setLoanType('Personal Loan')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
+                            <DropdownMenuItem onClick={() => setLoanType('Personal')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
                                 <div className="p-1 rounded-md bg-primary/10">
                                     <User className="h-3.5 w-3.5 text-primary" />
                                 </div>
-                                <span className="text-sm font-medium">Personal Loan</span>
+                                <span className="text-sm font-medium">Personal</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setLoanType('Mortgage')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
-                                <div className="p-1 rounded-md bg-emerald-500/10">
-                                    <Home className="h-3.5 w-3.5 text-emerald-500" />
+                            <DropdownMenuItem onClick={() => setLoanType('Company')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
+                                <div className="p-1 rounded-md bg-primary/10">
+                                    <Briefcase className="h-3.5 w-3.5 text-primary" />
                                 </div>
-                                <span className="text-sm font-medium">Mortgage</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setLoanType('Auto Loan')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
-                                <div className="p-1 rounded-md bg-blue-500/10">
-                                    <Car className="h-3.5 w-3.5 text-blue-500" />
-                                </div>
-                                <span className="text-sm font-medium">Auto Loan</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setLoanType('Business Loan')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
-                                <div className="p-1 rounded-md bg-purple-500/10">
-                                    <Briefcase className="h-3.5 w-3.5 text-purple-500" />
-                                </div>
-                                <span className="text-sm font-medium">Business Loan</span>
+                                <span className="text-sm font-medium">Company</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -397,43 +394,42 @@ export function ApplicationKanban() {
                             <Table>
                                 <TableHeader className="bg-muted/50">
                                     <TableRow className="hover:bg-transparent border-border/50">
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Borrower</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Ref Number</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Amount</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Stage</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">No. Reference</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Branch</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Loan Amount</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Tenor</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Status</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Date</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4 text-right">Action</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4 text-right">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {allApplications.map((app) => (
                                         <TableRow key={app.id} className="hover:bg-muted/30 border-border/40 transition-colors group">
                                             <TableCell className="py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar className="h-8 w-8 border border-border/50">
-                                                        <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
-                                                            {app.borrowerName.split(' ').map(n => n[0]).join('')}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="font-bold text-sm">{app.borrowerName}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="py-4">
                                                 <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground bg-muted/20">
-                                                    {app.refNumber}
+                                                    #{app.refNumber}
                                                 </Badge>
                                             </TableCell>
+                                            <TableCell className="py-4 text-sm font-medium">
+                                                {app.branchCode || '—'}
+                                            </TableCell>
                                             <TableCell className="py-4 font-bold text-sm">
-                                                {app.amount > 0 ? `$${app.amount.toLocaleString()}` : '$-'}
+                                                {app.amount > 0 ? `Rp ${app.amount.toLocaleString('id-ID')}` : 'Rp -'}
+                                            </TableCell>
+                                            <TableCell className="py-4 text-sm">
+                                                {app.tenorMonths} bln
                                             </TableCell>
                                             <TableCell className="py-4">
                                                 <Badge className={cn(
                                                     "text-[10px] font-bold px-2 py-0.5 rounded-full border-none",
-                                                    app.status === 'Collect Additional Data' && "bg-blue-500/10 text-blue-500",
-                                                    app.status === 'Application in Progress' && "bg-purple-500/10 text-purple-500",
-                                                    app.status === 'Review Required' && "bg-rose-500/10 text-rose-500",
-                                                    app.status === 'Automated Decisioning' && "bg-orange-500/10 text-orange-500",
-                                                    app.status === 'Offers Available' && "bg-emerald-500/10 text-emerald-500"
+                                                    app.status === 'INTAKE' && "bg-slate-500/10 text-slate-600",
+                                                    app.status === 'ANALYSIS' && "bg-blue-500/10 text-blue-600",
+                                                    app.status === 'SURVEY' && "bg-purple-500/10 text-purple-600",
+                                                    app.status === 'COMMITTEE' && "bg-orange-500/10 text-orange-600",
+                                                    app.status === 'APPROVED' && "bg-emerald-500/10 text-emerald-600",
+                                                    app.status === 'REJECTED' && "bg-rose-500/10 text-rose-600",
+                                                    app.status === 'DISBURSED' && "bg-teal-500/10 text-teal-600",
                                                 )}>
                                                     {app.status}
                                                 </Badge>

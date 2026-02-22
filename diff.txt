@@ -1,0 +1,166 @@
+diff --git a/src/core/api/services/application-service.ts b/src/core/api/services/application-service.ts
+index d0b82c7..046a2ce 100644
+--- a/src/core/api/services/application-service.ts
++++ b/src/core/api/services/application-service.ts
+@@ -1,19 +1,71 @@
+-import { apiClient } from '../client';
+-import { Application, ApplicationListResponse } from '@/shared/types/api';
++import { createClient } from "@connectrpc/connect";
++import { transport } from "../grpc-client";
++import { ApplicationService } from "@/gen/application/v1/application_pb";
++import { Application } from "@/shared/types/api";
++
++const client = createClient(ApplicationService, transport);
+ 
+ export const applicationService = {
+-    create: (data: Partial<Application>) =>
+-        apiClient.post<Application>('/v1/applications', data),
++    create: async (data: Partial<Application>) => {
++        const response = await client.createApplication({
++            applicantId: data.applicantId,
++            productId: data.productId,
++            aoId: data.aoId,
++            loanAmount: data.loanAmount?.toString() || "0",
++            tenorMonths: data.tenorMonths || 0,
++            interestType: data.interestType || "",
++            interestRate: data.interestRate?.toString() || "0",
++            loanPurpose: data.loanPurpose || "",
++            applicationChannel: data.applicationChannel || "",
++            branchCode: data.branchCode || "",
++            attributes: data.attributes?.map(a => ({
++                key: a.key,
++                value: a.value,
++                dataType: a.dataType
++            })) || []
++        });
++        return response;
++    },
+ 
+     getById: (id: string) =>
+-        apiClient.get<Application>(`/v1/applications/${id}`),
++        client.getApplication({ id }),
+ 
+-    list: (params?: Record<string, string>) =>
+-        apiClient.get<ApplicationListResponse>('/v1/applications', { params }),
++    list: async (params?: Record<string, string>) => {
++        const response = await client.listApplications({
++            cursor: params?.cursor || "",
++            status: params?.status || "",
++            applicantId: params?.applicantId || ""
++        });
+ 
+-    delete: (id: string) =>
+-        apiClient.delete<void>(`/v1/applications/${id}`),
++        return {
++            applications: response.applications.map(app => ({
++                id: app.id,
++                applicantId: app.applicantId,
++                productId: app.productId,
++                aoId: app.aoId,
++                loanAmount: app.loanAmount,
++                tenorMonths: app.tenorMonths,
++                interestType: app.interestType,
++                interestRate: app.interestRate,
++                loanPurpose: app.loanPurpose,
++                applicationChannel: app.applicationChannel,
++                status: app.status,
++                branchCode: app.branchCode,
++                attributes: app.attributes,
++                createdAt: app.createdAt ? new Date(Number(app.createdAt.seconds) * 1000).toISOString() : undefined,
++                updatedAt: app.updatedAt ? new Date(Number(app.updatedAt.seconds) * 1000).toISOString() : undefined,
++                submittedAt: app.submittedAt ? new Date(Number(app.submittedAt.seconds) * 1000).toISOString() : undefined,
++            })),
++            nextCursor: response.nextCursor,
++        };
++    },
+ 
+-    updateStatus: (id: string, status: string) =>
+-        apiClient.patch<Application>(`/v1/applications/${id}/status`, { status }),
++    updateStatus: async (id: string, status: string) => {
++        const response = await client.changeApplicationStatus({
++            id,
++            newStatus: status,
++            reason: ""
++        });
++        return response;
++    },
+ };
+diff --git a/src/gen/applicant/v1/applicant_pb.ts b/src/gen/applicant/v1/applicant_pb.ts
+index c21b6c8..e9355b5 100644
+--- a/src/gen/applicant/v1/applicant_pb.ts
++++ b/src/gen/applicant/v1/applicant_pb.ts
+@@ -4,6 +4,7 @@
+ 
+ import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+ import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
++import { file_google_api_annotations } from "../../google/api/annotations_pb";
+ import type { Timestamp } from "@bufbuild/protobuf/wkt";
+ import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
+ import type { Message } from "@bufbuild/protobuf";
+@@ -12,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
+  * Describes the file applicant/v1/applicant.proto.
+  */
+ export const file_applicant_v1_applicant: GenFile = /*@__PURE__*/
+-  fileDesc("ChxhcHBsaWNhbnQvdjEvYXBwbGljYW50LnByb3RvEhBhcGkuYXBwbGljYW50LnYxInMKEkFwcGxpY2FudEF0dHJpYnV0ZRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAkSEQoJZGF0YV90eXBlGAMgASgJEi4KCnVwZGF0ZWRfYXQYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIrACCglBcHBsaWNhbnQSCgoCaWQYASABKAkSEQoJaGVhZF90eXBlGAIgASgJEhcKD2lkZW50aXR5X251bWJlchgDIAEoCRIOCgZ0YXhfaWQYBCABKAkSEQoJZnVsbF9uYW1lGAUgASgJEhIKCmJpcnRoX2RhdGUYBiABKAkSGgoSZXN0YWJsaXNobWVudF9kYXRlGAcgASgJEjgKCmF0dHJpYnV0ZXMYCCADKAsyJC5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudEF0dHJpYnV0ZRIuCgpjcmVhdGVkX2F0GAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJPChNBcHBsaWNhbnRBdHRyaWJ1dGVzEjgKCmF0dHJpYnV0ZXMYASADKAsyJC5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudEF0dHJpYnV0ZSLRAQoWQ3JlYXRlQXBwbGljYW50UmVxdWVzdBIRCgloZWFkX3R5cGUYASABKAkSFwoPaWRlbnRpdHlfbnVtYmVyGAIgASgJEg4KBnRheF9pZBgDIAEoCRIRCglmdWxsX25hbWUYBCABKAkSEgoKYmlydGhfZGF0ZRgFIAEoCRIaChJlc3RhYmxpc2htZW50X2RhdGUYBiABKAkSOAoKYXR0cmlidXRlcxgHIAMoCzIkLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlIiEKE0dldEFwcGxpY2FudFJlcXVlc3QSCgoCaWQYASABKAkiNQodR2V0QXBwbGljYW50QXR0cmlidXRlc1JlcXVlc3QSFAoMYXBwbGljYW50X2lkGAEgASgJIt0BChZVcGRhdGVBcHBsaWNhbnRSZXF1ZXN0EgoKAmlkGAEgASgJEhEKCWhlYWRfdHlwZRgCIAEoCRIXCg9pZGVudGl0eV9udW1iZXIYAyABKAkSDgoGdGF4X2lkGAQgASgJEhEKCWZ1bGxfbmFtZRgFIAEoCRISCgpiaXJ0aF9kYXRlGAYgASgJEhoKEmVzdGFibGlzaG1lbnRfZGF0ZRgHIAEoCRI4CgphdHRyaWJ1dGVzGAggAygLMiQuYXBpLmFwcGxpY2FudC52MS5BcHBsaWNhbnRBdHRyaWJ1dGUiJwoVTGlzdEFwcGxpY2FudHNSZXF1ZXN0Eg4KBmN1cnNvchgBIAEoCSJeChZMaXN0QXBwbGljYW50c1Jlc3BvbnNlEi8KCmFwcGxpY2FudHMYASADKAsyGy5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudBITCgtuZXh0X2N1cnNvchgCIAEoCSJyCiBVcHNlcnRBcHBsaWNhbnRBdHRyaWJ1dGVzUmVxdWVzdBIUCgxhcHBsaWNhbnRfaWQYASABKAkSOAoKYXR0cmlidXRlcxgCIAMoCzIkLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlMsIGChBBcHBsaWNhbnRTZXJ2aWNlEnsKDkxpc3RBcHBsaWNhbnRzEicuYXBpLmFwcGxpY2FudC52MS5MaXN0QXBwbGljYW50c1JlcXVlc3QaKC5hcGkuYXBwbGljYW50LnYxLkxpc3RBcHBsaWNhbnRzUmVzcG9uc2UiFoLT5JMCEBIOL3YxL2FwcGxpY2FudHMScwoPQ3JlYXRlQXBwbGljYW50EiguYXBpLmFwcGxpY2FudC52MS5DcmVhdGVBcHBsaWNhbnRSZXF1ZXN0GhsuYXBpLmFwcGxpY2FudC52MS5BcHBsaWNhbnQiGYLT5JMCEzoBKiIOL3YxL2FwcGxpY2FudHMSbwoMR2V0QXBwbGljYW50EiUuYXBpLmFwcGxpY2FudC52MS5HZXRBcHBsaWNhbnRSZXF1ZXN0GhsuYXBpLmFwcGxpY2FudC52MS5BcHBsaWNhbnQiG4LT5JMCFRITL3YxL2FwcGxpY2FudHMve2lkfRJ4Cg9VcGRhdGVBcHBsaWNhbnQSKC5hcGkuYXBwbGljYW50LnYxLlVwZGF0ZUFwcGxpY2FudFJlcXVlc3QaGy5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudCIegtPkkwIYOgEqGhMvdjEvYXBwbGljYW50cy97aWR9EqIBChZHZXRBcHBsaWNhbnRBdHRyaWJ1dGVzEi8uYXBpLmFwcGxpY2FudC52MS5HZXRBcHBsaWNhbnRBdHRyaWJ1dGVzUmVxdWVzdBolLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlcyIwgtPkkwIqEigvdjEvYXBwbGljYW50cy97YXBwbGljYW50X2lkfS9hdHRyaWJ1dGVzEqsBChlVcHNlcnRBcHBsaWNhbnRBdHRyaWJ1dGVzEjIuYXBpLmFwcGxpY2FudC52MS5VcHNlcnRBcHBsaWNhbnRBdHRyaWJ1dGVzUmVxdWVzdBolLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlcyIzgtPkkwItOgEqIigvdjEvYXBwbGljYW50cy97YXBwbGljYW50X2lkfS9hdHRyaWJ1dGVzQkIKEGFwaS5hcHBsaWNhbnQudjFQAVosY3JlZGl0LWFuYWx5dGljcy1iYWNrZW5kL2FwaS9hcHBsaWNhbnQvdjE7djFiBnByb3RvMw", [file_google_protobuf_timestamp]);
++  fileDesc("ChxhcHBsaWNhbnQvdjEvYXBwbGljYW50LnByb3RvEhBhcGkuYXBwbGljYW50LnYxInMKEkFwcGxpY2FudEF0dHJpYnV0ZRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAkSEQoJZGF0YV90eXBlGAMgASgJEi4KCnVwZGF0ZWRfYXQYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIrACCglBcHBsaWNhbnQSCgoCaWQYASABKAkSEQoJaGVhZF90eXBlGAIgASgJEhcKD2lkZW50aXR5X251bWJlchgDIAEoCRIOCgZ0YXhfaWQYBCABKAkSEQoJZnVsbF9uYW1lGAUgASgJEhIKCmJpcnRoX2RhdGUYBiABKAkSGgoSZXN0YWJsaXNobWVudF9kYXRlGAcgASgJEjgKCmF0dHJpYnV0ZXMYCCADKAsyJC5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudEF0dHJpYnV0ZRIuCgpjcmVhdGVkX2F0GAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJPChNBcHBsaWNhbnRBdHRyaWJ1dGVzEjgKCmF0dHJpYnV0ZXMYASADKAsyJC5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudEF0dHJpYnV0ZSLRAQoWQ3JlYXRlQXBwbGljYW50UmVxdWVzdBIRCgloZWFkX3R5cGUYASABKAkSFwoPaWRlbnRpdHlfbnVtYmVyGAIgASgJEg4KBnRheF9pZBgDIAEoCRIRCglmdWxsX25hbWUYBCABKAkSEgoKYmlydGhfZGF0ZRgFIAEoCRIaChJlc3RhYmxpc2htZW50X2RhdGUYBiABKAkSOAoKYXR0cmlidXRlcxgHIAMoCzIkLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlIiEKE0dldEFwcGxpY2FudFJlcXVlc3QSCgoCaWQYASABKAkiNQodR2V0QXBwbGljYW50QXR0cmlidXRlc1JlcXVlc3QSFAoMYXBwbGljYW50X2lkGAEgASgJIt0BChZVcGRhdGVBcHBsaWNhbnRSZXF1ZXN0EgoKAmlkGAEgASgJEhEKCWhlYWRfdHlwZRgCIAEoCRIXCg9pZGVudGl0eV9udW1iZXIYAyABKAkSDgoGdGF4X2lkGAQgASgJEhEKCWZ1bGxfbmFtZRgFIAEoCRISCgpiaXJ0aF9kYXRlGAYgASgJEhoKEmVzdGFibGlzaG1lbnRfZGF0ZRgHIAEoCRI4CgphdHRyaWJ1dGVzGAggAygLMiQuYXBpLmFwcGxpY2FudC52MS5BcHBsaWNhbnRBdHRyaWJ1dGUiJwoVTGlzdEFwcGxpY2FudHNSZXF1ZXN0Eg4KBmN1cnNvchgBIAEoCSJeChZMaXN0QXBwbGljYW50c1Jlc3BvbnNlEi8KCmFwcGxpY2FudHMYASADKAsyGy5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudBITCgtuZXh0X2N1cnNvchgCIAEoCSJyCiBVcHNlcnRBcHBsaWNhbnRBdHRyaWJ1dGVzUmVxdWVzdBIUCgxhcHBsaWNhbnRfaWQYASABKAkSOAoKYXR0cmlidXRlcxgCIAMoCzIkLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlMsIGChBBcHBsaWNhbnRTZXJ2aWNlEnsKDkxpc3RBcHBsaWNhbnRzEicuYXBpLmFwcGxpY2FudC52MS5MaXN0QXBwbGljYW50c1JlcXVlc3QaKC5hcGkuYXBwbGljYW50LnYxLkxpc3RBcHBsaWNhbnRzUmVzcG9uc2UiFoLT5JMCEBIOL3YxL2FwcGxpY2FudHMScwoPQ3JlYXRlQXBwbGljYW50EiguYXBpLmFwcGxpY2FudC52MS5DcmVhdGVBcHBsaWNhbnRSZXF1ZXN0GhsuYXBpLmFwcGxpY2FudC52MS5BcHBsaWNhbnQiGYLT5JMCEzoBKiIOL3YxL2FwcGxpY2FudHMSbwoMR2V0QXBwbGljYW50EiUuYXBpLmFwcGxpY2FudC52MS5HZXRBcHBsaWNhbnRSZXF1ZXN0GhsuYXBpLmFwcGxpY2FudC52MS5BcHBsaWNhbnQiG4LT5JMCFRITL3YxL2FwcGxpY2FudHMve2lkfRJ4Cg9VcGRhdGVBcHBsaWNhbnQSKC5hcGkuYXBwbGljYW50LnYxLlVwZGF0ZUFwcGxpY2FudFJlcXVlc3QaGy5hcGkuYXBwbGljYW50LnYxLkFwcGxpY2FudCIegtPkkwIYOgEqGhMvdjEvYXBwbGljYW50cy97aWR9EqIBChZHZXRBcHBsaWNhbnRBdHRyaWJ1dGVzEi8uYXBpLmFwcGxpY2FudC52MS5HZXRBcHBsaWNhbnRBdHRyaWJ1dGVzUmVxdWVzdBolLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlcyIwgtPkkwIqEigvdjEvYXBwbGljYW50cy97YXBwbGljYW50X2lkfS9hdHRyaWJ1dGVzEqsBChlVcHNlcnRBcHBsaWNhbnRBdHRyaWJ1dGVzEjIuYXBpLmFwcGxpY2FudC52MS5VcHNlcnRBcHBsaWNhbnRBdHRyaWJ1dGVzUmVxdWVzdBolLmFwaS5hcHBsaWNhbnQudjEuQXBwbGljYW50QXR0cmlidXRlcyIzgtPkkwItOgEqIigvdjEvYXBwbGljYW50cy97YXBwbGljYW50X2lkfS9hdHRyaWJ1dGVzQkIKEGFwaS5hcHBsaWNhbnQudjFQAVosY3JlZGl0LWFuYWx5dGljcy1iYWNrZW5kL2FwaS9hcHBsaWNhbnQvdjE7djFiBnByb3RvMw", [file_google_api_annotations, file_google_protobuf_timestamp]);
+ 
+ /**
+  * @generated from message api.applicant.v1.ApplicantAttribute
+@@ -373,3 +374,4 @@ export const ApplicantService: GenService<{
+   },
+ }> = /*@__PURE__*/
+   serviceDesc(file_applicant_v1_applicant, 0);
++
+diff --git a/src/modules/dashboard/components/kanban-column.tsx b/src/modules/dashboard/components/kanban-column.tsx
+index d37c3aa..de68355 100644
+--- a/src/modules/dashboard/components/kanban-column.tsx
++++ b/src/modules/dashboard/components/kanban-column.tsx
+@@ -57,12 +57,16 @@ export function KanbanColumn({ column }: KanbanColumnProps) {
+                             <ApplicationCard
+                                 application={{
+                                     id: 'placeholder',
+-                                    borrowerName: '',
++                                    applicantId: '',
++                                    productId: '',
++                                    aoId: '',
+                                     refNumber: '',
+                                     date: '',
+                                     amount: 0,
+-                                    status: column.id,
+-                                    assignees: []
++                                    tenorMonths: 0,
++                                    branchCode: '',
++                                    status: column.id as any,
++                                    loanPurpose: ''
+                                 }}
+                             />
+                             <span className="text-[10px] font-bold uppercase tracking-widest">Empty Stage</span>
+diff --git a/src/modules/dashboard/services/kanban-service.ts b/src/modules/dashboard/services/kanban-service.ts
+index aad07b6..30af735 100644
+--- a/src/modules/dashboard/services/kanban-service.ts
++++ b/src/modules/dashboard/services/kanban-service.ts
+@@ -1,5 +1,5 @@
+-import { apiClient } from '@/core/api/client';
+ import { ApplicationListResponse, Application } from '@/shared/types/api';
++import { applicationService } from '@/core/api/services/application-service';
+ import {
+     ApplicationCardData,
+     APPLICATION_STATUS_COLUMNS,
+@@ -35,7 +35,7 @@ function mapToCardData(app: Application): ApplicationCardData {
+ 
+ export const kanbanService = {
+     getBoardData: async (): Promise<KanbanColumnData[]> => {
+-        const response = await apiClient.get<ApplicationListResponse>('/v1/applications');
++        const response = await applicationService.list();
+ 
+         // Build a map of status -> cards
+         const cardsByStatus: Record<string, ApplicationCardData[]> = {};
+@@ -43,7 +43,7 @@ export const kanbanService = {
+             if (!cardsByStatus[app.status]) {
+                 cardsByStatus[app.status] = [];
+             }
+-            cardsByStatus[app.status].push(mapToCardData(app));
++            cardsByStatus[app.status].push(mapToCardData(app as any));
+         }
+ 
+         // Build columns in fixed order, filling in empty ones

@@ -4,58 +4,58 @@ msgstr ""
 "PO-Revision-Date: 2026-02-20 14:15+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: id\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-msgid "First Name"
+msgid "Nama Depan"
 msgstr "Nama Depan"
 
-msgid "Last Name"
+msgid "Nama Belakang"
 msgstr "Nama Belakang"
 
-msgid "Company Name"
+msgid "Nama Perusahaan"
 msgstr "Nama Perusahaan"
 
-msgid "Date of Birth"
+msgid "Tanggal Lahir"
 msgstr "Tanggal Lahir"
 
-msgid "Establishment Date"
-msgstr "Tanggal Pendirian"
+msgid "Tanggal Didirikan"
+msgstr "Tanggal Didirikan"
 
-msgid "Personal ID Number (NIK)"
-msgstr "Nomor NIK"
+msgid "Nomor ID Personal (NIK)"
+msgstr "Nomor ID Personal (NIK)"
 
-msgid "Business Registration Number"
-msgstr "Nomor Registrasi Bisnis"
+msgid "Nomor Registrasi Usaha"
+msgstr "Nomor Registrasi Usaha"
 
-msgid "Home Address"
+msgid "Alamat Rumah"
 msgstr "Alamat Rumah"
 
 msgid "Email"
 msgstr "Email"
 
-msgid "Phone"
-msgstr "Telepon"
+msgid "Nomor Telepon"
+msgstr "Nomor Telepon"
 
-msgid "Save Borrower"
+msgid "Simpan Peminjam"
 msgstr "Simpan Peminjam"
 
-msgid "Cancel"
+msgid "Batal"
 msgstr "Batal"
 
-msgid "Basic Information"
+msgid "Informasi Dasar"
 msgstr "Informasi Dasar"
 
-msgid "Contact Details"
+msgid "Detail Kontak"
 msgstr "Detail Kontak"
 
-msgid "Person"
-msgstr "Perorangan"
+msgid "Orang"
+msgstr "Orang"
 
-msgid "Company"
+msgid "Perusahaan"
 msgstr "Perusahaan"
 
 msgid "Identitas"
@@ -83,7 +83,7 @@ msgid "Karakter & Perilaku"
 msgstr "Karakter & Perilaku"
 
 msgid "Nama lengkap sesuai dengan KTP"
-msgstr "Nama lengkap sesuai KTP"
+msgstr "Nama Lengkap Sesuai dengan KTP"
 
 msgid "NIK"
 msgstr "NIK"
@@ -127,8 +127,8 @@ msgstr "Menikah"
 msgid "Cerai"
 msgstr "Cerai"
 
-msgid "Nama lengkap pasangan sesuai KTP"
-msgstr "Nama Lengkap Pasangan"
+msgid "Nama lengkap pasangan sesuai dengan KTP"
+msgstr "Nama Lengkap Pasangan Sesuai dengan KTP"
 
 msgid "NIK Pasangan"
 msgstr "NIK Pasangan"
@@ -139,8 +139,17 @@ msgstr "Tempat Lahir Pasangan"
 msgid "Tanggal lahir pasangan"
 msgstr "Tanggal Lahir Pasangan"
 
+msgid "Jenis kelamin pasangan"
+msgstr "Jenis Kelamin Pasangan"
+
+msgid "Kewarganegaraan pasangan"
+msgstr "Kewarganegaraan Pasangan"
+
 msgid "Nama ibu kandung pasangan"
-msgstr "Nama Ibu Pasangan"
+msgstr "Nama Ibu Kandung Pasangan"
+
+msgid "NPWP Pasangan"
+msgstr "NPWP Pasangan"
 
 msgid "Perkawinan ke"
 msgstr "Perkawinan Ke"
@@ -157,44 +166,62 @@ msgstr "No HP Alternatif"
 msgid "Alamat Sesuai KTP"
 msgstr "Alamat Sesuai KTP"
 
-msgid "Alamat Lengkap (KTP)"
-msgstr "Alamat Lengkap (KTP)"
+msgid "Kelurahan sesuai KTP"
+msgstr "Kelurahan Sesuai KTP"
 
-msgid "Kota/Kabupaten"
-msgstr "Kota/Kabupaten"
+msgid "Kecamatan sesuai KTP"
+msgstr "Kecamatan Sesuai KTP"
+
+msgid "Kota sesuai KTP"
+msgstr "Kota Sesuai KTP"
+
+msgid "Provinsi sesuai KTP"
+msgstr "Provinsi Sesuai KTP"
+
+msgid "Kode Pos sesuai KTP"
+msgstr "Kode Pos Sesuai KTP"
+
+msgid "Alamat sesuai Domisili"
+msgstr "Alamat Sesuai Domisili"
+
+msgid "Kelurahan sesuai Domisili"
+msgstr "Kelurahan Sesuai Domisili"
+
+msgid "Kecamatan sesuai Domisili"
+msgstr "Kecamatan Sesuai Domisili"
+
+msgid "Kota sesuai Domisili"
+msgstr "Kota Sesuai Domisili"
+
+msgid "Provinsi sesuai Domisili"
+msgstr "Provinsi Sesuai Domisili"
 
 msgid "Kode Pos"
 msgstr "Kode Pos"
 
-msgid "Domisili & Properti"
-msgstr "Domisili & Properti"
+msgid "Lama tinggal di alamat ini"
+msgstr "Lama Tinggal di Alamat Ini"
 
-msgid "Status kepemilikan rumah"
-msgstr "Status Kepemilikan Rumah"
-
-msgid "Lama tinggal (Tahun)"
-msgstr "Lama Tinggal (Tahun)"
-
-msgid "Milik Sendiri"
-msgstr "Milik Sendiri"
-
-msgid "Sewa/Kontrak"
-msgstr "Sewa/Kontrak"
-
-msgid "Milik Keluarga"
-msgstr "Milik Keluarga"
-
-msgid "Rumah Dinas"
-msgstr "Rumah Dinas"
+msgid "Perkiraan jarak kantor cabang (km)"
+msgstr "Perkiraan Jarak Kantor Cabang (km)"
 
 msgid "Jumlah tanggungan"
 msgstr "Jumlah Tanggungan"
 
-msgid "Total penghasilan rumah tangga"
-msgstr "Total Penghasilan Rumah Tangga"
+msgid "Jumlah anggota rumah tangga"
+msgstr "Jumlah Anggota Rumah Tangga"
 
-msgid "Total pengeluaran rumah tangga"
-msgstr "Total Pengeluaran Rumah Tangga"
+msgid "Jumlah anggota rumah tangga berpenghasilan"
+msgstr "Jumlah Anggota Rumah Tangga Berpenghasilan"
+
+msgid "Jumlah anggota rumah tangga berhutang"
+msgstr "Jumlah Anggota Rumah Tangga Berhutang"
+
+msgid "Status pekerjaan pasangan"
+msgstr "Status Pekerjaan Pasangan"
+
+msgid "Penghasilan pasangan"
+msgstr "Penghasilan Pasangan"
 
 msgid "Pendidikan terakhir"
 msgstr "Pendidikan Terakhir"
@@ -203,7 +230,7 @@ msgid "Pilih Pendidikan"
 msgstr "Pilih Pendidikan"
 
 msgid "SMA/Sederajat"
-msgstr "SMA / Sederajat"
+msgstr "SMA/Sederajat"
 
 msgid "D3"
 msgstr "D3"
@@ -216,6 +243,15 @@ msgstr "S2"
 
 msgid "Jurusan pendidikan"
 msgstr "Jurusan Pendidikan"
+
+msgid "Sertifikasi profesi"
+msgstr "Sertifikasi Profesi"
+
+msgid "Peran sosial di masyarakat"
+msgstr "Peran Sosial di Masyarakat"
+
+msgid "Apakah dikenal lingkungan setempat"
+msgstr "Apakah Dikenal Lingkungan Setempat"
 
 msgid "Status pekerjaan"
 msgstr "Status Pekerjaan"
@@ -232,20 +268,77 @@ msgstr "Wiraswasta"
 msgid "Nama perusahaan"
 msgstr "Nama Perusahaan"
 
+msgid "Industri perusahaan"
+msgstr "Industri Perusahaan"
+
+msgid "Alamat tempat kerja"
+msgstr "Alamat Tempat Kerja"
+
+msgid "Jabatan"
+msgstr "Jabatan"
+
+msgid "Lama bekerja (Tahun)"
+msgstr "Lama Bekerja (Tahun)"
+
+msgid "No telp perusahaan"
+msgstr "No Telp Perusahaan"
+
 msgid "Gaji bersih bulanan"
 msgstr "Gaji Bersih Bulanan"
+
+msgid "Penghasilan lain rutin"
+msgstr "Penghasilan Lain Rutin"
+
+msgid "Metode pembayaran gaji"
+msgstr "Metode Pembayaran Gaji"
+
+msgid "Status verifikasi pekerjaan"
+msgstr "Status Verifikasi Pekerjaan"
 
 msgid "Nama usaha"
 msgstr "Nama Usaha"
 
-msgid "Lama berusaha (Tahun)"
+msgid "Jenis usaha"
+msgstr "Jenis Usaha"
+
+msgid "Sektor usaha"
+msgstr "Sektor Usaha"
+
+msgid "lama berusaha (Tahun)"
 msgstr "Lama Berusaha (Tahun)"
+
+msgid "Alamat usaha"
+msgstr "Alamat Usaha"
+
+msgid "Status kepemilikan tempat usaha"
+msgstr "Status Kepemilikan Tempat Usaha"
+
+msgid "Jumlah karyawan"
+msgstr "Jumlah Karyawan"
 
 msgid "Penghasilan bulanan"
 msgstr "Penghasilan Bulanan"
 
 msgid "Persepsi kedisiplinan bayar"
 msgstr "Persepsi Kedisiplinan Bayar"
+
+msgid "Riwayat gagal bayar (internal)"
+msgstr "Riwayat Gagal Bayar (Internal)"
+
+msgid "Frekuensi pindah kerja"
+msgstr "Frekuensi Pindah Kerja"
+
+msgid "Frekuensi pindah alamat"
+msgstr "Frekuensi Pindah Alamat"
+
+msgid "Indikasi gaya hidup lebih besar dari penghasilan"
+msgstr "Indikasi Gaya Hidup Lebih Besar dari Penghasilan"
+
+msgid "Ya"
+msgstr "Ya"
+
+msgid "Tidak"
+msgstr "Tidak"
 
 msgid "Sangat Disiplin"
 msgstr "Sangat Disiplin"

@@ -21,12 +21,36 @@ export interface Applicant {
     updatedAt?: string | null;
 }
 
+export interface ApplicationAttribute {
+    key: string;
+    value: string;
+    dataType: string;
+}
+
+export type ApplicationStatus =
+    | 'INTAKE'
+    | 'ANALYSIS'
+    | 'SURVEY'
+    | 'COMMITTEE'
+    | 'APPROVED'
+    | 'REJECTED'
+    | 'DISBURSED';
+
 export interface Application {
     id: string;
     applicantId: string;
-    loanAmount: number;
-    tenor: number;
-    status: string;
+    productId: string;
+    aoId: string;
+    loanAmount: string;       // comes as string from API
+    tenorMonths: number;
+    interestType: string;
+    interestRate: string;     // comes as string from API
+    loanPurpose: string;
+    applicationChannel: string;
+    status: ApplicationStatus;
+    branchCode: string;
+    attributes: ApplicationAttribute[];
+    submittedAt: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -148,4 +172,9 @@ export interface PaginatedResponse<T> {
     total: number;
     page: number;
     pageSize: number;
+}
+
+export interface ApplicationListResponse {
+    applications: Application[];
+    nextCursor: string;
 }

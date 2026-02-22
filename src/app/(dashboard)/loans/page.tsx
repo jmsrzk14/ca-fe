@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { ErrorBoundary } from '@/shared/components/error-boundary';
-import { LoanListView } from '@/modules/dashboard';
+import { ApplicationKanban } from '@/modules/dashboard';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -12,7 +12,9 @@ export default function LoansPage() {
     return (
         <ErrorBoundary>
             <Suspense fallback={<LoanLoadingSkeleton />}>
-                <LoanListView />
+                <div className="h-[calc(100vh-8rem)]">
+                    <ApplicationKanban />
+                </div>
             </Suspense>
         </ErrorBoundary>
     );

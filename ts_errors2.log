@@ -1,0 +1,2 @@
+src/gen/applicant/v1/applicant_pb.ts(7,10): error TS2305: Module '"../../google/api/annotations_pb"' has no exported member 'file_google_api_annotations'.
+src/gen/application/v1/application_pb.ts(7,10): error TS2305: Module '"../../google/api/annotations_pb"' has no exported member 'file_google_api_annotations'.

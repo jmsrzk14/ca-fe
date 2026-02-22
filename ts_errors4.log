@@ -1,0 +1,2 @@
+src/gen/applicant/v1/applicant_pb.ts(16,3011): error TS2740: Type '{}' is missing the following properties from type 'DescFile': kind, edition, name, dependencies, and 6 more.
+src/gen/application/v1/application_pb.ts(16,6804): error TS2740: Type '{}' is missing the following properties from type 'DescFile': kind, edition, name, dependencies, and 6 more.

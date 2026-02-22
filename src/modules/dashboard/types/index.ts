@@ -9,16 +9,17 @@ export interface LoanAnalytics {
     tasksChange: number;
 }
 
-export interface LoanApplication {
+export interface ApplicationSummary {
     id: string;
-    borrower: {
+    applicantId: string;
+    applicant?: {
         name: string;
         email: string;
         avatar: string;
     };
     amount: number;
     product: string;
-    status: 'Draft' | 'Sent' | 'In Review' | 'Approved' | 'Declined' | 'Funded';
+    status: string;
     createdAt: string;
 }
 

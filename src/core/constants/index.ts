@@ -1,6 +1,6 @@
 export const APP_CONFIG = {
-  NAME: 'Horizon Admin',
-  DESCRIPTION: 'Premium Clean Architecture Dashboard',
+  NAME: 'Credit Analytics',
+  DESCRIPTION: 'Credit Analytics Dots',
   API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://creditanalyticsbackend-production.up.railway.app',
 } as const;
 
@@ -17,6 +17,6 @@ export const ROUTES = {
 } as const;
 
 export const THEME_CONFIG = {
-  DEFAULT_THEME: 'dark',
+  DEFAULT_THEME: 'light',
   STORAGE_KEY: 'horizon-theme',
 } as const;
