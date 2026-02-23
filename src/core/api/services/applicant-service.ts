@@ -43,8 +43,13 @@ export const applicantService = {
         return response;
     },
 
-    getById: (id: string) =>
-        client.getApplicant({ id }),
+    getById: async (id: string) => {
+        const response = await client.getApplicant({ id });
+        return {
+            ...response,
+            applicantType: response.headType || "PERSONAL",
+        };
+    },
 
     update: (id: string, data: any) =>
         client.updateApplicant({
@@ -63,62 +68,25 @@ export const applicantService = {
         }),
 
     list: async (params?: Record<string, string>) => {
-        try {
-            const response = await client.listApplicants({
-                cursor: params?.cursor || "",
-            });
+        const response = await client.listApplicants({
+            cursor: params?.cursor || "",
+        });
 
-            // Map back to existing UI structure/types to avoid breaking components
-            return {
-                applicants: (response.applicants || []).map((app: any) => ({
-                    id: app.id || "unknown",
-                    applicantType: app.headType || "PERSONAL",
-                    identityNumber: app.identityNumber || "",
-                    taxId: app.taxId || "",
-                    fullName: app.fullName || "Unnamed Applicant",
-                    birthDate: parseTimestamp(app.birthDate) || "",
-                    establishmentDate: parseTimestamp(app.establishmentDate) || "",
-                    attributes: app.attributes || [],
-                    createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
-                    updatedAt: parseTimestamp(app.updatedAt) || new Date().toISOString(),
-                })),
-                nextCursor: response.nextCursor || "",
-            };
-        } catch (error) {
-            console.error('Failed to fetch applicants from backend (likely 500 error):', error);
-            console.warn('Using mock fallback data for display.');
-
-            // Temporary Mock Data for UI stability while backend is being fixed
-            return {
-                applicants: [
-                    {
-                        id: "mock-1",
-                        applicantType: "PERSONAL",
-                        identityNumber: "3273010101010001",
-                        taxId: "01.234.567.8-901.000",
-                        fullName: "John Doe (Mock)",
-                        birthDate: "1990-01-01",
-                        establishmentDate: "",
-                        attributes: [],
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                    },
-                    {
-                        id: "mock-2",
-                        applicantType: "CORPORATE",
-                        identityNumber: "02.345.678.9-012.000",
-                        taxId: "02.345.678.9-012.000",
-                        fullName: "PT Maju Bersama (Mock)",
-                        birthDate: "",
-                        establishmentDate: "2010-05-15",
-                        attributes: [],
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                    }
-                ],
-                nextCursor: ""
-            };
-        }
+        return {
+            applicants: (response.applicants || []).map((app: any) => ({
+                id: app.id || "unknown",
+                applicantType: app.headType || "PERSONAL",
+                identityNumber: app.identityNumber || "",
+                taxId: app.taxId || "",
+                fullName: app.fullName || "Unnamed Applicant",
+                birthDate: parseTimestamp(app.birthDate) || "",
+                establishmentDate: parseTimestamp(app.establishmentDate) || "",
+                attributes: app.attributes || [],
+                createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
+                updatedAt: parseTimestamp(app.updatedAt) || new Date().toISOString(),
+            })),
+            nextCursor: response.nextCursor || "",
+        };
     },
 
     upsertAttribute: (applicantId: string, attribute: any) =>
