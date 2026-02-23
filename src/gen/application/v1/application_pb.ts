@@ -504,17 +504,30 @@ export class GetApplicationRequest extends Message<GetApplicationRequest> {
  */
 export class ListApplicationsRequest extends Message<ListApplicationsRequest> {
   /**
+   * Cursor dari response sebelumnya (opaque token). Jika kosong, ambil halaman pertama.
+   *
    * @generated from field: string cursor = 1;
    */
   cursor = "";
 
   /**
-   * @generated from field: string status = 2;
+   * Jumlah data per halaman. Default 10, Max 100.
+   *
+   * @generated from field: int32 page_size = 2;
+   */
+  pageSize = 0;
+
+  /**
+   * Filter status aplikasi
+   *
+   * @generated from field: string status = 3;
    */
   status = "";
 
   /**
-   * @generated from field: string applicant_id = 3;
+   * Filter berdasarkan ID Applicant
+   *
+   * @generated from field: string applicant_id = 4;
    */
   applicantId = "";
 
@@ -527,8 +540,9 @@ export class ListApplicationsRequest extends Message<ListApplicationsRequest> {
   static readonly typeName = "api.application.v1.ListApplicationsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "cursor", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "applicant_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "status", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "applicant_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListApplicationsRequest {
@@ -558,9 +572,18 @@ export class ListApplicationsResponse extends Message<ListApplicationsResponse> 
   applications: Application[] = [];
 
   /**
+   * Token untuk mengambil halaman berikutnya (opaque token).
+   *
    * @generated from field: string next_cursor = 2;
    */
   nextCursor = "";
+
+  /**
+   * Flag apakah ada halaman berikutnya.
+   *
+   * @generated from field: bool has_next = 3;
+   */
+  hasNext = false;
 
   constructor(data?: PartialMessage<ListApplicationsResponse>) {
     super();
@@ -572,6 +595,7 @@ export class ListApplicationsResponse extends Message<ListApplicationsResponse> 
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "applications", kind: "message", T: Application, repeated: true },
     { no: 2, name: "next_cursor", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "has_next", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListApplicationsResponse {

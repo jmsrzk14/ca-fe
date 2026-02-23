@@ -159,14 +159,22 @@ message GetApplicationRequest {
 }
 
 message ListApplicationsRequest {
+  // Cursor dari response sebelumnya (opaque token). Jika kosong, ambil halaman pertama.
   string cursor = 1;
-  string status = 2;
-  string applicant_id = 3;
+  // Jumlah data per halaman. Default 10, Max 100.
+  int32 page_size = 2;
+  // Filter status aplikasi
+  string status = 3;
+  // Filter berdasarkan ID Applicant
+  string applicant_id = 4;
 }
 
 message ListApplicationsResponse {
   repeated Application applications = 1;
+  // Token untuk mengambil halaman berikutnya (opaque token).
   string next_cursor = 2;
+  // Flag apakah ada halaman berikutnya.
+  bool has_next = 3;
 }
 
 message UpdateApplicationRequest {
