@@ -72,6 +72,9 @@ export const applicantService = {
             cursor: params?.cursor || "",
         });
         console.log("DEBUG: gRPC raw response:", response);
+        if (typeof window !== 'undefined') {
+            (window as any).lastApplicants = response;
+        }
 
         return {
             applicants: (response.applicants || []).map((app: any) => ({
