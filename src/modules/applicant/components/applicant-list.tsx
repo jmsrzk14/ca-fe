@@ -273,7 +273,7 @@ export function ApplicantList() {
                         >
                             <Link href="/borrowers/add">
                                 <Plus className="h-5 w-5" />
-                                {t`Add Applicant`}
+                                {t`Tambah peminjam`}
                             </Link>
                         </Button>
                     </div>

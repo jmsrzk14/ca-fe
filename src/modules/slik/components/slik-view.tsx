@@ -46,7 +46,7 @@ export function SlikView() {
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between px-2">
                 <div className="flex items-center gap-4">
                     <h1 className="text-3xl font-bold tracking-tight text-foreground text-gradient">
-                        SLIK Pipeline
+                        SLIK
                     </h1>
                 </div>
 
@@ -90,7 +90,7 @@ export function SlikView() {
                             <div className="relative group min-w-[240px]">
                                 <Input
                                     className="h-9 w-full pr-10 bg-background/50 border-border/50 rounded-lg text-xs focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all placeholder:text-muted-foreground/60"
-                                    placeholder="Search NIK or Nama..."
+                                    placeholder="Cari NIK atau Nama..."
                                 />
                                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             </div>
@@ -159,7 +159,7 @@ export function SlikView() {
                                 className="h-8 px-3 text-xs font-bold text-muted-foreground hover:bg-transparent hover:text-primary transition-all"
                             >
                                 <ChevronLeft className="h-4 w-4 mr-1" />
-                                Previous
+                                Sebelumnya
                             </Button>
                             <Button
                                 variant="default"
@@ -173,7 +173,7 @@ export function SlikView() {
                                 size="sm"
                                 className="h-8 px-3 text-xs font-bold text-muted-foreground hover:bg-transparent hover:text-primary transition-all"
                             >
-                                Next
+                                Selanjutnya
                                 <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                         </div>

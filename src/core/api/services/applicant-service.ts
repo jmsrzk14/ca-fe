@@ -43,8 +43,13 @@ export const applicantService = {
         return response;
     },
 
-    getById: (id: string) =>
-        client.getApplicant({ id }),
+    getById: async (id: string) => {
+        const response = await client.getApplicant({ id });
+        return {
+            ...response,
+            applicantType: response.headType || "PERSONAL",
+        };
+    },
 
     update: (id: string, data: any) =>
         client.updateApplicant({

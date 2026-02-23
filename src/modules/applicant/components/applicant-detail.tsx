@@ -54,9 +54,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         );
     }
 
-    const response = applicant as any;
-    // Handle both cases: { applicant: { ... } } and directly { ... }
-    const data = response?.applicant || response || {};
+    const data = applicant || {};
     const attributes = data.attributes || [];
 
     // Helper to get attribute value
@@ -93,7 +91,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                                     {data.fullName?.charAt(0) || 'A'}
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                                    {data.updatedAt ? t`Updated ${new Date(data.updatedAt).toLocaleDateString()}` : t`No update info`}
+                                    {data.updatedAt ? t`Updated ${new Date(typeof data.updatedAt === 'string' ? data.updatedAt : Number((data.updatedAt as any).seconds) * 1000).toLocaleDateString()}` : t`No update info`}
                                     <LinkIcon className="h-3 w-3 text-cyan-500 ml-1" />
                                 </div>
                             </div>

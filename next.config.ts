@@ -11,6 +11,17 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
+  
+  async rewrites() {
+    return [
+      {
+        source: "/api/grpc/:path*",
+        destination: `https://creditanalyticsbackend-production.up.railway.app/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
