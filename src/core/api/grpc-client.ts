@@ -5,7 +5,7 @@ import { ApplicationService } from "../../gen/application/v1/application_connect
 import { ApplicantService } from "../../gen/applicant/v1/applicant_connect";
 
 export const transport = createGrpcWebTransport({
-    baseUrl: "/api/grpc",
+    baseUrl: "https://creditanalyticsbackend-production.up.railway.app",
 });
 
 export const applicationClient = createPromiseClient(ApplicationService, transport);
