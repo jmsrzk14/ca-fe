@@ -14,7 +14,7 @@ export function getInitialLocale(): string {
 }
 
 export async function dynamicActivate(locale: string) {
-    const { messages } = await import(`@/locales/${locale}/messages.po`);
+    const { messages } = await import(`@/locales/${locale}/messages.js`);
     i18n.load(locale, messages);
     i18n.activate(locale);
     if (typeof window !== "undefined") {

@@ -402,3 +402,27 @@ msgstr "KONTAK"
 
 msgid "CREATED"
 msgstr "DIBUAT"
+
+msgid "Add Borrower"
+msgstr "Tambah Peminjam"
+
+msgid "Tambah peminjam"
+msgstr "Tambah Peminjam"
+
+msgid "Tidak ada data peminjam."
+msgstr "Tidak ada data peminjam."
+
+msgid "Fill in the details below to register a new borrower in the system."
+msgstr "Isi detail di bawah ini untuk mendaftarkan peminjam baru dalam sistem."
+
+msgid "View Details"
+msgstr "Lihat Detail"
+
+msgid "Peminjam"
+msgstr "Peminjam"
+
+msgid "Cari berdasarkan nama atau NIK"
+msgstr "Cari berdasarkan nama atau NIK"
+
+msgid "Search by name or ID number..."
+msgstr "Cari berdasarkan nama atau NIK"
