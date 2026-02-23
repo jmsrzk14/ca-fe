@@ -1,9 +1,9 @@
-import { createClient } from "@connectrpc/connect";
+import { createPromiseClient } from "@connectrpc/connect";
 import { transport } from "../grpc-client";
-import { ApplicationService } from "@/gen/application/v1/application_pb";
+import { ApplicationService } from "@/gen/application/v1/application_connect";
 import { Application } from "@/shared/types/api";
 
-const client = createClient(ApplicationService, transport);
+const client = createPromiseClient(ApplicationService, transport);
 
 /**
  * Robustly parses a timestamp from the REST/gRPC response.
