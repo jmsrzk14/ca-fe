@@ -71,6 +71,7 @@ export const applicantService = {
         const response = await client.listApplicants({
             cursor: params?.cursor || "",
         });
+        console.log("DEBUG: gRPC raw response:", response);
 
         return {
             applicants: (response.applicants || []).map((app: any) => ({
