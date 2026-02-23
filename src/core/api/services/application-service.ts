@@ -10,11 +10,7 @@ const client = createPromiseClient(ApplicationService, transport);
  */
 function parseTimestamp(ts: any): string | undefined {
     if (!ts) return undefined;
-
-    // If it's already an ISO string
     if (typeof ts === 'string') return ts;
-
-    // If it's a google.protobuf.Timestamp message object
     if (ts.seconds !== undefined) {
         try {
             return new Date(Number(ts.seconds) * 1000).toISOString();
@@ -22,8 +18,6 @@ function parseTimestamp(ts: any): string | undefined {
             return undefined;
         }
     }
-
-    // Fallback for any other date-like object
     try {
         const d = new Date(ts);
         return isNaN(d.getTime()) ? undefined : d.toISOString();
@@ -65,7 +59,7 @@ export const applicationService = {
         });
 
         return {
-            applications: (response.applications || []).map(app => ({
+            applications: (response.applications || []).map((app: any) => ({
                 id: app.id || "unknown-id",
                 applicantId: app.applicantId || "unknown-applicant",
                 productId: app.productId || "",
