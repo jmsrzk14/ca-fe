@@ -12,37 +12,26 @@ export function t(
     strings: TemplateStringsArray,
     ...values: unknown[]
 ): string {
-    // If no interpolation, just pass through as a simple message
-    if (values.length === 0) {
-        try {
-            return i18n._(strings[0]);
-        } catch {
-            // i18n not yet activated — return the raw string
-            return strings[0];
-        }
-    }
+    const rawKey = values.length === 0
+        ? strings[0]
+        : strings.reduce((acc, str, i) => acc + (i > 0 ? `{${i - 1}}` : "") + str, "");
 
-    // Build the interpolated string directly as fallback
-    let raw = strings[0];
-    for (let i = 0; i < values.length; i++) {
-        raw += String(values[i]) + strings[i + 1];
-    }
+    // Build interpolated string for immediate fallback
+    const fallback = strings.reduce((acc, str, i) => acc + (i > 0 ? String(values[i - 1]) : "") + str, "");
 
-    // Try Lingui translation, fall back to raw interpolation
     try {
-        // Build the message pattern: "Hello {0}, welcome to {1}"
-        let message = strings[0];
-        for (let i = 0; i < values.length; i++) {
-            message += `{${i}}` + strings[i + 1];
-        }
+        // Only try Lingui if it has the message to avoid "Uncompiled message" warning
+        if (i18n.messages && i18n.messages[i18n.locale] && i18n.messages[i18n.locale][rawKey]) {
+            if (values.length === 0) return i18n._(rawKey);
 
-        const valuesObj: Record<string, unknown> = {};
-        for (let i = 0; i < values.length; i++) {
-            valuesObj[String(i)] = values[i];
+            const valuesObj: Record<string, unknown> = {};
+            for (let i = 0; i < values.length; i++) {
+                valuesObj[String(i)] = values[i];
+            }
+            return i18n._(rawKey, valuesObj);
         }
-
-        return i18n._(message, valuesObj);
+        return fallback;
     } catch {
-        return raw;
+        return fallback;
     }
 }
