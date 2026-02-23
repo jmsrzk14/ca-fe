@@ -21,6 +21,7 @@ function mapToCardData(app: any): ApplicationCardData {
     return {
         id: app.id || "unknown",
         applicantId: app.applicantId || "unknown",
+        borrowerName: app.borrowerName || app.applicantName || "",
         productId: app.productId || "",
         aoId: app.aoId || "",
         refNumber: (app.id || "").slice(0, 8).toUpperCase() || "NEW",

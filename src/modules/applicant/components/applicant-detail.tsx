@@ -23,7 +23,7 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import { Separator } from '@/shared/ui/separator';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { t } from '@lingui/macro';
+import { t } from '@/shared/lib/t';
 
 interface ApplicantDetailProps {
     id: string;

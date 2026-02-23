@@ -58,6 +58,7 @@ export function KanbanColumn({ column }: KanbanColumnProps) {
                                 application={{
                                     id: 'placeholder',
                                     applicantId: '',
+                                    borrowerName: '',
                                     productId: '',
                                     aoId: '',
                                     refNumber: '',

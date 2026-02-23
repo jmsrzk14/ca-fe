@@ -8,7 +8,7 @@ import {
     SheetTitle,
     SheetDescription,
 } from '@/shared/ui/sheet';
-import { t } from '@lingui/macro';
+import { t } from '@/shared/lib/t';
 import { ApplicantForm } from './applicant-form';
 
 interface ApplicantFormSheetProps {

@@ -74,6 +74,9 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
                             <GripVertical className="h-4 w-4" />
                         </div>
                         <div>
+                            <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 mb-0.5">
+                                {application.borrowerName || 'Guest'}
+                            </div>
                             <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors font-mono">
                                 #{application.refNumber}
                             </h4>

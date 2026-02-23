@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { t } from '@lingui/macro';
+import { t } from '@/shared/lib/t';
 import { User, Building2 } from 'lucide-react';
 import { Applicant } from '@/shared/types/api';
 import ApplicantCard from './applicant-card';

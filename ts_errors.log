@@ -1,3 +1,0 @@
-src/gen/applicant/v1/applicant_pb.ts(7,45): error TS2307: Cannot find module '../../google/api/annotations_pb' or its corresponding type declarations.
-src/gen/application/v1/application_pb.ts(7,45): error TS2307: Cannot find module '../../google/api/annotations_pb' or its corresponding type declarations.
-src/modules/dashboard/components/kanban-column.tsx(60,37): error TS2353: Object literal may only specify known properties, and 'borrowerName' does not exist in type 'ApplicationCardData'.

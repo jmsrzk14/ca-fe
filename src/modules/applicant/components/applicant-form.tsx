@@ -23,7 +23,7 @@ import {
     UserPlus,
     Building
 } from 'lucide-react';
-import { t } from '@lingui/macro';
+import { t } from '@/shared/lib/t';
 import { toast } from 'sonner';
 import { applicantService } from '@/core/api';
 import { ApplicantType } from '@/shared/types/api';

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, UserPlus } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
-import { t } from '@lingui/macro';
+import { t } from '@/shared/lib/t';
 import { ApplicantForm } from './applicant-form';
 
 export function ApplicantAddView() {
