@@ -1,0 +1,23 @@
+{
+    "NAME": "NAME",
+    "TYPE": "TYPE",
+    "CONTACT": "CONTACT",
+    "CREATED": "CREATED",
+    "Add Borrower": "Add Borrower",
+    "Tambah peminjam": "Add Borrower",
+    "Tidak ada data peminjam.": "No borrower data found.",
+    "Fill in the details below to register a new borrower in the system.": "Fill in the details below to register a new borrower in the system.",
+    "View Details": "View Details",
+    "Peminjam": "Borrowers",
+    "Cari berdasarkan nama atau NIK": "Search by name or ID number",
+    "Search by name or ID number...": "Search by name or ID number",
+    "Identitas": "Identity",
+    "Pasangan": "Spouse",
+    "Kontak & Alamat": "Contact & Address",
+    "Profil Rumah Tangga": "Household Profile",
+    "Pendidikan & Sosial": "Education & Social",
+    "Pekerjaan": "Occupation",
+    "Usaha": "Business",
+    "Karakter & Perilaku": "Character & Behavior",
+    "Add Applicant": "Add Applicant"
+}
