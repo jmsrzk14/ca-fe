@@ -21,7 +21,8 @@ export function t(
 
     try {
         // Only try Lingui if it has the message to avoid "Uncompiled message" warning
-        const catalog = (i18n.messages as any)[i18n.locale];
+        const messages = i18n.messages as Record<string, any>;
+        const catalog = messages[i18n.locale];
         if (catalog && catalog[rawKey]) {
             if (values.length === 0) return i18n._(rawKey);
 
