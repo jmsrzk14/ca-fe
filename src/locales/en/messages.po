@@ -421,8 +421,38 @@ msgstr "View Details"
 msgid "Peminjam"
 msgstr "Borrowers"
 
+msgid "Tambah peminjam"
+msgstr "Add Borrower"
+
 msgid "Cari berdasarkan nama atau NIK"
 msgstr "Search by name or ID number"
 
 msgid "Search by name or ID number..."
 msgstr "Search by name or ID number"
+
+msgid "Identitas"
+msgstr "Identity"
+
+msgid "Pasangan"
+msgstr "Spouse"
+
+msgid "Kontak & Alamat"
+msgstr "Contact & Address"
+
+msgid "Profil Rumah Tangga"
+msgstr "Household Profile"
+
+msgid "Pendidikan & Sosial"
+msgstr "Education & Social"
+
+msgid "Pekerjaan"
+msgstr "Occupation"
+
+msgid "Usaha"
+msgstr "Business"
+
+msgid "Karakter & Perilaku"
+msgstr "Character & Behavior"
+
+msgid "Add Applicant"
+msgstr "Add Applicant"

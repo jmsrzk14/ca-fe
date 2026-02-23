@@ -426,3 +426,30 @@ msgstr "Cari berdasarkan nama atau NIK"
 
 msgid "Search by name or ID number..."
 msgstr "Cari berdasarkan nama atau NIK"
+
+msgid "Identitas"
+msgstr "Identitas"
+
+msgid "Pasangan"
+msgstr "Pasangan"
+
+msgid "Kontak & Alamat"
+msgstr "Kontak & Alamat"
+
+msgid "Profil Rumah Tangga"
+msgstr "Profil Rumah Tangga"
+
+msgid "Pendidikan & Sosial"
+msgstr "Pendidikan & Sosial"
+
+msgid "Pekerjaan"
+msgstr "Pekerjaan"
+
+msgid "Usaha"
+msgstr "Usaha"
+
+msgid "Karakter & Perilaku"
+msgstr "Karakter & Perilaku"
+
+msgid "Add Applicant"
+msgstr "Tambah Peminjam"
