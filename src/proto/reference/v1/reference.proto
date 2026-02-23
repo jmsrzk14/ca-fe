@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package api.reference.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "credit-analytics-backend/api/reference/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.reference.v1";
+
+service ReferenceService {
+  rpc ListLoanProducts (google.protobuf.Empty) returns (ListLoanProductsResponse) {
+    option (google.api.http) = {
+      get: "/v1/reference/loan-products"
+    };
+  }
+  rpc GetLoanProduct (GetLoanProductRequest) returns (LoanProduct) {
+    option (google.api.http) = {
+      get: "/v1/reference/loan-products/{id}"
+    };
+  }
+
+  rpc ListBranches (google.protobuf.Empty) returns (ListBranchesResponse) {
+    option (google.api.http) = {
+      get: "/v1/reference/branches"
+    };
+  }
+  rpc ListLoanOfficers (ListLoanOfficersRequest) returns (ListLoanOfficersResponse) {
+    option (google.api.http) = {
+      get: "/v1/reference/branches/{branch_code}/officers"
+    };
+  }
+
+  rpc ListApplicationStatuses (google.protobuf.Empty) returns (ListApplicationStatusesResponse) {
+    option (google.api.http) = {
+      get: "/v1/reference/application-statuses"
+    };
+  }
+
+  rpc ListAttributeRegistry (google.protobuf.Empty) returns (ListAttributeRegistryResponse) {
+    option (google.api.http) = {
+      get: "/v1/reference/attribute-registry"
+    };
+  }
+
+  rpc ListSurveyTemplates (ListSurveyTemplatesRequest) returns (ListSurveyTemplatesResponse) {
+    option (google.api.http) = {
+      get: "/v1/reference/survey-templates"
+    };
+  }
+
+  rpc ListFinancialGLAccounts (google.protobuf.Empty) returns (ListFinancialGLAccountsResponse) {
+    option (google.api.http) = {
+      get: "/v1/reference/gl-accounts"
+    };
+  }
+}
+
+message LoanProduct {
+  string id = 1;
+  string product_code = 2;
+  string product_name = 3;
+  string segment = 4;
+  bool active = 5;
+}
+
+message Branch {
+  string branch_code = 1;
+  string branch_name = 2;
+  string region_code = 3;
+}
+
+message LoanOfficer {
+  string id = 1;
+  string officer_code = 2;
+  string branch_code = 3;
+}
+
+message ApplicationStatusRef {
+  string status_code = 1;
+  string status_group = 2;
+  bool is_terminal = 3;
+  string description = 4;
+}
+
+message AttributeRegistry {
+  string attr_key = 1;
+  string attr_name = 2;
+  string data_type = 3;
+  string category = 4;
+  bool required = 5;
+}
+
+message SurveyTemplate {
+  string id = 1;
+  string template_code = 2;
+  string template_name = 3;
+  string applicant_type = 4;
+  string product_id = 5;
+}
+
+message FinancialGLAccount {
+  string gl_code = 1;
+  string gl_name = 2;
+  string statement_type = 3;
+  string category = 4;
+  int32 sign = 5;
+  bool is_debt_service = 6;
+  bool is_operating = 7;
+  string description = 8;
+}
+
+message GetLoanProductRequest {
+  string id = 1;
+}
+
+message ListLoanProductsResponse {
+  repeated LoanProduct products = 1;
+}
+
+message ListBranchesResponse {
+  repeated Branch branches = 1;
+}
+
+message ListLoanOfficersRequest {
+  string branch_code = 1;
+}
+
+message ListLoanOfficersResponse {
+  repeated LoanOfficer officers = 1;
+}
+
+message ListApplicationStatusesResponse {
+  repeated ApplicationStatusRef statuses = 1;
+}
+
+message ListAttributeRegistryResponse {
+  repeated AttributeRegistry attributes = 1;
+}
+
+message ListSurveyTemplatesRequest {
+  string head_type = 1;
+  string product_id = 2;
+}
+
+message ListSurveyTemplatesResponse {
+  repeated SurveyTemplate templates = 1;
+}
+
+message ListFinancialGLAccountsResponse {
+  repeated FinancialGLAccount accounts = 1;
+}

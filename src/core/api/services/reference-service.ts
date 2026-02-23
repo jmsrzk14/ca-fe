@@ -1,13 +1,14 @@
-import { apiClient } from '../client';
-import { LoanProduct, Branch, GLAccount } from '@/shared/types/api';
+import { createPromiseClient } from "@connectrpc/connect";
+import { transport } from "../grpc-client";
+import { ReferenceService } from "@/gen/reference/v1/reference_connect";
+import { Empty } from "@bufbuild/protobuf";
+
+const client = createPromiseClient(ReferenceService, transport);
 
 export const referenceService = {
-    getLoanProducts: () =>
-        apiClient.get<LoanProduct[]>('/v1/reference/loan-products'),
-
-    getBranches: () =>
-        apiClient.get<Branch[]>('/v1/reference/branches'),
-
-    getGLAccounts: () =>
-        apiClient.get<GLAccount[]>('/v1/reference/gl-accounts'),
+    getLoanProducts: () => client.listLoanProducts(new Empty()),
+    getBranches: () => client.listBranches(new Empty()),
+    getGLAccounts: () => client.listFinancialGLAccounts(new Empty()),
+    getAttributeRegistry: () => client.listAttributeRegistry(new Empty()),
 };
+

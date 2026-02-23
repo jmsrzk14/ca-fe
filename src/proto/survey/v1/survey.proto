@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+package api.survey.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "credit-analytics-backend/api/survey/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.survey.v1";
+
+service SurveyService {
+  rpc AssignSurvey (AssignSurveyRequest) returns (ApplicationSurvey) {
+    option (google.api.http) = {
+      post: "/v1/applications/{application_id}/surveys",
+      body: "*"
+    };
+  }
+  rpc GetSurvey (GetSurveyRequest) returns (ApplicationSurvey) {
+    option (google.api.http) = {
+      get: "/v1/surveys/{id}"
+    };
+  }
+  rpc ListSurveysByApplication (ListSurveysByApplicationRequest) returns (ListSurveysResponse) {
+    option (google.api.http) = {
+      get: "/v1/applications/{application_id}/surveys"
+    };
+  }
+
+  rpc StartSurvey (StartSurveyRequest) returns (ApplicationSurvey) {
+    option (google.api.http) = {
+      post: "/v1/surveys/{id}/start",
+      body: "*"
+    };
+  }
+  rpc SubmitSurvey (SubmitSurveyRequest) returns (ApplicationSurvey) {
+    option (google.api.http) = {
+      post: "/v1/surveys/{id}/submit",
+      body: "*"
+    };
+  }
+  rpc VerifySurvey (VerifySurveyRequest) returns (ApplicationSurvey) {
+    option (google.api.http) = {
+      post: "/v1/surveys/{id}/verify",
+      body: "*"
+    };
+  }
+
+  rpc SubmitSurveyAnswer (SubmitSurveyAnswerRequest) returns (SurveyAnswer) {
+    option (google.api.http) = {
+      post: "/v1/surveys/{survey_id}/answers",
+      body: "*"
+    };
+  }
+  rpc UploadSurveyEvidence (UploadSurveyEvidenceRequest) returns (SurveyEvidence) {
+    option (google.api.http) = {
+      post: "/v1/surveys/{survey_id}/evidences",
+      body: "*"
+    };
+  }
+}
+
+message SurveyTemplate {
+  string id = 1;
+  string template_code = 2;
+  string template_name = 3;
+  string head_type = 4;
+  string product_id = 5;
+  bool active = 6;
+}
+
+message ApplicationSurvey {
+  string id = 1;
+  string application_id = 2;
+  string template_id = 3;
+  string survey_type = 4;
+  string status = 5;
+  string assigned_to = 6;
+  string survey_purpose = 7;
+  google.protobuf.Timestamp started_at = 8;
+  google.protobuf.Timestamp submitted_at = 9;
+  string submitted_by = 10;
+}
+
+message SurveyAnswer {
+  string id = 1;
+  string survey_id = 2;
+  string question_id = 3;
+  string answer_text = 4;
+  string answer_number = 5;
+  bool answer_boolean = 6;
+  string answer_date = 7;
+  google.protobuf.Timestamp answered_at = 8;
+}
+
+message SurveyEvidence {
+  string id = 1;
+  string survey_id = 2;
+  string evidence_type = 3;
+  string file_url = 4;
+  string description = 5;
+  google.protobuf.Timestamp captured_at = 6;
+}
+
+message ListSurveysByApplicationRequest {
+  string application_id = 1;
+}
+
+message ListSurveysResponse {
+  repeated ApplicationSurvey surveys = 1;
+}
+
+message StartSurveyRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message SubmitSurveyRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message VerifySurveyRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message SubmitSurveyAnswerRequest {
+  string survey_id = 1;
+  string question_id = 2;
+  string answer_text = 3;
+  string answer_number = 4;
+  bool answer_boolean = 5;
+  string answer_date = 6;
+}
+
+message UploadSurveyEvidenceRequest {
+  string survey_id = 1;
+  string evidence_type = 2;
+  string file_url = 3;
+  string description = 4;
+}
+
+message AssignSurveyRequest {
+  string application_id = 1;
+  string template_id = 2;
+  string survey_type = 3;
+  string assigned_to = 4;
+  string survey_purpose = 5;
+}
+
+message GetSurveyRequest {
+  string id = 1;
+}
+
+message CreateSurveyTemplateRequest {
+  string template_code = 1;
+  string template_name = 2;
+  string head_type = 3;
+  string product_id = 4;
+  bool active = 5;
+}
+
+message ListSurveyTemplatesRequest {}
+
+message ListSurveyTemplatesResponse {
+  repeated SurveyTemplate templates = 1;
+}
