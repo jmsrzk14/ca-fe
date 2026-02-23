@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddDecisionConditionRequest, ApplicationDecision, CommitteeDecision, CommitteeSession, CommitteeVote, CreateCommitteeSessionRequest, DecisionCondition, FinalizeCommitteeDecisionRequest, GetApplicationDecisionRequest, GetCommitteeSessionRequest, ListCommitteeSessionsByApplicationRequest, ListCommitteeSessionsResponse, ListDecisionConditionsRequest, ListDecisionConditionsResponse, RecordFinalDecisionRequest, SubmitCommitteeVoteRequest } from "./decision_pb";
+import { AddDecisionConditionRequest, ApplicationDecision, CommitteeDecision, CommitteeSession, CommitteeVote, CreateCommitteeSessionRequest, DecisionCondition, FinalizeCommitteeDecisionRequest, GetApplicationDecisionRequest, GetCommitteeSessionRequest, ListCommitteeSessionsByApplicationRequest, ListCommitteeSessionsResponse, ListDecisionConditionsRequest, ListDecisionConditionsResponse, RecordFinalDecisionRequest, SubmitCommitteeVoteRequest } from "./decision_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen-proto": "buf generate buf.build/dots-credit-analytics/credit-analytics"
+    "gen-proto": "npx @bufbuild/buf generate buf.build/dots-credit-analytics/credit-analytics",
+    "gen-proto-local": "npx @bufbuild/buf generate src/proto"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.1",

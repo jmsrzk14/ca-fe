@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { Empty, MethodKind } from "@bufbuild/protobuf";
-import { GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeRegistryResponse, ListBranchesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct } from "./reference_pb";
+import { GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeRegistryResponse, ListBranchesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct } from "./reference_pb.js";
 
 /**
  * @generated from service api.reference.v1.ReferenceService

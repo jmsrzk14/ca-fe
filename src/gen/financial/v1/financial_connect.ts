@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddAssetRequest, AddLiabilityRequest, ApplicationAsset, ApplicationFinancialFact, ApplicationLiability, CalculateFinancialRatiosRequest, ListAssetsByApplicationRequest, ListAssetsResponse, ListFinancialFactsRequest, ListFinancialFactsResponse, ListFinancialRatiosResponse, ListLiabilitiesByApplicationRequest, ListLiabilitiesResponse, UpdateAssetRequest, UpdateLiabilityRequest, UpsertFinancialFactRequest } from "./financial_pb";
+import { AddAssetRequest, AddLiabilityRequest, ApplicationAsset, ApplicationFinancialFact, ApplicationLiability, CalculateFinancialRatiosRequest, ListAssetsByApplicationRequest, ListAssetsResponse, ListFinancialFactsRequest, ListFinancialFactsResponse, ListFinancialRatiosResponse, ListLiabilitiesByApplicationRequest, ListLiabilitiesResponse, UpdateAssetRequest, UpdateLiabilityRequest, UpsertFinancialFactRequest } from "./financial_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**

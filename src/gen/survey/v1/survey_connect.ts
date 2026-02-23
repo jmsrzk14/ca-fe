@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ApplicationSurvey, AssignSurveyRequest, GetSurveyRequest, ListSurveysByApplicationRequest, ListSurveysResponse, StartSurveyRequest, SubmitSurveyAnswerRequest, SubmitSurveyRequest, SurveyAnswer, SurveyEvidence, UploadSurveyEvidenceRequest, VerifySurveyRequest } from "./survey_pb";
+import { ApplicationSurvey, AssignSurveyRequest, GetSurveyRequest, ListSurveysByApplicationRequest, ListSurveysResponse, StartSurveyRequest, SubmitSurveyAnswerRequest, SubmitSurveyRequest, SurveyAnswer, SurveyEvidence, UploadSurveyEvidenceRequest, VerifySurveyRequest } from "./survey_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**

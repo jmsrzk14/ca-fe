@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { Applicant, ApplicantAttributes, CreateApplicantRequest, GetApplicantAttributesRequest, GetApplicantRequest, ListApplicantsRequest, ListApplicantsResponse, UpdateApplicantRequest, UpsertApplicantAttributesRequest } from "./applicant_pb";
+import { Applicant, ApplicantAttributes, CreateApplicantRequest, GetApplicantAttributesRequest, GetApplicantRequest, ListApplicantsRequest, ListApplicantsResponse, UpdateApplicantRequest, UpsertApplicantAttributesRequest } from "./applicant_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**

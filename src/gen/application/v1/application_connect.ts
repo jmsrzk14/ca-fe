@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddPartyToApplicationRequest, Application, ApplicationAttributes, ApplicationDocument, ApplicationParty, ChangeApplicationStatusRequest, CreateApplicationRequest, GetApplicationAttributesRequest, GetApplicationRequest, GetPresignedUrlRequest, GetPresignedUrlResponse, ListApplicationDocumentsRequest, ListApplicationDocumentsResponse, ListApplicationPartiesRequest, ListApplicationPartiesResponse, ListApplicationsRequest, ListApplicationsResponse, RemovePartyFromApplicationRequest, UpdateApplicationRequest, UploadApplicationDocumentRequest, UpsertApplicationAttributesRequest } from "./application_pb";
+import { AddPartyToApplicationRequest, Application, ApplicationAttributes, ApplicationDocument, ApplicationParty, ChangeApplicationStatusRequest, CreateApplicationRequest, GetApplicationAttributesRequest, GetApplicationRequest, GetPresignedUrlRequest, GetPresignedUrlResponse, ListApplicationDocumentsRequest, ListApplicationDocumentsResponse, ListApplicationPartiesRequest, ListApplicationPartiesResponse, ListApplicationsRequest, ListApplicationsResponse, RemovePartyFromApplicationRequest, UpdateApplicationRequest, UploadApplicationDocumentRequest, UpsertApplicationAttributesRequest } from "./application_pb.js";
 import { Empty, MethodKind } from "@bufbuild/protobuf";
 
 /**
