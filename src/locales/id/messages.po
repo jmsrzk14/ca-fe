@@ -53,7 +53,7 @@ msgid "Detail Kontak"
 msgstr "Detail Kontak"
 
 msgid "Orang"
-msgstr "Orang"
+msgstr "Perorangan"
 
 msgid "Perusahaan"
 msgstr "Perusahaan"
