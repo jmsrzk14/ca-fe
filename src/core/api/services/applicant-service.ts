@@ -38,8 +38,11 @@ export const applicantService = {
                 key: attr.key,
                 value: attr.value,
                 dataType: attr.dataType,
+                updatedAt: attr.updatedAt ? (typeof attr.updatedAt === 'string' ? { seconds: BigInt(Math.floor(new Date(attr.updatedAt).getTime() / 1000)), nanos: 0 } : attr.updatedAt) : undefined
             })) || [],
-        });
+            // Note: createApplicant proto might not have set_created_at, check if it's ignored or needed
+            ...(data.createdAt ? { createdAt: typeof data.createdAt === 'string' ? { seconds: BigInt(Math.floor(new Date(data.createdAt).getTime() / 1000)), nanos: 0 } : data.createdAt } : {})
+        } as any);
         return response;
     },
 
@@ -64,8 +67,9 @@ export const applicantService = {
                 key: attr.key,
                 value: attr.value,
                 dataType: attr.dataType,
+                updatedAt: attr.updatedAt ? (typeof attr.updatedAt === 'string' ? { seconds: BigInt(Math.floor(new Date(attr.updatedAt).getTime() / 1000)), nanos: 0 } : attr.updatedAt) : undefined
             })) || [],
-        }),
+        } as any),
 
     list: async (params?: Record<string, string>) => {
         const response = await client.listApplicants({

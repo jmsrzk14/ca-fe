@@ -74,7 +74,12 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         const groups: Record<string, AttributeRegistry[]> = {};
 
         // Ensure categories are sorted (1. Identitas, 2. Pasangan, etc.)
+        // Also Filter out fields that are already handled as Primary Columns
+        const primaryKeys = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate', 'applicantType'];
+
         registry.forEach(attr => {
+            if (primaryKeys.includes(attr.attrKey)) return;
+
             const catName = attr.category || 'IDENTITAS';
             if (!groups[catName]) {
                 groups[catName] = [];
@@ -148,28 +153,43 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
 
     const performSubmit = () => {
         setIsConfirmOpen(false);
+        const now = new Date().toISOString();
 
-        // Map dynamic form data to EAV structure expected by Backend
-        const coreKeys = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate'];
+        // 1. Primary Columns as specified by USER
+        const primaryKeys = [
+            'applicantType',
+            'identityNumber',
+            'taxId',
+            'fullName',
+            'birthDate',
+            'establishmentDate',
+            'attributes',
+            'createdAt'
+        ];
+
+        // 2. Map everything else to Attributes (Secondary Columns)
         const attributes = Object.entries(formData)
-            .filter(([key, value]) => !coreKeys.includes(key) && value !== undefined && value !== '')
+            .filter(([key, value]) => !primaryKeys.includes(key) && value !== undefined && value !== '')
             .map(([key, value]) => {
                 const regItem = registry.find(r => r.attrKey === key);
                 return {
                     key,
                     value: String(value),
-                    dataType: regItem?.dataType || 'STRING'
+                    dataType: regItem?.dataType || 'STRING',
+                    updatedAt: now
                 };
             });
 
+        // 3. Assemble Primary Payload
         const payload = {
             applicantType: type,
             fullName: formData.fullName,
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
-            birthDate: type === 'PERSONAL' ? formData.birthDate : undefined,
-            establishmentDate: type === 'CORPORATE' ? formData.establishmentDate : undefined,
-            attributes
+            birthDate: type === 'PERSONAL' ? formData.birthDate : '',
+            establishmentDate: type === 'CORPORATE' ? formData.establishmentDate : '',
+            attributes,
+            createdAt: now
         };
 
         mutation.mutate(payload);
