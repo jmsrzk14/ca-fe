@@ -391,17 +391,20 @@ msgstr "Yes, Submit Now"
 msgid "Batal"
 msgstr "Cancel"
 
-msgid "NAME"
+msgid "NAMA"
 msgstr "NAME"
 
-msgid "TYPE"
+msgid "TIPE"
 msgstr "TYPE"
 
-msgid "CONTACT"
+msgid "KONTAK"
 msgstr "CONTACT"
 
-msgid "CREATED"
+msgid "TANGGAL DIBUAT"
 msgstr "CREATED"
+
+msgid "AKSI"
+msgstr "ACTION"
 
 msgid "Add Borrower"
 msgstr "Add Borrower"

@@ -18,6 +18,10 @@ export const metadata: Metadata = {
     template: "Credit Analytics | %s",
     default: "Credit Analytics",
   },
+  icons: {
+    icon: "/favicon.ico",
+  },
+  keywords: ["Credit Analytics", "Credit Analysis", "Banking System", "dots", "Dimensi Kreasi Nusantara"],
   description: "Credit Analysis for the banking system",
 };
 

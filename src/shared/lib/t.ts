@@ -20,10 +20,10 @@ export function t(
     const fallback = strings.reduce((acc, str, i) => acc + (i > 0 ? String(values[i - 1]) : "") + str, "");
 
     try {
-        // Only try Lingui if it has the message to avoid "Uncompiled message" warning
-        const messages = i18n.messages as Record<string, any>;
-        const catalog = messages[i18n.locale];
-        if (catalog && catalog[rawKey]) {
+        // In Lingui v5, i18n.messages is a flat Record<string, CompiledMessage>
+        // for the currently active locale — NOT nested by locale key.
+        const messages = i18n.messages as Record<string, unknown>;
+        if (messages && rawKey in messages) {
             if (values.length === 0) return i18n._(rawKey);
 
             const valuesObj: Record<string, unknown> = {};

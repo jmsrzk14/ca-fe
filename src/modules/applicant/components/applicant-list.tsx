@@ -130,7 +130,7 @@ export function ApplicantList() {
                                 onClick={() => handleSort('fullName')}
                             >
                                 <div className="flex items-center gap-2">
-                                    {t`NAME`} <SortIcon column="fullName" />
+                                    {t`NAMA`} <SortIcon column="fullName" />
                                 </div>
                             </TableHead>
                             <TableHead
@@ -138,19 +138,19 @@ export function ApplicantList() {
                                 onClick={() => handleSort('applicantType')}
                             >
                                 <div className="flex items-center gap-2">
-                                    {t`TYPE`} <SortIcon column="applicantType" />
+                                    {t`TIPE`} <SortIcon column="applicantType" />
                                 </div>
                             </TableHead>
-                            <TableHead className="py-4 font-bold text-foreground outline-none">{t`CONTACT`}</TableHead>
+                            <TableHead className="py-4 font-bold text-foreground outline-none">{t`KONTAK`}</TableHead>
                             <TableHead
                                 className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
                                 onClick={() => handleSort('createdAt')}
                             >
                                 <div className="flex items-center gap-2">
-                                    {t`CREATED`} <SortIcon column="createdAt" />
+                                    {t`TANGGAL DIBUAT`} <SortIcon column="createdAt" />
                                 </div>
                             </TableHead>
-                            <TableHead className="py-4 text-right"></TableHead>
+                            <TableHead className="py-4 text-right">{t`AKSI`}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
