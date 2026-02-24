@@ -47,17 +47,6 @@ interface ApplicantFormProps {
     onCancel?: () => void;
 }
 
-const STEPS = [
-    { id: 'identitas', title: t`Identitas`, icon: User },
-    { id: 'pasangan', title: t`Pasangan`, icon: Heart },
-    { id: 'kontak', title: t`Kontak & Alamat`, icon: MapPin },
-    { id: 'rumah_tangga', title: t`Profil Rumah Tangga`, icon: Home },
-    { id: 'pendidikan', title: t`Pendidikan & Sosial`, icon: GraduationCap },
-    { id: 'pekerjaan', title: t`Pekerjaan`, icon: Briefcase },
-    { id: 'usaha', title: t`Usaha`, icon: Store },
-    { id: 'karakter', title: t`Karakter & Perilaku`, icon: Activity },
-];
-
 const STEP_FIELDS: Record<number, string[]> = {
     0: ['fullName', 'identityNumber', 'birthPlace', 'birthDate', 'gender', 'nationality', 'maritalStatus', 'motherName', 'taxId'],
     1: ['spouseFullName', 'spouseIdentityNumber', 'spouseBirthPlace', 'spouseBirthDate', 'spouseGender', 'spouseNationality', 'spouseMotherName', 'spouseTaxId', 'marriageOrder'],
@@ -74,6 +63,17 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
     const [currentStep, setCurrentStep] = React.useState(0);
     const [type, setType] = React.useState<ApplicantType>('PERSONAL');
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+
+    const STEPS = [
+        { id: 'identitas', title: t`Identitas` },
+        { id: 'pasangan', title: t`Pasangan` },
+        { id: 'kontak', title: t`Kontak & Alamat` },
+        { id: 'rumah_tangga', title: t`Profil Rumah Tangga` },
+        { id: 'pendidikan', title: t`Pendidikan & Sosial` },
+        { id: 'pekerjaan', title: t`Pekerjaan` },
+        { id: 'usaha', title: t`Usaha` },
+        { id: 'karakter', title: t`Karakter & Perilaku` },
+    ];
 
     // Form state to persist data across steps
     const [formData, setFormData] = React.useState<Record<string, any>>({
@@ -652,7 +652,6 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
             {/* Multi-step Header */}
             <div className="hidden lg:flex border-b border-border/50 bg-muted/20">
                 {STEPS.map((step, index) => {
-                    const Icon = step.icon;
                     const isActive = index === currentStep;
                     const isCompleted = index < currentStep;
 
