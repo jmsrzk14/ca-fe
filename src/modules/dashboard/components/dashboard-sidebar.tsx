@@ -84,6 +84,7 @@ const NAV_ITEMS: NavGroup[] = [
                     { title: 'Komponen CRR', url: ROUTES.SETTINGS_CRR_COMPONENTS },
                     { title: 'Penilaian CRR', url: ROUTES.SETTINGS_CRR_ASSESSMENT },
                     { title: 'Status Peminjaman', url: ROUTES.SETTINGS_LOAN_STATUS },
+                    { title: 'Registri Field', url: '/admin/attributes' },
                 ]
             },
         ],
@@ -126,7 +127,7 @@ export function DashboardSidebar() {
 
             <SidebarContent className="px-4 pt-6 space-y-6">
                 {NAV_ITEMS.map((group) => (
-                    <SidebarGroup className="p-0">
+                    <SidebarGroup key={group.title} className="p-0">
                         <SidebarMenu>
                             {group.items.map((item) => {
                                 const hasSubItems = item.items && item.items.length > 0;

@@ -55,6 +55,26 @@ service ReferenceService {
       get: "/v1/reference/gl-accounts"
     };
   }
+
+  rpc CreateAttributeRegistry (CreateAttributeRegistryRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/reference/attribute-registry",
+      body: "*"
+    };
+  }
+}
+
+message CreateAttributeRegistryRequest {
+  string attribute_code = 1;
+  string applies_to = 2;
+  string scope = 3;
+  string value_type = 4;
+  string category = 5;
+  bool is_required = 6;
+  bool risk_relevant = 7;
+  string description = 8;
+  string ui_icon = 9;
+  string ui_label = 10;
 }
 
 message LoanProduct {
@@ -90,6 +110,8 @@ message AttributeRegistry {
   string data_type = 3;
   string category = 4;
   bool required = 5;
+  string ui_icon = 6;
+  string ui_label = 7;
 }
 
 message SurveyTemplate {
@@ -140,7 +162,7 @@ message ListAttributeRegistryResponse {
 }
 
 message ListSurveyTemplatesRequest {
-  string head_type = 1;
+  string applicant_type = 1;
   string product_id = 2;
 }
 

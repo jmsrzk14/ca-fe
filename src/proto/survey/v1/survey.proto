@@ -64,7 +64,7 @@ message SurveyTemplate {
   string id = 1;
   string template_code = 2;
   string template_name = 3;
-  string head_type = 4;
+  string applicant_type = 4;
   string product_id = 5;
   bool active = 6;
 }
@@ -156,7 +156,7 @@ message GetSurveyRequest {
 message CreateSurveyTemplateRequest {
   string template_code = 1;
   string template_name = 2;
-  string head_type = 3;
+  string applicant_type = 3;
   string product_id = 4;
   bool active = 5;
 }

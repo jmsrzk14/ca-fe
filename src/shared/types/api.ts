@@ -18,7 +18,6 @@ export interface Applicant {
     establishmentDate: string;
     attributes: Attribute[];
     createdAt?: string | null;
-    updatedAt?: string | null;
 }
 
 export interface ApplicationAttribute {
@@ -52,7 +51,6 @@ export interface Application {
     attributes: ApplicationAttribute[];
     submittedAt: string | null;
     createdAt: string;
-    updatedAt: string;
 }
 
 export interface StatusLog {
@@ -165,6 +163,16 @@ export interface GLAccount {
     code: string;
     name: string;
     accountType: string;
+}
+
+export interface AttributeRegistry {
+    attrKey: string;
+    attrName: string;
+    dataType: string;
+    category: string;
+    required: boolean;
+    uiIcon?: string;
+    uiLabel?: string;
 }
 
 export interface PaginatedResponse<T> {

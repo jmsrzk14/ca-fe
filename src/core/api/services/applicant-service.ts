@@ -28,7 +28,7 @@ function parseTimestamp(ts: any): string | undefined {
 export const applicantService = {
     create: async (data: any) => {
         const response = await client.createApplicant({
-            headType: data.applicantType || data.headType || "PERSONAL",
+            applicantType: data.applicantType || "PERSONAL",
             identityNumber: data.identityNumber,
             taxId: data.taxId,
             fullName: data.fullName,
@@ -47,14 +47,14 @@ export const applicantService = {
         const response = await client.getApplicant({ id });
         return {
             ...response,
-            applicantType: response.headType || "PERSONAL",
+            applicantType: response.applicantType || "PERSONAL",
         };
     },
 
     update: (id: string, data: any) =>
         client.updateApplicant({
             id,
-            headType: data.applicantType || data.headType || "PERSONAL",
+            applicantType: data.applicantType || "PERSONAL",
             identityNumber: data.identityNumber,
             taxId: data.taxId,
             fullName: data.fullName,
@@ -79,7 +79,7 @@ export const applicantService = {
         return {
             applicants: (response.applicants || []).map((app: any) => ({
                 id: app.id || "unknown",
-                applicantType: app.headType || "PERSONAL",
+                applicantType: app.applicantType || "PERSONAL",
                 identityNumber: app.identityNumber || "",
                 taxId: app.taxId || "",
                 fullName: app.fullName || "Unnamed Applicant",
@@ -87,7 +87,6 @@ export const applicantService = {
                 establishmentDate: parseTimestamp(app.establishmentDate) || "",
                 attributes: app.attributes || [],
                 createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
-                updatedAt: parseTimestamp(app.updatedAt) || new Date().toISOString(),
             })),
             nextCursor: response.nextCursor || "",
         };

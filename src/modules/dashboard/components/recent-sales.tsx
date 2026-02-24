@@ -9,10 +9,21 @@ import { useRecentApplications } from '../hooks/use-dashboard-data';
 import { Skeleton } from '@/shared/ui/skeleton';
 
 export function RecentApplications() {
-    const { data, isLoading } = useRecentApplications();
+    const { data, isLoading, error } = useRecentApplications();
 
     if (isLoading) {
         return <Skeleton className="h-[400px] w-full rounded-xl" />;
+    }
+
+    if (error) {
+        return (
+            <Card className="col-span-1 lg:col-span-4 border-border/50 bg-destructive/5 backdrop-blur-sm">
+                <CardContent className="h-[300px] flex flex-col items-center justify-center text-center gap-2">
+                    <p className="font-bold text-destructive">Gagal memuat pengajuan terbaru</p>
+                    <p className="text-xs text-muted-foreground">Silakan periksa koneksi internet Anda.</p>
+                </CardContent>
+            </Card>
+        );
     }
 
     const getStatusColor = (status: string) => {

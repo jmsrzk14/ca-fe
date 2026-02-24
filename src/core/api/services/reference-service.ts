@@ -10,5 +10,7 @@ export const referenceService = {
     getBranches: () => client.listBranches(new Empty()),
     getGLAccounts: () => client.listFinancialGLAccounts(new Empty()),
     getAttributeRegistry: () => client.listAttributeRegistry(new Empty()),
+    createAttributeRegistry: (data: any) => client.createAttributeRegistry(data),
+    updateAttributeRegistry: (data: any) => client.updateAttributeRegistry(data),
 };
 

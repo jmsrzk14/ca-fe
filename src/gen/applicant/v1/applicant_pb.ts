@@ -71,9 +71,9 @@ export class Applicant extends Message<Applicant> {
   id = "";
 
   /**
-   * @generated from field: string head_type = 2;
+   * @generated from field: string applicant_type = 2;
    */
-  headType = "";
+  applicantType = "";
 
   /**
    * @generated from field: string identity_number = 3;
@@ -110,11 +110,6 @@ export class Applicant extends Message<Applicant> {
    */
   createdAt?: Timestamp;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 10;
-   */
-  updatedAt?: Timestamp;
-
   constructor(data?: PartialMessage<Applicant>) {
     super();
     proto3.util.initPartial(data, this);
@@ -124,7 +119,7 @@ export class Applicant extends Message<Applicant> {
   static readonly typeName = "api.applicant.v1.Applicant";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "head_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "identity_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "tax_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "full_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -132,7 +127,6 @@ export class Applicant extends Message<Applicant> {
     { no: 7, name: "establishment_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "attributes", kind: "message", T: ApplicantAttribute, repeated: true },
     { no: 9, name: "created_at", kind: "message", T: Timestamp },
-    { no: 10, name: "updated_at", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Applicant {
@@ -194,9 +188,9 @@ export class ApplicantAttributes extends Message<ApplicantAttributes> {
  */
 export class CreateApplicantRequest extends Message<CreateApplicantRequest> {
   /**
-   * @generated from field: string head_type = 1;
+   * @generated from field: string applicant_type = 1;
    */
-  headType = "";
+  applicantType = "";
 
   /**
    * @generated from field: string identity_number = 2;
@@ -236,7 +230,7 @@ export class CreateApplicantRequest extends Message<CreateApplicantRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.applicant.v1.CreateApplicantRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "head_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "identity_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "tax_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "full_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
@@ -346,9 +340,9 @@ export class UpdateApplicantRequest extends Message<UpdateApplicantRequest> {
   id = "";
 
   /**
-   * @generated from field: string head_type = 2;
+   * @generated from field: string applicant_type = 2;
    */
-  headType = "";
+  applicantType = "";
 
   /**
    * @generated from field: string identity_number = 3;
@@ -389,7 +383,7 @@ export class UpdateApplicantRequest extends Message<UpdateApplicantRequest> {
   static readonly typeName = "api.applicant.v1.UpdateApplicantRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "head_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "identity_number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "tax_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "full_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },

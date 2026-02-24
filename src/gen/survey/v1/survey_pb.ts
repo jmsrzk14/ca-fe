@@ -26,9 +26,9 @@ export class SurveyTemplate extends Message<SurveyTemplate> {
   templateName = "";
 
   /**
-   * @generated from field: string head_type = 4;
+   * @generated from field: string applicant_type = 4;
    */
-  headType = "";
+  applicantType = "";
 
   /**
    * @generated from field: string product_id = 5;
@@ -51,7 +51,7 @@ export class SurveyTemplate extends Message<SurveyTemplate> {
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "template_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "template_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "head_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "product_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
@@ -748,9 +748,9 @@ export class CreateSurveyTemplateRequest extends Message<CreateSurveyTemplateReq
   templateName = "";
 
   /**
-   * @generated from field: string head_type = 3;
+   * @generated from field: string applicant_type = 3;
    */
-  headType = "";
+  applicantType = "";
 
   /**
    * @generated from field: string product_id = 4;
@@ -772,7 +772,7 @@ export class CreateSurveyTemplateRequest extends Message<CreateSurveyTemplateReq
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "template_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "template_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "head_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "product_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);

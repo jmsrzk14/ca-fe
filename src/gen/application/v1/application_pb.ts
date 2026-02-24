@@ -171,11 +171,6 @@ export class Application extends Message<Application> {
    */
   createdAt?: Timestamp;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 16;
-   */
-  updatedAt?: Timestamp;
-
   constructor(data?: PartialMessage<Application>) {
     super();
     proto3.util.initPartial(data, this);
@@ -199,7 +194,6 @@ export class Application extends Message<Application> {
     { no: 13, name: "attributes", kind: "message", T: ApplicationAttribute, repeated: true },
     { no: 14, name: "submitted_at", kind: "message", T: Timestamp },
     { no: 15, name: "created_at", kind: "message", T: Timestamp },
-    { no: 16, name: "updated_at", kind: "message", T: Timestamp },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Application {

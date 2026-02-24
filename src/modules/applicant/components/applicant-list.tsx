@@ -250,14 +250,6 @@ export function ApplicantList() {
 
     if (error) {
         return (
-            // <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-            //     <div className="p-4 bg-destructive/10 text-destructive rounded-full">
-            //         <X className="h-10 w-10" />
-            //     </div>
-            //     <h2 className="text-xl font-bold text-foreground">{t`Failed to load applicants`}</h2>
-            //     <p className="text-muted-foreground">{t`There was an error fetching the data. Please try again later.`}</p>
-            //     <Button onClick={() => window.location.reload()}>{t`Retry`}</Button>
-            // </div>
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -279,47 +271,24 @@ export function ApplicantList() {
                     </div>
                 </div>
 
-                <ApplicantFormSheet open={isFormOpen} onOpenChange={setIsFormOpen} />
-
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-card/50 p-4 rounded-2xl border border-border/50 backdrop-blur-sm">
-                    <div className="relative w-full md:w-96">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder={t`Cari berdasarkan nama atau NIK`}
-                            className="pl-10 bg-background/50 border-border/50 rounded-xl focus-visible:ring-orange-500/50"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+                <div className="flex flex-col items-center justify-center py-20 gap-4 text-center bg-card/30 backdrop-blur-md rounded-2xl border border-destructive/20">
+                    <div className="p-4 bg-destructive/10 text-destructive rounded-full">
+                        <X className="h-10 w-10" />
                     </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/50 shadow-inner">
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => setViewMode('table')}
-                                className={cn(
-                                    "h-8 w-8 transition-all",
-                                    viewMode === 'table' ? "bg-background shadow-md text-primary hover:bg-background" : "text-muted-foreground hover:bg-transparent hover:text-primary"
-                                )}
-                            >
-                                <List className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => setViewMode('kanban')}
-                                className={cn(
-                                    "h-8 w-8 transition-all",
-                                    viewMode === 'kanban' ? "bg-background shadow-md text-primary hover:bg-background" : "text-muted-foreground hover:bg-transparent hover:text-primary"
-                                )}
-                            >
-                                <LayoutGrid className="h-4 w-4" />
-                            </Button>
-                        </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-foreground">{t`Gagal memuat data peminjam`}</h2>
+                        <p className="text-muted-foreground max-w-md mx-auto mt-2">
+                            {error instanceof Error ? error.message : t`Terjadi kesalahan saat mengambil data. Silakan periksa koneksi internet Anda atau coba lagi nanti.`}
+                        </p>
                     </div>
+                    <Button
+                        variant="outline"
+                        onClick={() => window.location.reload()}
+                        className="mt-2 rounded-xl border-orange-200 hover:bg-orange-50 text-orange-700"
+                    >
+                        {t`Coba Lagi`}
+                    </Button>
                 </div>
-
-                {renderContent()}
             </div>
         );
     }
@@ -340,7 +309,7 @@ export function ApplicantList() {
                     >
                         <Link href="/borrowers/add">
                             <Plus className="h-5 w-5" />
-                            {t`Add Applicant`}
+                            {t`Tambah peminjam`}
                         </Link>
                     </Button>
                 </div>

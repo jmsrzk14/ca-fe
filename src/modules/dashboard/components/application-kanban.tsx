@@ -61,6 +61,7 @@ export function ApplicationKanban() {
     const [data, setData] = React.useState<KanbanColumnData[] | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const [error, setError] = React.useState<string | null>(null);
     const [activeApp, setActiveApp] = React.useState<ApplicationCardData | null>(null);
     const [isNewAppDialogOpen, setIsNewAppDialogOpen] = React.useState(false);
 
@@ -73,15 +74,25 @@ export function ApplicationKanban() {
     );
 
     const fetchData = React.useCallback(async (silent = false) => {
-        if (!silent) setIsLoading(true);
-        else setIsRefreshing(true);
+        if (!silent) {
+            setIsLoading(true);
+            setError(null);
+        } else {
+            setIsRefreshing(true);
+        }
 
         try {
             const boardData = await kanbanService.getBoardData();
             setData(boardData);
+            setError(null);
             if (silent) toast.success('Data refreshed');
-        } catch (error) {
-            toast.error('Failed to fetch data');
+        } catch (err: any) {
+            const errorMessage = err?.message || 'Failed to fetch data';
+            if (!silent) {
+                setError(errorMessage);
+            } else {
+                toast.error(errorMessage);
+            }
         } finally {
             setIsLoading(false);
             setIsRefreshing(false);
@@ -261,6 +272,29 @@ export function ApplicationKanban() {
     }
 
     const allApplications = data?.flatMap(col => col.applications) ?? [];
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 gap-6 text-center animate-in fade-in duration-500">
+                <div className="p-6 bg-rose-500/10 text-rose-600 rounded-full ring-8 ring-rose-500/5">
+                    <RotateCw className="h-12 w-12" />
+                </div>
+                <div className="space-y-2">
+                    <h2 className="text-2xl font-bold text-foreground">Gagal memuat data pengajuan</h2>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                        {error}
+                    </p>
+                </div>
+                <Button
+                    onClick={() => fetchData()}
+                    className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl gap-2 font-semibold shadow-lg shadow-orange-600/20"
+                >
+                    <RotateCw className="h-4 w-4" />
+                    Coba Lagi
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 w-full h-full overflow-hidden animate-in fade-in duration-500">

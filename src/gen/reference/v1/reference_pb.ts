@@ -7,6 +7,97 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
+ * @generated from message api.reference.v1.CreateAttributeRegistryRequest
+ */
+export class CreateAttributeRegistryRequest extends Message<CreateAttributeRegistryRequest> {
+  /**
+   * @generated from field: string attribute_code = 1;
+   */
+  attributeCode = "";
+
+  /**
+   * @generated from field: string applies_to = 2;
+   */
+  appliesTo = "";
+
+  /**
+   * @generated from field: string scope = 3;
+   */
+  scope = "";
+
+  /**
+   * @generated from field: string value_type = 4;
+   */
+  valueType = "";
+
+  /**
+   * @generated from field: string category = 5;
+   */
+  category = "";
+
+  /**
+   * @generated from field: bool is_required = 6;
+   */
+  isRequired = false;
+
+  /**
+   * @generated from field: bool risk_relevant = 7;
+   */
+  riskRelevant = false;
+
+  /**
+   * @generated from field: string description = 8;
+   */
+  description = "";
+
+  /**
+   * @generated from field: string ui_icon = 9;
+   */
+  uiIcon = "";
+
+  /**
+   * @generated from field: string ui_label = 10;
+   */
+  uiLabel = "";
+
+  constructor(data?: PartialMessage<CreateAttributeRegistryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.CreateAttributeRegistryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "attribute_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "applies_to", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "scope", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "value_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "is_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 7, name: "risk_relevant", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "ui_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "ui_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAttributeRegistryRequest {
+    return new CreateAttributeRegistryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAttributeRegistryRequest {
+    return new CreateAttributeRegistryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAttributeRegistryRequest {
+    return new CreateAttributeRegistryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateAttributeRegistryRequest | PlainMessage<CreateAttributeRegistryRequest> | undefined, b: CreateAttributeRegistryRequest | PlainMessage<CreateAttributeRegistryRequest> | undefined): boolean {
+    return proto3.util.equals(CreateAttributeRegistryRequest, a, b);
+  }
+}
+
+/**
  * @generated from message api.reference.v1.LoanProduct
  */
 export class LoanProduct extends Message<LoanProduct> {
@@ -249,6 +340,16 @@ export class AttributeRegistry extends Message<AttributeRegistry> {
    */
   required = false;
 
+  /**
+   * @generated from field: string ui_icon = 6;
+   */
+  uiIcon = "";
+
+  /**
+   * @generated from field: string ui_label = 7;
+   */
+  uiLabel = "";
+
   constructor(data?: PartialMessage<AttributeRegistry>) {
     super();
     proto3.util.initPartial(data, this);
@@ -262,6 +363,8 @@ export class AttributeRegistry extends Message<AttributeRegistry> {
     { no: 3, name: "data_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 6, name: "ui_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "ui_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttributeRegistry {
@@ -685,9 +788,9 @@ export class ListAttributeRegistryResponse extends Message<ListAttributeRegistry
  */
 export class ListSurveyTemplatesRequest extends Message<ListSurveyTemplatesRequest> {
   /**
-   * @generated from field: string head_type = 1;
+   * @generated from field: string applicant_type = 1;
    */
-  headType = "";
+  applicantType = "";
 
   /**
    * @generated from field: string product_id = 2;
@@ -702,7 +805,7 @@ export class ListSurveyTemplatesRequest extends Message<ListSurveyTemplatesReque
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.reference.v1.ListSurveyTemplatesRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "head_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "product_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 

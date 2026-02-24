@@ -74,7 +74,6 @@ export const applicationService = {
                 branchCode: app.branchCode || "",
                 attributes: app.attributes || [],
                 createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
-                updatedAt: parseTimestamp(app.updatedAt) || new Date().toISOString(),
                 submittedAt: parseTimestamp(app.submittedAt) || null,
             })),
             nextCursor: response.nextCursor || "",

@@ -14,8 +14,11 @@ import {
     Copy,
     Smartphone,
     Link as LinkIcon,
+    Activity,
+    Calendar,
+    Settings,
 } from 'lucide-react';
-import { applicantService } from '@/core/api';
+import { applicantService, referenceService } from '@/core/api';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
@@ -35,6 +38,52 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         queryFn: () => applicantService.getById(id),
     });
 
+    const { data: registryResponse } = useQuery({
+        queryKey: ['attribute-registry'],
+        queryFn: () => referenceService.getAttributeRegistry(),
+    });
+
+    const registry = (registryResponse?.attributes || []) as any[];
+
+    // Grouping logic: Merge registry info with actual values (MUST be before early returns)
+    const groupedAttributes = React.useMemo(() => {
+        if (!applicant) return [];
+
+        const groups: Record<string, any[]> = {};
+        const data = applicant;
+        const attributes = data.attributes || [];
+
+        // 1. Initial Core Group (Category 1 usually)
+        const coreGroup = '1. Identitas';
+        groups[coreGroup] = [
+            { label: t`Tipe Applicant`, value: data.applicantType, icon: Building2 },
+            { label: t`Nama Lengkap`, value: data.fullName, icon: User },
+            { label: t`NIK / No. Identitas`, value: data.identityNumber, icon: Fingerprint },
+            { label: t`NPWP`, value: data.taxId || '-', icon: Activity },
+            {
+                label: data.applicantType === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`,
+                value: data.applicantType === 'PERSONAL' ? data.birthDate : data.establishmentDate,
+                icon: Calendar
+            },
+        ];
+
+        // 2. Map Dynamic attributes to their categories
+        attributes.forEach((attr: any) => {
+            const regItem = registry.find(r => r.attrKey === attr.key);
+            const cat = regItem?.category || t`Informasi Lainnya`;
+
+            if (!groups[cat]) groups[cat] = [];
+
+            groups[cat].push({
+                label: regItem?.uiLabel || regItem?.attrName || attr.key,
+                value: attr.value,
+                icon: regItem?.uiIcon ? Settings : Settings
+            });
+        });
+
+        return Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]));
+    }, [applicant, registry, t]);
+
     if (isLoading) {
         return <DetailSkeleton />;
     }
@@ -43,7 +92,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
                 <div className="p-4 bg-destructive/10 text-destructive rounded-full">
-                    <User className="h-10 w-10" />
+                    <X className="h-10 w-10" />
                 </div>
                 <h2 className="text-xl font-bold">{t`Applicant Not Found`}</h2>
                 <p className="text-muted-foreground">{t`The applicant you are looking for does not exist or has been removed.`}</p>
@@ -54,11 +103,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         );
     }
 
-    const data = applicant || {};
-    const attributes = data.attributes || [];
-
-    // Helper to get attribute value
-    const getAttr = (key: string) => attributes.find((a: any) => a.key === key)?.value || '-';
+    const data = applicant;
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -75,26 +120,6 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                             <h1 className="text-5xl font-extrabold tracking-tight text-foreground">
                                 {data.fullName}
                             </h1>
-                            <div className="flex items-center gap-3">
-                                <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-border bg-background/50 hover:bg-muted transition-all">
-                                    <Mail className="h-5 w-5 text-foreground" />
-                                </Button>
-                                <Button variant="outline" size="icon" className="h-10 w-10 rounded-full border-border bg-background/50 hover:bg-muted transition-all">
-                                    <Smartphone className="h-5 w-5 text-foreground" />
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-lg bg-orange-600 flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-orange-600/20">
-                                    {data.fullName?.charAt(0) || 'A'}
-                                </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                                    {data.updatedAt ? t`Updated ${new Date(typeof data.updatedAt === 'string' ? data.updatedAt : Number((data.updatedAt as any).seconds) * 1000).toLocaleDateString()}` : t`No update info`}
-                                    <LinkIcon className="h-3 w-3 text-cyan-500 ml-1" />
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -123,90 +148,32 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                             value="profile"
                             className="bg-transparent p-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-600 data-[state=active]:bg-transparent data-[state=active]:text-foreground text-base font-bold transition-all"
                         >
-                            {t`Profile`}
+                            {t`Profile Lengkap`}
                         </TabsTrigger>
                         <TabsTrigger
                             value="applications"
                             className="bg-transparent p-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-600 data-[state=active]:bg-transparent data-[state=active]:text-foreground text-base font-bold transition-all text-muted-foreground/60 hover:text-muted-foreground"
                         >
-                            {t`Applications`}
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="portal"
-                            className="bg-transparent p-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-600 data-[state=active]:bg-transparent data-[state=active]:text-foreground text-base font-bold transition-all text-muted-foreground/60 hover:text-muted-foreground"
-                        >
-                            {t`Digital Lending Portal`}
+                            {t`Daftar Pinjaman`}
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="profile" className="pt-10 space-y-16">
-                        {/* Profile Section Header */}
-                        <div className="flex items-center justify-between gap-4">
-                            <h2 className="text-3xl font-bold text-foreground">{t`Profile`}</h2>
-                            <div className="flex gap-4">
-                                <Badge variant={data.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="px-4 py-1.5 rounded-full font-bold">
-                                    {data.applicantType}
-                                </Badge>
-                                <Button variant="link" className="text-cyan-600 font-bold p-0 h-auto flex gap-2 items-center hover:no-underline hover:text-cyan-500">
-                                    <Edit3 className="h-4 w-4" />
-                                    {t`Edit Profile`}
-                                </Button>
+                    <TabsContent value="profile" className="pt-10 space-y-12">
+                        {groupedAttributes.map(([category, items]) => (
+                            <div key={category} className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                <h3 className="text-xl font-bold text-foreground flex items-center gap-2 border-b-2 border-orange-100 pb-2 w-fit pr-8">
+                                    <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
+                                        <Building2 className="h-4 w-4" />
+                                    </div>
+                                    {category}
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
+                                    {items.map((item, idx) => (
+                                        <DetailRow key={idx} label={item.label} value={item.value || '-'} />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-
-                        {/* Basic Information */}
-                        <div className="space-y-8">
-                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                                <User className="h-5 w-5 text-orange-600" />
-                                {t`Basic Information`}
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
-                                <DetailRow label={t`Full Name`} value={data.fullName || '-'} />
-                                <DetailRow label={t`ID (NIK)`} value={getAttr('id_nik')} />
-                                <DetailRow label={t`Birth Date`} value={data.birthDate || '-'} />
-                                <DetailRow label={t`Marital Status`} value={getAttr('id_status_kawin')} />
-                                {getAttr('id_status_kawin') === 'Kawin' && (
-                                    <DetailRow label={t`Spouse Name`} value={getAttr('sp_nama')} />
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Contact Details */}
-                        <div className="space-y-8">
-                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                                <Phone className="h-5 w-5 text-orange-600" />
-                                {t`Contact Details`}
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
-                                <DetailRow label={t`Primary Phone`} value={getAttr('c_hp1')} />
-                                <DetailRow label={t`Email Address`} value={getAttr('c_email')} isLink />
-                                <DetailRow label={t`Residential Address`} value={getAttr('addr_residence')} />
-                            </div>
-                        </div>
-
-                        {/* Employment & Financials */}
-                        <div className="space-y-8">
-                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                                <Building2 className="h-5 w-5 text-orange-600" />
-                                {t`Employment & Financials`}
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
-                                <DetailRow label={t`Job Status`} value={getAttr('job_status')} />
-                                <DetailRow label={t`Net Salary`} value={getAttr('job_gaji_bersih') !== '-' ? `Rp ${Number(getAttr('job_gaji_bersih')).toLocaleString()}` : '-'} />
-                                <DetailRow label={t`Company Name`} value={getAttr('job_instansi_nama')} />
-                            </div>
-                        </div>
-
-                        {/* Behavioral Information */}
-                        <div className="space-y-8">
-                            <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
-                                <Fingerprint className="h-5 w-5 text-orange-600" />
-                                {t`Behavioral Records`}
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-10">
-                                <DetailRow label={t`Discipline Level`} value={getAttr('beh_disiplin')} />
-                            </div>
-                        </div>
+                        ))}
                     </TabsContent>
 
                     <TabsContent value="applications">
