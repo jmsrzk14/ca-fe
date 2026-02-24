@@ -84,7 +84,7 @@ const NAV_ITEMS: NavGroup[] = [
                     { title: 'Komponen CRR', url: ROUTES.SETTINGS_CRR_COMPONENTS },
                     { title: 'Penilaian CRR', url: ROUTES.SETTINGS_CRR_ASSESSMENT },
                     { title: 'Status Peminjaman', url: ROUTES.SETTINGS_LOAN_STATUS },
-                    { title: 'Registri Field', url: '/admin/attributes' },
+                    { title: 'Registri Field', url: ROUTES.ATTRIBUTES },
                 ]
             },
         ],

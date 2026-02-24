@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, UserPlus } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { t } from '@/shared/lib/t';
-import { ApplicantForm } from './applicant-form';
+import { DynamicApplicantForm } from './dynamic-applicant-form';
 
 export function ApplicantAddView() {
     const router = useRouter();
@@ -35,7 +35,7 @@ export function ApplicantAddView() {
                 </div>
             </div>
 
-            <ApplicantForm
+            <DynamicApplicantForm
                 onSuccess={() => router.push('/borrowers')}
                 onCancel={() => router.back()}
             />

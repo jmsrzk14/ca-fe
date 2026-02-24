@@ -19,6 +19,8 @@ import {
     Activity,
     Heart,
     Calendar,
+    GraduationCap,
+    Home,
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
 import { toast } from 'sonner';
@@ -73,7 +75,7 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
 
         // Ensure categories are sorted (1. Identitas, 2. Pasangan, etc.)
         registry.forEach(attr => {
-            const catName = attr.category || t`Lainnya`;
+            const catName = attr.category || 'IDENTITAS';
             if (!groups[catName]) {
                 groups[catName] = [];
             }
@@ -85,7 +87,7 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([name, fields]) => ({
                 id: name.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                title: name,
+                title: t`${name}`,
                 fields
             }));
     }, [registry, t]);
@@ -97,11 +99,13 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
             const name = cat.title.toUpperCase();
             if (name.includes('KONTAK')) Icon = Phone;
             if (name.includes('PEKERJAAN')) Icon = Briefcase;
-            if (name.includes('FINANSIAL')) Icon = DollarSign;
+            if (name.includes('FINANSIAL') || name.includes('USAHA')) Icon = DollarSign;
             if (name.includes('IDENTITAS') || name.includes('BIO')) Icon = User;
-            if (name.includes('PERILAKU')) Icon = Activity;
+            if (name.includes('PERILAKU') || name.includes('KARAKTER')) Icon = Activity;
             if (name.includes('PASANGAN')) Icon = Heart;
             if (name.includes('DOKUMEN')) Icon = Building2;
+            if (name.includes('PENDIDIKAN')) Icon = GraduationCap;
+            if (name.includes('RUMAH')) Icon = Home;
 
             return { ...cat, icon: Icon };
         });
@@ -184,11 +188,10 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
     const getIconWithName = (name?: string) => {
         if (!name) return Settings;
         try {
-            // This is a simple mapping for common icons.
-            // In a real app, you might use a lookup table or dynamic import
             const icons: Record<string, any> = {
                 User, Building2, Settings, CheckCircle2,
                 Phone, Mail, MapPin, Briefcase, DollarSign, Activity, Heart,
+                GraduationCap, Home
             };
             return icons[name] || Settings;
         } catch {
@@ -196,9 +199,43 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         }
     };
 
+    // Specific options for common fields to make the dynamic form feel premium
+    const COMMON_OPTIONS: Record<string, { label: string, value: string }[]> = {
+        gender: [
+            { label: t`Laki-laki`, value: 'MALE' },
+            { label: t`Perempuan`, value: 'FEMALE' },
+        ],
+        maritalStatus: [
+            { label: t`Belum Menikah`, value: 'SINGLE' },
+            { label: t`Menikah`, value: 'MARRIED' },
+            { label: t`Cerai`, value: 'DIVORCED' },
+        ],
+        homeOwnership: [
+            { label: t`Milik Sendiri`, value: 'OWNED' },
+            { label: t`Sewa/Kontrak`, value: 'RENTED' },
+            { label: t`Milik Keluarga`, value: 'FAMILY' },
+        ],
+        jobStatus: [
+            { label: t`Karyawan Tetap`, value: 'PERMANENT' },
+            { label: t`Karyawan Kontrak`, value: 'CONTRACT' },
+            { label: t`Wiraswasta`, value: 'SELF_EMPLOYED' },
+        ],
+        lastEducation: [
+            { label: t`SMA/Sederajat`, value: 'SMA' },
+            { label: t`D3`, value: 'D3' },
+            { label: t`S1`, value: 'S1' },
+            { label: t`S2`, value: 'S2' },
+        ],
+        isKnownInArea: [
+            { label: t`Ya`, value: 'YES' },
+            { label: t`Tidak`, value: 'NO' },
+        ]
+    };
+
     const renderField = (field: AttributeRegistry) => {
         const id = field.attrKey;
-        const label = field.uiLabel || field.attrName || id;
+        const rawLabel = field.uiLabel || field.attrName || id;
+        const label = t`${rawLabel}`;
         const isRequired = field.required;
         const FieldIcon = getIconWithName(field.uiIcon);
 
@@ -209,7 +246,27 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
             </Label>
         );
 
-        switch (field.dataType) {
+        // Check if we have common options for this field key
+        const options = COMMON_OPTIONS[id];
+        if (options) {
+            return (
+                <div key={id} className="space-y-1">
+                    {labelContent}
+                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id]}>
+                        <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
+                            <SelectValue placeholder={t`Pilih ${label}...`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {options.map(opt => (
+                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            );
+        }
+
+        switch (field.dataType?.toUpperCase()) {
             case 'BOOLEAN':
                 return (
                     <div key={id} className="space-y-1">
@@ -243,7 +300,7 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
                 return (
                     <div key={id} className="space-y-1">
                         {labelContent}
-                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" />
+                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan ${label}`} />
                     </div>
                 );
         }

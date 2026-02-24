@@ -14,6 +14,7 @@ export const ROUTES = {
   SETTINGS_CRR_COMPONENTS: '/settings/crr-components',
   SETTINGS_CRR_ASSESSMENT: '/settings/crr-assessment',
   SETTINGS_LOAN_STATUS: '/settings/loan-status',
+  ATTRIBUTES: '/settings/attributes',
 } as const;
 
 export const THEME_CONFIG = {
