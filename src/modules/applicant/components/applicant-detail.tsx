@@ -69,6 +69,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
 
         // 2. Map Dynamic attributes to their categories
         attributes.forEach((attr: any) => {
+            const regItem = registry.find(r => r.attrKey === attr.key);
             const catVal = regItem?.category || 'Informasi Lainnya';
             const cat = t`${catVal}`;
 
