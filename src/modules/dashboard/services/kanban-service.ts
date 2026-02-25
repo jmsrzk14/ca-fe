@@ -20,8 +20,8 @@ function formatDate(iso: string): string {
 function mapToCardData(app: any): ApplicationCardData {
     return {
         id: app.id || "unknown",
-        applicantId: app.applicantId || "unknown",
-        borrowerName: app.borrowerName || app.applicantName || "",
+        identityNumber: app.identityNumber || "unknown",
+        fullName: app.fullName || "",
         productId: app.productId || "",
         aoId: app.aoId || "",
         refNumber: (app.id || "").slice(0, 8).toUpperCase() || "NEW",
