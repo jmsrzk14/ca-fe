@@ -129,6 +129,14 @@ export function ApplicantList() {
                         <TableRow className="hover:bg-transparent border-border/50">
                             <TableHead
                                 className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                onClick={() => handleSort('identityNumber')}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {t`NIK`} <SortIcon column="identityNumber" />
+                                </div>
+                            </TableHead>
+                            <TableHead
+                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
                                 onClick={() => handleSort('fullName')}
                             >
                                 <div className="flex items-center gap-2">
@@ -151,13 +159,17 @@ export function ApplicantList() {
                                     {t`TANGGAL DIBUAT`} <SortIcon column="createdAt" />
                                 </div>
                             </TableHead>
-                            <TableHead className="py-4 flex item-center gap-2">{t`AKSI`}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {sortedApplicants.length > 0 ? (
                             sortedApplicants.map((app: any) => (
                                 <TableRow key={app.id} className="group hover:bg-white/5 border-border/50 transition-colors">
+                                    <TableCell className="py-4">
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            {app.identityNumber}
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="py-4">
                                         <div className="flex items-center gap-3">
                                             <Avatar className="h-10 w-10 ring-2 ring-primary/5 group-hover:ring-orange-500/20 transition-all">
@@ -184,20 +196,6 @@ export function ApplicantList() {
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                             <Calendar className="h-3 w-3" />
                                             <span>{app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Feb 19, 2026'}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-4">
-                                        <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="icon" className="rounded-xl hover:bg-orange-500/10 hover:text-orange-500" asChild>
-                                                <Link href={`/borrowers/${app.id}`}>
-                                                    <Eye className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
-                                            <Button variant="outline" size="icon" className="rounded-xl hover:bg-orange-500/10 hover:text-orange-500" asChild>
-                                                <Link href={`/borrowers/${app.id}/edit`}>
-                                                    <PencilIcon className="h-4 w-4" />
-                                                </Link>
-                                            </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>

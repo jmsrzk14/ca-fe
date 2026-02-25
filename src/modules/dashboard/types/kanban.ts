@@ -14,8 +14,8 @@ export const APPLICATION_STATUS_COLUMNS: { id: ApplicationStatus; title: string;
 
 export interface ApplicationCardData {
     id: string;
-    applicantId: string;
-    borrowerName: string;
+    identityNumber: string;
+    fullName: string;
     productId: string;
     aoId: string;
     // Display-friendly fields (derived from API)
