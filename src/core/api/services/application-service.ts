@@ -26,8 +26,78 @@ function parseTimestamp(ts: any): string | undefined {
     }
 }
 
+// --- DUMMY DATA BLOCK START ---
+const USE_DUMMY_DATA = false;
+
+const DUMMY_APPLICATIONS: any[] = [
+    {
+        id: "dummy-loan-1",
+        applicantId: "dummy-app-1",
+        productId: "prod-1",
+        aoId: "ao-1",
+        loanAmount: "50000000",
+        tenorMonths: 12,
+        interestType: "FLAT",
+        interestRate: "1.5",
+        loanPurpose: "Modal Usaha",
+        applicationChannel: "BRANCH",
+        status: "PROCESSING",
+        branchCode: "JKT01",
+        attributes: [],
+        createdAt: new Date().toISOString(),
+        submittedAt: new Date().toISOString(),
+    },
+    {
+        id: "dummy-loan-2",
+        applicantId: "dummy-app-2",
+        productId: "prod-2",
+        aoId: "ao-2",
+        loanAmount: "250000000",
+        tenorMonths: 36,
+        interestType: "EFFECTIVE",
+        interestRate: "1.2",
+        loanPurpose: "Ekspansi Bisnis",
+        applicationChannel: "ONLINE",
+        status: "APPROVED",
+        branchCode: "JKT02",
+        attributes: [],
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        submittedAt: new Date(Date.now() - 86400000).toISOString(),
+    },
+    {
+        id: "dummy-loan-3",
+        applicantId: "dummy-app-3",
+        productId: "prod-1",
+        aoId: "ao-1",
+        loanAmount: "15000000",
+        tenorMonths: 6,
+        interestType: "FLAT",
+        interestRate: "2.0",
+        loanPurpose: "Biaya Pendidikan",
+        applicationChannel: "APP",
+        status: "REJECTED",
+        branchCode: "JKT01",
+        attributes: [],
+        createdAt: new Date(Date.now() - 172800000).toISOString(),
+        submittedAt: new Date(Date.now() - 172800000).toISOString(),
+    }
+];
+// --- DUMMY DATA BLOCK END ---
+
 export const applicationService = {
     create: async (data: Partial<Application>) => {
+        if (USE_DUMMY_DATA) {
+            const newApp = {
+                ...data,
+                id: `dummy-loan-${Date.now()}`,
+                status: "SUBMITTED",
+                createdAt: new Date().toISOString(),
+                submittedAt: new Date().toISOString()
+            };
+            DUMMY_APPLICATIONS.unshift(newApp);
+            return newApp;
+        }
+
         const response = await client.createApplication({
             applicantId: data.applicantId,
             productId: data.productId,
@@ -48,10 +118,29 @@ export const applicationService = {
         return response;
     },
 
-    getById: (id: string) =>
-        client.getApplication({ id }),
+    getById: async (id: string) => {
+        if (USE_DUMMY_DATA) {
+            const app = DUMMY_APPLICATIONS.find(a => a.id === id);
+            return app ? { ...app } : null;
+        }
+        return client.getApplication({ id });
+    },
 
     list: async (params?: Record<string, string>) => {
+        if (USE_DUMMY_DATA) {
+            let filtered = [...DUMMY_APPLICATIONS];
+            if (params?.status) {
+                filtered = filtered.filter(a => a.status === params.status);
+            }
+            if (params?.applicantId) {
+                filtered = filtered.filter(a => a.applicantId === params.applicantId);
+            }
+            return {
+                applications: filtered,
+                nextCursor: "",
+            };
+        }
+
         const response = await client.listApplications({
             cursor: params?.cursor || "",
             status: params?.status || "",
@@ -81,6 +170,15 @@ export const applicationService = {
     },
 
     updateStatus: async (id: string, status: string) => {
+        if (USE_DUMMY_DATA) {
+            const index = DUMMY_APPLICATIONS.findIndex(a => a.id === id);
+            if (index !== -1) {
+                DUMMY_APPLICATIONS[index].status = status;
+                return { success: true };
+            }
+            return { success: false };
+        }
+
         const response = await client.changeApplicationStatus({
             id,
             newStatus: status,

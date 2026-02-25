@@ -281,9 +281,6 @@ export function ApplicationKanban() {
                 </div>
                 <div className="space-y-2">
                     <h2 className="text-2xl font-bold text-foreground">Gagal memuat data pengajuan</h2>
-                    <p className="text-muted-foreground max-w-md mx-auto">
-                        {error}
-                    </p>
                 </div>
                 <Button
                     onClick={() => fetchData()}

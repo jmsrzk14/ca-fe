@@ -42,11 +42,12 @@ import {
 } from '@/shared/ui/dialog';
 
 interface DynamicApplicantFormProps {
+    applicantId?: string;
     onSuccess?: () => void;
     onCancel?: () => void;
 }
 
-export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFormProps) {
+export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: DynamicApplicantFormProps) {
     const queryClient = useQueryClient();
     const [currentStep, setCurrentStep] = React.useState(0);
     const [type, setType] = React.useState<ApplicantType>('PERSONAL');
@@ -57,6 +58,13 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         queryKey: ['attribute-registry'],
         queryFn: () => referenceService.getAttributeRegistry(),
     });
+
+    const { data: applicantData, isLoading: isApplicantLoading } = useQuery({
+        queryKey: ['applicant', applicantId],
+        queryFn: () => applicantService.getById(applicantId!),
+        enabled: !!applicantId,
+    });
+
 
     const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
 
@@ -69,6 +77,25 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         establishmentDate: '',
     });
 
+    React.useEffect(() => {
+        if (applicantData) {
+            setType(applicantData.applicantType || 'PERSONAL');
+
+            const newFormData: Record<string, any> = {
+                fullName: applicantData.fullName || '',
+                identityNumber: applicantData.identityNumber || '',
+                taxId: applicantData.taxId || '',
+                birthDate: applicantData.birthDate ? String(applicantData.birthDate).split('T')[0] : '',
+                establishmentDate: applicantData.establishmentDate ? String(applicantData.establishmentDate).split('T')[0] : '',
+            };
+
+            applicantData.attributes?.forEach((attr: any) => {
+                newFormData[attr.key] = attr.value;
+            });
+
+            setFormData(newFormData);
+        }
+    }, [applicantData]);
     // 2. Group Registry by Category to create Steps dynamically
     const categories = React.useMemo(() => {
         const groups: Record<string, AttributeRegistry[]> = {};
@@ -126,14 +153,22 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
     };
 
     const mutation = useMutation({
-        mutationFn: (data: any) => applicantService.create(data),
+        mutationFn: (data: any) => {
+            if (applicantId) {
+                return applicantService.update(applicantId, data);
+            }
+            return applicantService.create(data);
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['applicants'] });
-            toast.success(t`Applicant created successfully`);
+            if (applicantId) {
+                queryClient.invalidateQueries({ queryKey: ['applicant', applicantId] });
+            }
+            toast.success(applicantId ? t`Applicant updated successfully` : t`Applicant created successfully`);
             onSuccess?.();
         },
         onError: (error: any) => {
-            toast.error(error.message || t`Failed to create applicant`);
+            toast.error(error.message || (applicantId ? t`Failed to update applicant` : t`Failed to create applicant`));
         },
     });
 
@@ -186,20 +221,20 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
             fullName: formData.fullName,
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
-            birthDate: type === 'PERSONAL' ? formData.birthDate : '',
-            establishmentDate: type === 'CORPORATE' ? formData.establishmentDate : '',
+            birthDate: type === 'PERSONAL' && formData.birthDate ? new Date(formData.birthDate).toISOString() : '',
+            establishmentDate: type === 'CORPORATE' && formData.establishmentDate ? new Date(formData.establishmentDate).toISOString() : '',
             attributes,
-            createdAt: now
+            ...(applicantId ? {} : { createdAt: now })
         };
 
         mutation.mutate(payload);
     };
 
-    if (isRegistryLoading) {
+    if (isRegistryLoading || (applicantId && isApplicantLoading)) {
         return (
             <div className="flex h-64 items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
-                <span className="ml-3 font-medium">{t`Memuat konfigurasi form...`}</span>
+                <span className="ml-3 font-medium">{t`Memuat data...`}</span>
             </div>
         );
     }

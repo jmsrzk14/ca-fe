@@ -125,11 +125,19 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                     </div>
 
                     <div className="flex flex-col items-end gap-16">
-                        <Button asChild variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full">
-                            <Link href="/borrowers">
-                                <X className="h-6 w-6" />
-                            </Link>
-                        </Button>
+                        <div className="flex items-center gap-4">
+                            <Button asChild variant="outline" className="rounded-xl hover:bg-orange-500/10 hover:text-orange-500 font-bold border-orange-500/20 text-orange-600">
+                                <Link href={`/borrowers/${data.id}/edit`}>
+                                    <Edit3 className="mr-2 h-4 w-4" />
+                                    {t`Edit Profil`}
+                                </Link>
+                            </Button>
+                            <Button asChild variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full">
+                                <Link href="/borrowers">
+                                    <X className="h-6 w-6" />
+                                </Link>
+                            </Button>
+                        </div>
                         <div
                             className="bg-muted/50 border border-border rounded-lg px-4 py-1.5 flex items-center gap-3 cursor-pointer hover:bg-muted transition-all group shadow-sm"
                             onClick={() => copyToClipboard(data.id)}
@@ -153,7 +161,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                         </TabsTrigger>
                         <TabsTrigger
                             value="applications"
-                            className="bg-transparent p-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-600 data-[state=active]:bg-transparent data-[state=active]:text-foreground text-base font-bold transition-all text-muted-foreground/60 hover:text-muted-foreground"
+                            className="bg-transparent p-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-600 data-[state=active]:bg-transparent data-[state=active]:text-foreground text-base font-bold transition-all text-muted-foreground/60 hover:text-muted-foreground capitalize"
                         >
                             {t`Daftar Pinjaman`}
                         </TabsTrigger>

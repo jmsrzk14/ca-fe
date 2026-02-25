@@ -17,7 +17,9 @@ import {
     X,
     ArrowUpDown,
     ArrowUp,
-    ArrowDown
+    ArrowDown,
+    Eye,
+    PencilIcon
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
 
@@ -141,7 +143,6 @@ export function ApplicantList() {
                                     {t`TIPE`} <SortIcon column="applicantType" />
                                 </div>
                             </TableHead>
-                            <TableHead className="py-4 font-bold text-foreground outline-none">{t`KONTAK`}</TableHead>
                             <TableHead
                                 className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
                                 onClick={() => handleSort('createdAt')}
@@ -150,7 +151,7 @@ export function ApplicantList() {
                                     {t`TANGGAL DIBUAT`} <SortIcon column="createdAt" />
                                 </div>
                             </TableHead>
-                            <TableHead className="py-4 text-right">{t`AKSI`}</TableHead>
+                            <TableHead className="py-4 flex item-center gap-2">{t`AKSI`}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -175,21 +176,9 @@ export function ApplicantList() {
                                         </div>
                                     </TableCell>
                                     <TableCell className="py-4">
-                                        <Badge variant={app.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="rounded-lg px-2 py-0.5">
+                                        <Badge variant={app.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="rounded-lg px-2 py-0.5 capitalize">
                                             {app.applicantType}
                                         </Badge>
-                                    </TableCell>
-                                    <TableCell className="py-4 text-muted-foreground text-sm">
-                                        <div className="flex flex-col gap-1">
-                                            <div className="flex items-center gap-2">
-                                                <Mail className="h-3 w-3 text-primary/60" />
-                                                <span>{app.fullName?.toLowerCase().replace(/\s+/g, '.')}@example.com</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Phone className="h-3 w-3 text-primary/60" />
-                                                <span>+62 812-XXX-XXX</span>
-                                            </div>
-                                        </div>
                                     </TableCell>
                                     <TableCell className="py-4">
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -197,22 +186,19 @@ export function ApplicantList() {
                                             <span>{app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Feb 19, 2026'}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="py-4 text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="rounded-xl hover:bg-orange-500/10 hover:text-orange-500">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="rounded-xl w-48 shadow-2xl">
-                                                <DropdownMenuItem asChild className="gap-2 rounded-lg cursor-pointer">
-                                                    <Link href={`/borrowers/${app.id}`}>
-                                                        <ExternalLink className="h-4 w-4" />
-                                                        {t`View Details`}
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                    <TableCell className="py-4">
+                                        <div className="flex items-center gap-2">
+                                            <Button variant="outline" size="icon" className="rounded-xl hover:bg-orange-500/10 hover:text-orange-500" asChild>
+                                                <Link href={`/borrowers/${app.id}`}>
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                            <Button variant="outline" size="icon" className="rounded-xl hover:bg-orange-500/10 hover:text-orange-500" asChild>
+                                                <Link href={`/borrowers/${app.id}/edit`}>
+                                                    <PencilIcon className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -277,9 +263,6 @@ export function ApplicantList() {
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-foreground">{t`Gagal memuat data peminjam`}</h2>
-                        <p className="text-muted-foreground max-w-md mx-auto mt-2">
-                            {error instanceof Error ? error.message : t`Terjadi kesalahan saat mengambil data. Silakan periksa koneksi internet Anda atau coba lagi nanti.`}
-                        </p>
                     </div>
                     <Button
                         variant="outline"
@@ -326,32 +309,6 @@ export function ApplicantList() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/50 shadow-inner">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => setViewMode('table')}
-                            className={cn(
-                                "h-8 w-8 transition-all",
-                                viewMode === 'table' ? "bg-background shadow-md text-primary hover:bg-background" : "text-muted-foreground hover:bg-transparent hover:text-primary"
-                            )}
-                        >
-                            <List className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => setViewMode('kanban')}
-                            className={cn(
-                                "h-8 w-8 transition-all",
-                                viewMode === 'kanban' ? "bg-background shadow-md text-primary hover:bg-background" : "text-muted-foreground hover:bg-transparent hover:text-primary"
-                            )}
-                        >
-                            <LayoutGrid className="h-4 w-4" />
-                        </Button>
-                    </div>
                 </div>
             </div>
 
