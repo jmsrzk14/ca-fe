@@ -16,6 +16,7 @@ import {
     User,
     MoreHorizontal
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -56,6 +57,7 @@ import { cn } from '@/shared/lib/utils';
 import { ApplicationFormSheet } from './application-form-sheet';
 
 export function ApplicationKanban() {
+    const router = useRouter();
     const [loanType, setLoanType] = React.useState('Personal');
     const [viewMode, setViewMode] = React.useState<'board' | 'list'>('board');
     const [data, setData] = React.useState<KanbanColumnData[] | null>(null);
@@ -118,6 +120,23 @@ export function ApplicationKanban() {
             }));
         });
     };
+
+    const filteredData = React.useMemo(() => {
+        if (!data) return null;
+        return data.map(col => {
+            const parsedType = loanType.toUpperCase();
+            const matchingApps = col.applications.filter(app => {
+                const appType = (app.applicantType || "UNKNOWN").toUpperCase();
+                return appType === parsedType;
+            });
+            return {
+                ...col,
+                applications: matchingApps,
+                count: matchingApps.length,
+                totalAmount: matchingApps.reduce((sum, a) => sum + a.amount, 0)
+            };
+        });
+    }, [data, loanType]);
 
     const handleNewApplication = () => {
         setIsNewAppDialogOpen(true);
@@ -238,7 +257,7 @@ export function ApplicationKanban() {
                 await applicationService.updateStatus(activeId as string, overCol.id as ApplicationStatus);
                 toast.success(`Application stage updated`, {
                     id: loadingToastId,
-                    description: `${active.data.current?.application.borrowerName ?? 'Application'} moved to ${overCol.title}`,
+                    description: `${active.data.current?.application.fullName ?? 'Application'} moved to ${overCol.title}`,
                     duration: 3000,
                 });
             } catch (error) {
@@ -271,7 +290,7 @@ export function ApplicationKanban() {
         );
     }
 
-    const allApplications = data?.flatMap(col => col.applications) ?? [];
+    const allApplications = filteredData?.flatMap(col => col.applications) ?? [];
 
     if (error) {
         return (
@@ -400,7 +419,7 @@ export function ApplicationKanban() {
                         onDragEnd={onDragEnd}
                     >
                         <div className="flex gap-6 min-w-max px-2">
-                            {data?.map((column) => (
+                            {filteredData?.map((column) => (
                                 <KanbanColumn key={column.id} column={column} />
                             ))}
                         </div>
@@ -436,7 +455,11 @@ export function ApplicationKanban() {
                                 </TableHeader>
                                 <TableBody>
                                     {allApplications.map((app) => (
-                                        <TableRow key={app.id} className="hover:bg-muted/30 border-border/40 transition-colors group">
+                                        <TableRow 
+                                            key={app.id} 
+                                            onClick={() => router.push(`/borrowers/${app.applicantId}`)}
+                                            className="hover:bg-muted/30 border-border/40 transition-colors group cursor-pointer"
+                                        >
                                             <TableCell className="py-4">
                                                 <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground bg-muted/20">
                                                     #{app.refNumber}

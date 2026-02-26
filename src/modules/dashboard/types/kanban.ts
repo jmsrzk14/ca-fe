@@ -14,6 +14,8 @@ export const APPLICATION_STATUS_COLUMNS: { id: ApplicationStatus; title: string;
 
 export interface ApplicationCardData {
     id: string;
+    applicantId: string;
+    applicantType: string;
     identityNumber: string;
     fullName: string;
     productId: string;

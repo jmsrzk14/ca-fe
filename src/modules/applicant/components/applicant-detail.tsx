@@ -56,13 +56,23 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         // 1. Initial Core Group (Category 1 usually)
         const coreGroup = '1. Identitas';
         groups[coreGroup] = [
-            { label: t`Tipe Applicant`, value: data.applicantType, icon: Building2 },
-            { label: t`Nama Lengkap`, value: data.fullName, icon: User },
-            { label: t`NIK / No. Identitas`, value: data.identityNumber, icon: Fingerprint },
+            {
+                label: t`Tipe Applicant`,
+                value: data.applicantType ? data.applicantType.charAt(0).toUpperCase() + data.applicantType.slice(1).toLowerCase() : '-',
+                icon: Building2
+            },
+            { label: data.applicantType?.toUpperCase() === 'COMPANY' ? t`Nama Perusahaan` : t`Nama Lengkap`, value: data.fullName, icon: User },
+            {
+                label: data.applicantType?.toUpperCase() === 'COMPANY' ? t`NIB` : t`NIK`,
+                value: data.identityNumber,
+                icon: Fingerprint
+            },
             { label: t`NPWP`, value: data.taxId || '-', icon: Activity },
             {
-                label: data.applicantType === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`,
-                value: data.applicantType === 'PERSONAL' ? data.birthDate : data.establishmentDate,
+                label: data.applicantType?.toUpperCase() === 'COMPANY' ? t`Tanggal Pendirian` : t`Tanggal Lahir`,
+                value: data.applicantType === 'COMPANY'
+                    ? (data.establishmentDate ? new Date(data.establishmentDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-')
+                    : (data.birthDate ? new Date(data.birthDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-'),
                 icon: Calendar
             },
         ];
@@ -199,10 +209,11 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
 }
 
 function DetailRow({ label, value, isLink }: { label: string; value: string; isLink?: boolean }) {
+    const formattedLabel = label.replace(/_/g, ' ');
     return (
-        <div className="flex items-center border-b border-border pb-5 justify-between gap-4">
-            <span className="text-sm text-muted-foreground font-semibold uppercase tracking-tight w-48">{label}</span>
-            <span className={`text-base font-bold flex-1 text-right md:text-left ${isLink ? 'text-cyan-600 hover:text-cyan-500 cursor-pointer transition-colors' : 'text-foreground'}`}>
+        <div className="flex items-start border-b border-border pb-5 justify-between gap-4">
+            <span className="text-sm text-muted-foreground font-semibold uppercase tracking-tight w-48 break-words leading-tight pt-1">{formattedLabel}</span>
+            <span className={`text-base font-bold flex-1 text-right md:text-left break-words pt-0.5 ${isLink ? 'text-cyan-600 hover:text-cyan-500 cursor-pointer transition-colors' : 'text-foreground'}`}>
                 {value}
             </span>
         </div>

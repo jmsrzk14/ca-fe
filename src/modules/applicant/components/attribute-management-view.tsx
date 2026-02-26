@@ -500,17 +500,6 @@ export function AttributeManagementView() {
                     </div>
                 )}
             </div>
-
-            {/* Info banner */}
-            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 flex gap-4">
-                <Database className="h-6 w-6 text-orange-600 shrink-0" />
-                <div>
-                    <h4 className="font-bold text-orange-900">{t`Pola EAV Aktif`}</h4>
-                    <p className="text-sm text-orange-800 mt-1">
-                        {t`Setiap field yang Anda tambah di atas akan otomatis disimpan ke tabel 'applicant_attributes' dengan relasi dinamis.`}
-                    </p>
-                </div>
-            </div>
         </div>
     );
 }

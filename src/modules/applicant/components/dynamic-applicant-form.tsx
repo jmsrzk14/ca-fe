@@ -481,7 +481,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{t`Konfirmasi Simpan`}</DialogTitle>
-                        <DialogDescription>{t`Semua field dinamis akan disimpan ke sistem EAV.`}</DialogDescription>
+                        {/* <DialogDescription>{t`Semua field dinamis akan disimpan ke sistem EAV.`}</DialogDescription> */}
                     </DialogHeader>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>{t`Batal`}</Button>

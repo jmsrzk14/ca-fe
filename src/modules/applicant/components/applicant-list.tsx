@@ -132,7 +132,7 @@ export function ApplicantList() {
                                 onClick={() => handleSort('identityNumber')}
                             >
                                 <div className="flex items-center gap-2">
-                                    {t`NIK`} <SortIcon column="identityNumber" />
+                                    {t`NIK / NIB`} <SortIcon column="identityNumber" />
                                 </div>
                             </TableHead>
                             <TableHead
@@ -181,9 +181,6 @@ export function ApplicantList() {
                                                 <Link href={`/borrowers/${app.id}`} className="font-bold text-foreground group-hover:text-orange-500 transition-colors">
                                                     {app.fullName}
                                                 </Link>
-                                                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                                    {app.id.slice(0, 8)}
-                                                </span>
                                             </div>
                                         </div>
                                     </TableCell>

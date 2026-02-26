@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Card, CardContent } from '@/shared/ui/card';
 import { MoreVertical, GripVertical, Building2, Clock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { ApplicationCardData, APPLICATION_STATUS_COLUMNS } from '../types/kanban';
 import { cn } from '@/shared/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
@@ -13,6 +14,7 @@ interface ApplicationCardProps {
 }
 
 export function ApplicationCard({ application }: ApplicationCardProps) {
+    const router = useRouter();
     const {
         attributes,
         listeners,
@@ -29,7 +31,7 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
     });
 
     const style = {
-        transform: CSS.Translate.toString(transform),
+        transform: CSS.Transform.toString(transform),
         transition,
     };
 
@@ -59,8 +61,9 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
             ref={setNodeRef}
             style={style}
             {...attributes}
+            onClick={() => router.push(`/borrowers/${application.applicantId}`)}
             className={cn(
-                "group relative overflow-hidden transition-all hover:shadow-lg border-t-4 bg-card/60 backdrop-blur-sm",
+                "group relative overflow-hidden transition-all hover:shadow-lg border-t-4 bg-card/60 backdrop-blur-sm cursor-pointer",
                 borderColor
             )}
         >
