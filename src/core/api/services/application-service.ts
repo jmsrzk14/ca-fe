@@ -32,7 +32,7 @@ const USE_DUMMY_DATA = false;
 const DUMMY_APPLICATIONS: any[] = [
     {
         id: "dummy-loan-1",
-        applicantId: "dummy-app-1",
+        applicantId: "dummy-app-3",
         productId: "prod-1",
         aoId: "ao-1",
         loanAmount: "50000000",
@@ -41,7 +41,7 @@ const DUMMY_APPLICATIONS: any[] = [
         interestRate: "1.5",
         loanPurpose: "Modal Usaha",
         applicationChannel: "BRANCH",
-        status: "PROCESSING",
+        status: "INTAKE",
         branchCode: "JKT01",
         attributes: [],
         createdAt: new Date().toISOString(),
@@ -75,7 +75,7 @@ const DUMMY_APPLICATIONS: any[] = [
         interestRate: "2.0",
         loanPurpose: "Biaya Pendidikan",
         applicationChannel: "APP",
-        status: "REJECTED",
+        status: "ANALYSIS",
         branchCode: "JKT01",
         attributes: [],
         createdAt: new Date(Date.now() - 172800000).toISOString(),

@@ -3,15 +3,17 @@
 import * as React from 'react';
 import {
     Plus,
-    Pencil,
     RotateCw,
-    ChevronLeft
+    ChevronLeft,
+    Loader2
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { applicationService } from '@/core/api/services/application-service';
+import { applicantService } from '@/core/api/services/applicant-service';
 
 // Import Tabs
 import { BorrowerProfileTab } from './loan-details/tabs/borrower-profile-tab';
@@ -29,34 +31,94 @@ const TABS = [
     'Kelengkapan Dokumen',
     'Finansial',
     'CRR',
-    'Manajemen Risiko',
-    'Komite',
-    'History'
+    'Histori'
 ];
 
 export function LoanDetailsView() {
     const [activeTab, setActiveTab] = React.useState('Profil Peminjam');
+    const [application, setApplication] = React.useState<any>(null);
+    const [applicant, setApplicant] = React.useState<any>(null);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
+
     const router = useRouter();
+    const params = useParams();
+    const id = params.id as string;
+
+    React.useEffect(() => {
+        const fetchData = async () => {
+            if (!id) return;
+            try {
+                setLoading(true);
+                const appData = await applicationService.getById(id);
+                if (appData) {
+                    setApplication(appData);
+                    if (appData.applicantId) {
+                        const applicantData = await applicantService.getById(appData.applicantId);
+                        setApplicant(applicantData);
+                    }
+                } else {
+                    setError('Application not found');
+                }
+            } catch (err) {
+                console.error('Error fetching loan details:', err);
+                setError('Failed to load loan details');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id]);
 
     const renderTabContent = () => {
+        if (loading) {
+            return (
+                <div className="flex items-center justify-center p-20">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+            );
+        }
+
+        if (error) {
+            return (
+                <div className="p-8 text-center text-destructive font-medium">
+                    {error}
+                </div>
+            );
+        }
+
         switch (activeTab) {
             case 'Profil Peminjam':
                 return (
                     <div className="flex flex-col gap-12">
-                        <BorrowerProfileTab />
+                        <BorrowerProfileTab applicant={applicant} />
                     </div>
                 );
-            case 'Pinjaman': return <LoanInfoTab />;
+            case 'Pinjaman': return <LoanInfoTab application={application} applicant={applicant} />;
             case 'Riwayat Hutang': return <DebtHistoryTab />;
             case 'Kelengkapan Dokumen': return <DocumentCompletenessTab />;
             case 'Finansial': return <FinancialInfoTab />;
             case 'CRR': return <CRRTab />;
-            case 'Manajemen Risiko': return <CRRTab />;
-            case 'Komite': return <HistoryTab />;
-            case 'History': return <HistoryTab />;
-            default: return <LoanInfoTab />;
+            case 'Histori': return <HistoryTab />;
+            default: return <LoanInfoTab application={application} applicant={applicant} />;
         }
     };
+
+    if (loading && !application) {
+        return (
+            <div className="flex flex-col gap-6 animate-pulse p-4">
+                <div className="h-40 w-full bg-muted rounded-2xl" />
+                <div className="grid grid-cols-4 gap-4">
+                    <div className="h-10 bg-muted rounded-lg" />
+                    <div className="h-10 bg-muted rounded-lg" />
+                    <div className="h-10 bg-muted rounded-lg" />
+                    <div className="h-10 bg-muted rounded-lg" />
+                </div>
+                <div className="h-[500px] w-full bg-muted rounded-2xl" />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -74,44 +136,43 @@ export function LoanDetailsView() {
             </div>
 
             {/* Top Header Card */}
-            <Card className="border-border shadow-none overflow-hidden bg-card rounded-2xl">
+            <Card className="border border-border/50 shadow-sm overflow-hidden bg-card rounded-2xl mb-8">
                 <CardContent className="p-0">
-                    <div className="p-8 border-b border-border/50 bg-muted/5">
-                        <div className="flex items-center gap-3">
-                            <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-                            <h1 className="text-xl font-bold text-foreground">Detail Peminjaman: <span className="text-muted-foreground font-medium">UMKM</span></h1>
-                        </div>
+                    <div className="p-6 border-b border-border/50 ">
+                        <h1 className="text-xl font-bold tracking-tight text-foreground">
+                            Peminjaman Kredit: <span className="text-foreground">{application?.productId || 'UMKM'}</span>
+                        </h1>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/50">
-                        <div className="flex items-center gap-4 p-8 hover:bg-muted/30 transition-colors">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/50 ">
+                        <div className="flex items-center gap-4 px-8 py-5">
+                            <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                                 <Plus className="h-5 w-5" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Diajukan</span>
-                                <span className="text-sm font-semibold text-foreground">February 13, 2026 - 9:50 WIB</span>
+                                <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">Diajukan</span>
+                                <span className="text-[13px] font-semibold text-foreground whitespace-nowrap">
+                                    {application?.createdAt ? new Date(application.createdAt).toLocaleDateString('id-ID', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    }) + ` - ${new Date(application.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB` : '-'}
+                                </span>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 p-6 hover:bg-muted/50 transition-colors">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                <Pencil className="h-5 w-5" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Diubah</span>
-                                <span className="text-sm font-semibold text-foreground">February 13, 2026 - 9:50 WIB</span>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-4 p-6 hover:bg-muted/50 transition-colors">
-                            <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
+                        <div className="flex items-center gap-4 px-8 py-5">
+                            <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 shrink-0">
                                 <RotateCw className="h-5 w-5" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Status</span>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/20 uppercase text-[10px] font-bold px-2 py-0">
-                                        Pending
+                                <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">Status</span>
+                                <div className="mt-0.5">
+                                    <Badge className={cn(
+                                        "hover:bg-opacity-80 text-white border-0 text-[10px] font-bold px-2.5 py-0.5 rounded-md shadow-none cursor-default uppercase",
+                                        application?.status === 'APPROVED' ? 'bg-emerald-500' :
+                                            application?.status === 'DECLINED' ? 'bg-rose-500' : 'bg-orange-500'
+                                    )}>
+                                        {application?.status || 'Pending'}
                                     </Badge>
                                 </div>
                             </div>

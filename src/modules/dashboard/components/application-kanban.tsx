@@ -87,7 +87,6 @@ export function ApplicationKanban() {
             const boardData = await kanbanService.getBoardData();
             setData(boardData);
             setError(null);
-            if (silent) toast.success('Data refreshed');
         } catch (err: any) {
             const errorMessage = err?.message || 'Failed to fetch data';
             if (!silent) {
@@ -111,7 +110,6 @@ export function ApplicationKanban() {
 
     const handleSort = () => {
         if (!data) return;
-        toast.info('Sorting by amount');
         setData(prev => {
             if (!prev) return prev;
             return prev.map(col => ({
@@ -444,26 +442,27 @@ export function ApplicationKanban() {
                             <Table>
                                 <TableHeader className="bg-muted/50">
                                     <TableRow className="hover:bg-transparent border-border/50">
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">No. Reference</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">NIK/NIB</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Nama Lengkap</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Branch</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Loan Amount</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Tenor</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Status</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Date</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4 text-right">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {allApplications.map((app) => (
                                         <TableRow 
                                             key={app.id} 
-                                            onClick={() => router.push(`/borrowers/${app.applicantId}`)}
+                                            onClick={() => router.push(`/loans/${app.id}`)}
                                             className="hover:bg-muted/30 border-border/40 transition-colors group cursor-pointer"
                                         >
                                             <TableCell className="py-4">
-                                                <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground bg-muted/20">
-                                                    #{app.refNumber}
-                                                </Badge>
+                                                {app.identityNumber}
+                                            </TableCell>
+                                            <TableCell className="py-4">
+                                                {app.fullName}
                                             </TableCell>
                                             <TableCell className="py-4 text-sm font-medium">
                                                 {app.branchCode || '—'}
@@ -490,11 +489,6 @@ export function ApplicationKanban() {
                                             </TableCell>
                                             <TableCell className="py-4 text-xs text-muted-foreground font-medium">
                                                 {app.date}
-                                            </TableCell>
-                                            <TableCell className="py-4 text-right">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}

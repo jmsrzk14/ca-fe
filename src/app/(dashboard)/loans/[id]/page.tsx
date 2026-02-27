@@ -8,11 +8,13 @@ export const metadata: Metadata = {
     title: 'Detail Pinjaman',
 };
 
-export default function LoanDetailPage() {
+export default async function LoanDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    
     return (
         <ErrorBoundary>
             <Suspense fallback={<LoanDetailLoadingSkeleton />}>
-                <LoanDetailsView />
+                <LoanDetailsView id={id} />
             </Suspense>
         </ErrorBoundary>
     );

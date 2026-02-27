@@ -61,7 +61,7 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
             ref={setNodeRef}
             style={style}
             {...attributes}
-            onClick={() => router.push(`/borrowers/${application.applicantId}`)}
+            onClick={() => router.push(`/loans/${application.id}`)}
             className={cn(
                 "group relative overflow-hidden transition-all hover:shadow-lg border-t-4 bg-card/60 backdrop-blur-sm cursor-pointer",
                 borderColor
@@ -78,10 +78,10 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
                         </div>
                         <div>
                             <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 mb-0.5">
-                                {application.fullName || 'Guest'}
+                                {application.identityNumber}
                             </div>
                             <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors font-mono">
-                                #{application.refNumber}
+                                {application.fullName || 'Guest'}
                             </h4>
                             <div className="flex items-center gap-2 mt-1">
                                 <Building2 className="h-3 w-3 text-muted-foreground" />

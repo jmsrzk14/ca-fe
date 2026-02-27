@@ -3,7 +3,43 @@
 import * as React from 'react';
 import { Button } from '@/shared/ui/button';
 
-export function LoanInfoTab() {
+interface LoanInfoTabProps {
+    application?: any;
+    applicant?: any;
+}
+
+export function LoanInfoTab({ application, applicant }: LoanInfoTabProps) {
+    if (!application) {
+        return (
+            <div className="p-8 text-center text-muted-foreground">
+                Data pinjaman tidak ditemukan.
+            </div>
+        );
+    }
+
+    const formatCurrency = (amount?: string | number) => {
+        if (amount === undefined || amount === null) return '—';
+        const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+        }).format(num);
+    };
+
+    const formatDate = (dateStr?: string) => {
+        if (!dateStr) return '—';
+        try {
+            return new Date(dateStr).toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            }) + ` - ${new Date(dateStr).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`;
+        } catch {
+            return dateStr;
+        }
+    };
+
     return (
         <div className="animate-in fade-in slide-in-from-left-4 duration-500">
             <div className="flex items-center justify-between mb-8">
@@ -16,24 +52,24 @@ export function LoanInfoTab() {
                 </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12 mb-12">
-                <DetailItem label="Peminjam" value="Mesya Angelia Hutagalung (Mesya)" />
-                <DetailItem label="Produk" value="UMKM" />
-                <DetailItem label="Tanggal Diajukan" value="February 13, 2026 - 9:50 WIB" />
-                <DetailItem label="Tanggal Diubah" value="February 13, 2026 - 9:50 WIB" />
-                <DetailItem label="Plafon Diajukan" value="Rp50,000,000" />
-                <DetailItem label="Jangka Waktu" value="3 Bulan" />
-                <DetailItem label="Suku Bunga" value="8.00%" />
-                <DetailItem label="Tipe Suku Bunga" value="Flat" />
-                <DetailItem label="Angsuran Per Bulan" value="Rp 17,000,000" />
+                <DetailItem label="Peminjam" value={applicant?.fullName || '—'} />
+                <DetailItem label="Produk" value={application.productId || '—'} />
+                <DetailItem label="Tanggal Diajukan" value={formatDate(application.createdAt)} />
+                <DetailItem label="Tanggal Diubah" value={formatDate(application.updatedAt || application.createdAt)} />
+                <DetailItem label="Plafon Diajukan" value={formatCurrency(application.loanAmount)} />
+                <DetailItem label="Jangka Waktu" value={`${application.tenorMonths || 0} Bulan`} />
+                <DetailItem label="Suku Bunga" value={`${application.interestRate || 0}%`} />
+                <DetailItem label="Tipe Suku Bunga" value={application.interestType || '—'} />
+                <DetailItem label="Angsuran Per Bulan" value="—" />
                 <DetailItem label="Plafon Max" value="—" />
-                <DetailItem label="Tujuan Penggunaan" value="buka toko lele" />
+                <DetailItem label="Tujuan Penggunaan" value={application.loanPurpose || '—'} />
             </div>
 
             <div className="mb-12">
                 <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center mb-6">Rincian Penggunaan</h3>
                 <div className="bg-muted rounded-xl p-4 flex justify-between items-center max-w-2xl mx-auto border border-border">
-                    <span className="text-sm font-medium text-foreground">buka toko lele</span>
-                    <span className="text-sm font-bold text-foreground">50,000,000.00</span>
+                    <span className="text-sm font-medium text-foreground">{application.loanPurpose || '—'}</span>
+                    <span className="text-sm font-bold text-foreground">{formatCurrency(application.loanAmount).replace('Rp', '')}</span>
                 </div>
             </div>
 
@@ -45,11 +81,17 @@ export function LoanInfoTab() {
                     </h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                    <DetailItem label="Asuransi" value="—" />
-                    <DetailItem label="Biaya Administrasi" value="—" />
-                    <DetailItem label="Biaya Provisi" value="—" />
-                    <DetailItem label="Materai" value="—" />
-                    <DetailItem label="Tabungan Rutin" value="—" />
+                    {application.attributes?.map((attr: any) => (
+                        <DetailItem key={attr.key} label={attr.key} value={attr.value || '—'} />
+                    )) || (
+                            <>
+                                <DetailItem label="Asuransi" value="—" />
+                                <DetailItem label="Biaya Administrasi" value="—" />
+                                <DetailItem label="Biaya Provisi" value="—" />
+                                <DetailItem label="Materai" value="—" />
+                                <DetailItem label="Tabungan Rutin" value="—" />
+                            </>
+                        )}
                 </div>
             </div>
         </div>

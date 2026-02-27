@@ -36,7 +36,7 @@ export function KanbanColumn({ column }: KanbanColumnProps) {
                     </span>
                 </div>
                 <div className="text-xs font-bold text-muted-foreground/50 tabular-nums">
-                    ${column.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    Rp {column.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
             </div>
 
