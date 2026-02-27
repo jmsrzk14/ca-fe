@@ -12,7 +12,8 @@ export function useAttributeRegistry() {
     const registryMap = useMemo(() => {
         if (!data?.attributes) return {};
         return data.attributes.reduce((acc: Record<string, any>, attr: any) => {
-            acc[attr.attributeCode] = attr;
+            if (attr.attributeCode) acc[attr.attributeCode] = attr;
+            if (attr.id) acc[attr.id] = attr;
             return acc;
         }, {});
     }, [data]);

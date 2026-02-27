@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Button } from '@/shared/ui/button';
+import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
 
 interface LoanInfoTabProps {
     application?: any;
@@ -10,6 +11,8 @@ interface LoanInfoTabProps {
 }
 
 export function LoanInfoTab({ application, applicant, productName }: LoanInfoTabProps) {
+    const { getLabel } = useAttributeRegistry();
+
     if (!application) {
         return (
             <div className="p-8 text-center text-muted-foreground">
@@ -83,7 +86,7 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
                     {application.attributes?.map((attr: any) => (
-                        <DetailItem key={attr.attributeId} label={attr.attributeId} value={attr.value || '—'} />
+                        <DetailItem key={attr.attributeId} label={getLabel(attr.attributeId)} value={attr.value || '—'} />
                     )) || (
                             <>
                                 <DetailItem label="Asuransi" value="—" />

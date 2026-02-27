@@ -1,12 +1,15 @@
 'use client';
 
 import * as React from 'react';
+import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
 
 interface BorrowerProfileTabProps {
     applicant?: any;
 }
 
 export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
+    const { getLabel } = useAttributeRegistry();
+
     if (!applicant) {
         return (
             <div className="p-8 text-center text-muted-foreground">
@@ -41,17 +44,17 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 text-sm">
                     {/* Left Column */}
                     <div className="flex flex-col divide-y divide-border/50 md:border-r border-border/50">
-                        <DetailItem label="Nama Lengkap" value={applicant.fullName || '—'} />
-                        <DetailItem label="NIK" value={applicant.identityNumber || '—'} />
-                        <DetailItem label="Tempat Lahir" value={applicant.birthPlace || '—'} />
-                        <DetailItem label="Jenis Kelamin" value={applicant.gender || '—'} />
+                        <DetailItem label={getLabel('full_name', 'Nama Lengkap')} value={applicant.fullName || '—'} />
+                        <DetailItem label={getLabel('identity_number', 'NIK')} value={applicant.identityNumber || '—'} />
+                        <DetailItem label={getLabel('tempat_lahir', 'Tempat Lahir')} value={applicant.birthPlace || '—'} />
+                        <DetailItem label={getLabel('jenis_kelamin', 'Jenis Kelamin')} value={applicant.gender || '—'} />
                     </div>
                     {/* Right Column */}
                     <div className="flex flex-col divide-y divide-border/50">
-                        <DetailItem label="Email" value={applicant.email || '—'} />
-                        <DetailItem label="NPWP" value={applicant.taxId || '—'} />
-                        <DetailItem label="Tanggal Lahir" value={formatDate(applicant.birthDate)} />
-                        <DetailItem label="Nomor Telepon" value={applicant.phoneNumber || '—'} />
+                        <DetailItem label={getLabel('email_pribadi', 'Email')} value={applicant.email || '—'} />
+                        <DetailItem label={getLabel('tax_id', 'NPWP')} value={applicant.taxId || '—'} />
+                        <DetailItem label={getLabel('tanggal_lahir', 'Tanggal Lahir')} value={formatDate(applicant.birthDate)} />
+                        <DetailItem label={getLabel('no_hp_utama', 'Nomor Telepon')} value={applicant.phoneNumber || '—'} />
                     </div>
                 </div>
             </div>

@@ -18,7 +18,8 @@ import {
     Calendar,
     Settings,
 } from 'lucide-react';
-import { applicantService, referenceService } from '@/core/api';
+import { applicantService } from '@/core/api';
+import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
@@ -33,17 +34,12 @@ interface ApplicantDetailProps {
 }
 
 export function ApplicantDetail({ id }: ApplicantDetailProps) {
+    const { getLabel, getAttributeConfig, isLoading: isRegistryLoading } = useAttributeRegistry();
+
     const { data: applicant, isLoading, error } = useQuery({
         queryKey: ['applicant', id],
         queryFn: () => applicantService.getById(id),
     });
-
-    const { data: registryResponse } = useQuery({
-        queryKey: ['attribute-registry'],
-        queryFn: () => referenceService.getAttributeRegistry(),
-    });
-
-    const registry = (registryResponse?.attributes || []) as any[];
 
     // Grouping logic: Merge registry info with actual values (MUST be before early returns)
     const groupedAttributes = React.useMemo(() => {
@@ -57,19 +53,29 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         const coreGroup = '1. Identitas';
         groups[coreGroup] = [
             {
-                label: t`Tipe Applicant`,
+                label: getLabel('applicant_type', t`Tipe Applicant`),
                 value: data.applicantType ? data.applicantType.charAt(0).toUpperCase() + data.applicantType.slice(1).toLowerCase() : '-',
                 icon: Building2
             },
-            { label: data.applicantType?.toUpperCase() === 'COMPANY' ? t`Nama Perusahaan` : t`Nama Lengkap`, value: data.fullName, icon: User },
             {
-                label: data.applicantType?.toUpperCase() === 'COMPANY' ? t`NIB` : t`NIK`,
+                label: data.applicantType?.toUpperCase() === 'COMPANY'
+                    ? getLabel('company_name', t`Nama Perusahaan`)
+                    : getLabel('full_name', t`Nama Lengkap`),
+                value: data.fullName,
+                icon: User
+            },
+            {
+                label: data.applicantType?.toUpperCase() === 'COMPANY'
+                    ? getLabel('nib_number', t`NIB`)
+                    : getLabel('identity_number', t`NIK`),
                 value: data.identityNumber,
                 icon: Fingerprint
             },
-            { label: t`NPWP`, value: data.taxId || '-', icon: Activity },
+            { label: getLabel('tax_id', t`NPWP`), value: data.taxId || '-', icon: Activity },
             {
-                label: data.applicantType?.toUpperCase() === 'COMPANY' ? t`Tanggal Pendirian` : t`Tanggal Lahir`,
+                label: data.applicantType?.toUpperCase() === 'COMPANY'
+                    ? getLabel('tanggal_pendirian', t`Tanggal Pendirian`)
+                    : getLabel('tanggal_lahir', t`Tanggal Lahir`),
                 value: data.applicantType === 'COMPANY'
                     ? (data.establishmentDate ? new Date(data.establishmentDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-')
                     : (data.birthDate ? new Date(data.birthDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-'),
@@ -79,23 +85,23 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
 
         // 2. Map Dynamic attributes to their categories
         attributes.forEach((attr: any) => {
-            const regItem = registry.find(r => r.attrKey === attr.key);
-            const catVal = regItem?.category || 'Informasi Lainnya';
+            const config = getAttributeConfig(attr.key || attr.attributeCode);
+            const catVal = config?.categoryName || 'Informasi Lainnya';
             const cat = t`${catVal}`;
 
             if (!groups[cat]) groups[cat] = [];
 
             groups[cat].push({
-                label: t`${regItem?.uiLabel || regItem?.attrName || attr.key}`,
+                label: t`${config?.uiLabel || attr.key}`,
                 value: attr.value,
-                icon: regItem?.uiIcon ? Settings : Settings
+                icon: Settings
             });
         });
 
         return Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]));
-    }, [applicant, registry, t]);
+    }, [applicant, getLabel, getAttributeConfig, t]);
 
-    if (isLoading) {
+    if (isLoading || isRegistryLoading) {
         return <DetailSkeleton />;
     }
 
