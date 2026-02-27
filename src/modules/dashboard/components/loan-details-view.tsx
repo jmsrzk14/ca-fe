@@ -68,7 +68,6 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                             const product = await referenceService.getLoanProduct(appData.productId);
                             if (product) setProductName(product.productName);
                         } catch (pErr) {
-                            console.warn('Failed to fetch product name:', pErr);
                             setProductName(appData.productId); // Fallback to ID
                         }
                     }
@@ -76,7 +75,6 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                     setError('Application not found');
                 }
             } catch (err) {
-                console.error('Error fetching loan details:', err);
                 setError('Failed to load loan details');
             } finally {
                 setLoading(false);

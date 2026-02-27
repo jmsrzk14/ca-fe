@@ -63,7 +63,7 @@ const getIconWithName = (name?: string) => {
 };
 
 // Specific options for common fields to make the dynamic form feel premium
-const getCommonOptions = () => ({
+const getCommonOptions = (): Record<string, { label: string; value: string; }[]> => ({
     gender: [
         { label: t`Laki-laki`, value: 'MALE' },
         { label: t`Perempuan`, value: 'FEMALE' },

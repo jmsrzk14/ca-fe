@@ -265,10 +265,6 @@ export function ApplicationKanban() {
         // 2. Status Changed (Persistence Fix)
         if (sourceStatus !== targetStatus) {
             const loadingToastId = toast.loading(`Updating application status...`);
-            console.log('--- Status Update Debug ---');
-            console.log('Application ID:', activeId);
-            console.log('Target Status (Column):', targetStatus);
-            console.log('Payload structure:', { id: activeId, newStatus: targetStatus, reason: "" });
 
             try {
                 await applicationService.updateStatus(activeId as string, targetStatus);
