@@ -54,7 +54,6 @@ export function RecentApplications() {
                     <TableHeader>
                         <TableRow className="hover:bg-transparent border-border/50">
                             <TableHead className="text-[10px] font-bold uppercase tracking-wider">Peminjam</TableHead>
-                            <TableHead className="text-[10px] font-bold uppercase tracking-wider">Produk</TableHead>
                             <TableHead className="text-[10px] font-bold uppercase tracking-wider">Jumlah</TableHead>
                             <TableHead className="text-[10px] font-bold uppercase tracking-wider text-right">Status</TableHead>
                         </TableRow>
@@ -70,12 +69,10 @@ export function RecentApplications() {
                                         </Avatar>
                                         <div className="flex flex-col">
                                             <span className="text-sm font-semibold">{app.applicant?.name || 'Unknown Applicant'}</span>
-                                            <span className="text-[10px] text-muted-foreground uppercase">{app.id}</span>
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-sm font-medium">{app.product}</TableCell>
-                                <TableCell className="text-sm font-mono font-bold">${app.amount.toLocaleString()}</TableCell>
+                                <TableCell className="text-sm font-mono font-bold">Rp. {app.amount.toLocaleString()}</TableCell>
                                 <TableCell className="text-right">
                                     <Badge variant="outline" className={getStatusColor(app.status)}>
                                         {app.status}

@@ -6,9 +6,10 @@ import { Button } from '@/shared/ui/button';
 interface LoanInfoTabProps {
     application?: any;
     applicant?: any;
+    productName?: string | null;
 }
 
-export function LoanInfoTab({ application, applicant }: LoanInfoTabProps) {
+export function LoanInfoTab({ application, applicant, productName }: LoanInfoTabProps) {
     if (!application) {
         return (
             <div className="p-8 text-center text-muted-foreground">
@@ -53,7 +54,7 @@ export function LoanInfoTab({ application, applicant }: LoanInfoTabProps) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12 mb-12">
                 <DetailItem label="Peminjam" value={applicant?.fullName || '—'} />
-                <DetailItem label="Produk" value={application.productId || '—'} />
+                <DetailItem label="Produk" value={productName || application.productId || '—'} />
                 <DetailItem label="Tanggal Diajukan" value={formatDate(application.createdAt)} />
                 <DetailItem label="Tanggal Diubah" value={formatDate(application.updatedAt || application.createdAt)} />
                 <DetailItem label="Plafon Diajukan" value={formatCurrency(application.loanAmount)} />
@@ -82,7 +83,7 @@ export function LoanInfoTab({ application, applicant }: LoanInfoTabProps) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
                     {application.attributes?.map((attr: any) => (
-                        <DetailItem key={attr.key} label={attr.key} value={attr.value || '—'} />
+                        <DetailItem key={attr.attributeId} label={attr.attributeId} value={attr.value || '—'} />
                     )) || (
                             <>
                                 <DetailItem label="Asuransi" value="—" />

@@ -10,79 +10,208 @@ option java_multiple_files = true;
 option java_package = "api.reference.v1";
 
 service ReferenceService {
+  // ---- Loan Products ----
   rpc ListLoanProducts (google.protobuf.Empty) returns (ListLoanProductsResponse) {
-    option (google.api.http) = {
-      get: "/v1/reference/loan-products"
-    };
+    option (google.api.http) = { get: "/v1/reference/loan-products" };
   }
   rpc GetLoanProduct (GetLoanProductRequest) returns (LoanProduct) {
-    option (google.api.http) = {
-      get: "/v1/reference/loan-products/{id}"
-    };
+    option (google.api.http) = { get: "/v1/reference/loan-products/{id}" };
   }
 
+  // ---- Branches & Officers ----
   rpc ListBranches (google.protobuf.Empty) returns (ListBranchesResponse) {
-    option (google.api.http) = {
-      get: "/v1/reference/branches"
-    };
+    option (google.api.http) = { get: "/v1/reference/branches" };
   }
   rpc ListLoanOfficers (ListLoanOfficersRequest) returns (ListLoanOfficersResponse) {
-    option (google.api.http) = {
-      get: "/v1/reference/branches/{branch_code}/officers"
-    };
+    option (google.api.http) = { get: "/v1/reference/branches/{branch_code}/officers" };
   }
 
+  // ---- Application Statuses ----
   rpc ListApplicationStatuses (google.protobuf.Empty) returns (ListApplicationStatusesResponse) {
-    option (google.api.http) = {
-      get: "/v1/reference/application-statuses"
-    };
+    option (google.api.http) = { get: "/v1/reference/application-statuses" };
   }
 
-  rpc ListAttributeRegistry (google.protobuf.Empty) returns (ListAttributeRegistryResponse) {
-    option (google.api.http) = {
-      get: "/v1/reference/attribute-registry"
-    };
-  }
-
-  rpc ListSurveyTemplates (ListSurveyTemplatesRequest) returns (ListSurveyTemplatesResponse) {
-    option (google.api.http) = {
-      get: "/v1/reference/survey-templates"
-    };
-  }
-
+  // ---- Financial GL Accounts ----
   rpc ListFinancialGLAccounts (google.protobuf.Empty) returns (ListFinancialGLAccountsResponse) {
-    option (google.api.http) = {
-      get: "/v1/reference/gl-accounts"
-    };
+    option (google.api.http) = { get: "/v1/reference/gl-accounts" };
   }
 
+  // ---- Attribute Categories (Dinamis — icon disimpan di sini) ----
+  rpc ListAttributeCategories (google.protobuf.Empty) returns (ListAttributeCategoriesResponse) {
+    option (google.api.http) = { get: "/v1/reference/attribute-categories" };
+  }
+  rpc GetAttributeCategory (GetAttributeCategoryRequest) returns (AttributeCategory) {
+    option (google.api.http) = { get: "/v1/reference/attribute-categories/{category_code}" };
+  }
+  rpc CreateAttributeCategory (CreateAttributeCategoryRequest) returns (AttributeCategory) {
+    option (google.api.http) = {
+      post: "/v1/reference/attribute-categories",
+      body: "*"
+    };
+  }
+  rpc UpdateAttributeCategory (UpdateAttributeCategoryRequest) returns (AttributeCategory) {
+    option (google.api.http) = {
+      put: "/v1/reference/attribute-categories/{category_code}",
+      body: "*"
+    };
+  }
+  rpc DeleteAttributeCategory (DeleteAttributeCategoryRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/v1/reference/attribute-categories/{category_code}" };
+  }
+
+  // ---- Attribute Registry (icon TIDAK di sini — diambil dari category) ----
+  rpc ListAttributeRegistry (google.protobuf.Empty) returns (ListAttributeRegistryResponse) {
+    option (google.api.http) = { get: "/v1/reference/attribute-registry" };
+  }
+  rpc ListAttributeRegistryByCategory (ListAttributeRegistryByCategoryRequest) returns (ListAttributeRegistryResponse) {
+    option (google.api.http) = { get: "/v1/reference/attribute-registry/by-category/{category_code}" };
+  }
   rpc CreateAttributeRegistry (CreateAttributeRegistryRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/reference/attribute-registry",
       body: "*"
     };
   }
+  rpc UpdateAttributeRegistry (UpdateAttributeRegistryRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/v1/reference/attribute-registry/{attribute_code}",
+      body: "*"
+    };
+  }
+  rpc DeleteAttributeRegistry (DeleteAttributeRegistryRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/v1/reference/attribute-registry/{id}" };
+  }
+
+  // ---- Survey Templates ----
+  rpc ListSurveyTemplates (ListSurveyTemplatesRequest) returns (ListSurveyTemplatesResponse) {
+    option (google.api.http) = { get: "/v1/reference/survey-templates" };
+  }
+}
+
+// ==============================
+// ATTRIBUTE CATEGORY messages
+// ==============================
+
+message AttributeCategory {
+  string category_code  = 1;
+  string category_name  = 2;
+  string ui_icon        = 3; // Nama icon Lucide/Heroicons, e.g. "id-card"
+  int32  display_order  = 4;
+  string description    = 5;
+}
+
+message ListAttributeCategoriesResponse {
+  repeated AttributeCategory categories = 1;
+}
+
+message GetAttributeCategoryRequest {
+  string category_code = 1;
+}
+
+message CreateAttributeCategoryRequest {
+  string category_code = 1;
+  string category_name = 2;
+  string ui_icon       = 3;
+  int32  display_order = 4;
+  string description   = 5;
+}
+
+message UpdateAttributeCategoryRequest {
+  string category_code = 1;
+  string category_name = 2;
+  string ui_icon       = 3;
+  int32  display_order = 4;
+  string description   = 5;
+}
+
+message DeleteAttributeCategoryRequest {
+  string category_code = 1;
+}
+
+// ==============================
+// ATTRIBUTE REGISTRY messages
+// icon TIDAK di sini — diambil dari AttributeCategory via JOIN
+// ==============================
+
+message AttributeOption {
+  string id            = 1;
+  string attribute_id  = 2;
+  string option_value  = 3;
+  string option_label  = 4;
+  int32  display_order = 5;
+  bool   is_active     = 6;
+}
+
+message AttributeRegistry {
+  string id            = 13;
+  string attribute_code= 1;
+  string applies_to    = 2;
+  string scope         = 3;
+  string data_type     = 4;
+  string category_code = 5;  // FK ke attribute_categories
+  string ui_label      = 6;  // Label per atribut (bisa beda dari description)
+  bool   is_required   = 7;
+  bool   risk_relevant = 8;
+  bool   is_active     = 14;
+  int32  display_order = 15;
+  string description   = 9;
+  // Denormalized dari JOIN (read-only, tidak disimpan di tabel registry)
+  string category_name     = 10;
+  string category_icon     = 11;
+  repeated AttributeOption options = 12; // Daftar pilihan jika data_type = SELECT
+}
+
+message ListAttributeRegistryResponse {
+  repeated AttributeRegistry attributes = 1;
+}
+
+message ListAttributeRegistryByCategoryRequest {
+  string category_code = 1;
 }
 
 message CreateAttributeRegistryRequest {
   string attribute_code = 1;
-  string applies_to = 2;
-  string scope = 3;
-  string value_type = 4;
-  string category = 5;
-  bool is_required = 6;
-  bool risk_relevant = 7;
-  string description = 8;
-  string ui_icon = 9;
-  string ui_label = 10;
+  string applies_to     = 2;
+  string scope          = 3;
+  string value_type     = 4;
+  string category_code  = 5;
+  string ui_label       = 6;
+  bool   is_required    = 7;
+  bool   risk_relevant  = 8;
+  bool   is_active      = 10;
+  int32  display_order  = 11;
+  string description    = 9;
 }
 
-message LoanProduct {
+message UpdateAttributeRegistryRequest {
+  string id             = 12;
+  string attribute_code = 1;
+  string applies_to     = 2;
+  string scope          = 3;
+  string value_type     = 4;
+  string category_code  = 5;
+  string ui_label       = 6;
+  bool   is_required    = 7;
+  bool   risk_relevant  = 8;
+  bool   is_active      = 10;
+  int32  display_order  = 11;
+  string description    = 9;
+}
+
+message DeleteAttributeRegistryRequest {
   string id = 1;
+}
+
+// ==============================
+// OTHER REFERENCE messages
+// ==============================
+
+message LoanProduct {
+  string id           = 1;
   string product_code = 2;
   string product_name = 3;
-  string segment = 4;
-  bool active = 5;
+  string segment      = 4;
+  bool   active       = 5;
 }
 
 message Branch {
@@ -92,45 +221,35 @@ message Branch {
 }
 
 message LoanOfficer {
-  string id = 1;
+  string id           = 1;
   string officer_code = 2;
-  string branch_code = 3;
+  string branch_code  = 3;
 }
 
 message ApplicationStatusRef {
-  string status_code = 1;
+  string status_code  = 1;
   string status_group = 2;
-  bool is_terminal = 3;
-  string description = 4;
-}
-
-message AttributeRegistry {
-  string attr_key = 1;
-  string attr_name = 2;
-  string data_type = 3;
-  string category = 4;
-  bool required = 5;
-  string ui_icon = 6;
-  string ui_label = 7;
-}
-
-message SurveyTemplate {
-  string id = 1;
-  string template_code = 2;
-  string template_name = 3;
-  string applicant_type = 4;
-  string product_id = 5;
+  bool   is_terminal  = 3;
+  string description  = 4;
 }
 
 message FinancialGLAccount {
-  string gl_code = 1;
-  string gl_name = 2;
+  string gl_code        = 1;
+  string gl_name        = 2;
   string statement_type = 3;
-  string category = 4;
-  int32 sign = 5;
-  bool is_debt_service = 6;
-  bool is_operating = 7;
-  string description = 8;
+  string category       = 4;
+  int32  sign           = 5;
+  bool   is_debt_service= 6;
+  bool   is_operating   = 7;
+  string description    = 8;
+}
+
+message SurveyTemplate {
+  string id             = 1;
+  string template_code  = 2;
+  string template_name  = 3;
+  string applicant_type = 4;
+  string product_id     = 5;
 }
 
 message GetLoanProductRequest {
@@ -157,19 +276,15 @@ message ListApplicationStatusesResponse {
   repeated ApplicationStatusRef statuses = 1;
 }
 
-message ListAttributeRegistryResponse {
-  repeated AttributeRegistry attributes = 1;
+message ListFinancialGLAccountsResponse {
+  repeated FinancialGLAccount accounts = 1;
 }
 
 message ListSurveyTemplatesRequest {
   string applicant_type = 1;
-  string product_id = 2;
+  string product_id     = 2;
 }
 
 message ListSurveyTemplatesResponse {
   repeated SurveyTemplate templates = 1;
-}
-
-message ListFinancialGLAccountsResponse {
-  repeated FinancialGLAccount accounts = 1;
 }

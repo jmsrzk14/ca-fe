@@ -20,10 +20,19 @@ export interface Applicant {
     createdAt?: string | null;
 }
 
+export interface AttributeCategory {
+    categoryCode: string;
+    categoryName: string;
+    uiIcon: string;
+    displayOrder: number;
+    description: string;
+}
+
 export interface ApplicationAttribute {
-    key: string;
+    attributeId: string;
     value: string;
     dataType: string;
+    attributeOptionId?: string;
 }
 
 export type ApplicationStatus =
@@ -33,11 +42,13 @@ export type ApplicationStatus =
     | 'COMMITTEE'
     | 'APPROVED'
     | 'REJECTED'
-    | 'DISBURSED';
+    | 'DISBURSED'
+    | 'CANCELLED';
 
 export interface Application {
     id: string;
     applicantId: string;
+    applicantName: string;
     productId: string;
     aoId: string;
     loanAmount: string;       // comes as string from API
@@ -121,6 +132,15 @@ export interface SurveyEvidence {
     description: string;
 }
 
+export interface AttributeOption {
+    id: string;
+    attributeId: string;
+    optionValue: string;
+    optionLabel: string;
+    displayOrder: number;
+    isActive: boolean;
+}
+
 export interface CommitteeSession {
     id: string;
     sessionDate: string;
@@ -165,14 +185,29 @@ export interface GLAccount {
     accountType: string;
 }
 
+export interface ApplicationStatusRef {
+    statusCode: string;
+    statusGroup: string;
+    isTerminal: boolean;
+    description: string;
+}
+
 export interface AttributeRegistry {
-    attrKey: string;
-    attrName: string;
+    id: string;
+    attributeCode: string;
+    appliesTo: string;
+    scope: string;
     dataType: string;
-    category: string;
-    required: boolean;
-    uiIcon?: string;
-    uiLabel?: string;
+    categoryCode: string;
+    uiLabel: string;
+    isRequired: boolean;
+    riskRelevant: boolean;
+    isActive: boolean;
+    displayOrder: number;
+    description: string;
+    categoryName?: string;
+    categoryIcon?: string;
+    options?: AttributeOption[];
 }
 
 export interface PaginatedResponse<T> {

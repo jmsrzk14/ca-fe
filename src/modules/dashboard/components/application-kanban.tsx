@@ -66,6 +66,8 @@ export function ApplicationKanban() {
     const [error, setError] = React.useState<string | null>(null);
     const [activeApp, setActiveApp] = React.useState<ApplicationCardData | null>(null);
     const [isNewAppDialogOpen, setIsNewAppDialogOpen] = React.useState(false);
+    const [updatedCardId, setUpdatedCardId] = React.useState<string | null>(null);
+    const [sourceStatus, setSourceStatus] = React.useState<ApplicationStatus | null>(null);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -142,7 +144,9 @@ export function ApplicationKanban() {
 
     const onDragStart = (event: DragStartEvent) => {
         if (event.active.data.current?.type === 'Application') {
-            setActiveApp(event.active.data.current.application);
+            const app = event.active.data.current.application;
+            setActiveApp(app);
+            setSourceStatus(app.status);
         }
     };
 
@@ -222,20 +226,29 @@ export function ApplicationKanban() {
         const { active, over } = event;
         setActiveApp(null);
 
-        if (!over || !data) return;
+        if (!over || !data || !sourceStatus) {
+            setSourceStatus(null);
+            return;
+        }
 
         const activeId = active.id;
         const overId = over.id;
 
-        const activeCol = data.find(col => col.applications.some(app => app.id === activeId));
+        // Find the OVER column even if dropping over an application card
         const overCol = data.find(col => col.applications.some(app => app.id === overId) || col.id === overId);
 
-        if (!activeCol || !overCol) return;
+        if (!overCol) {
+            setSourceStatus(null);
+            return;
+        }
 
-        if (activeId !== overId) {
+        const targetStatus = overCol.id as ApplicationStatus;
+
+        // 1. Reordering within the SAME column
+        if (sourceStatus === targetStatus && activeId !== overId) {
             setData(prev => {
                 if (!prev) return prev;
-                const col = prev.find(c => c.id === overCol.id);
+                const col = prev.find(c => c.id === targetStatus);
                 if (!col) return prev;
 
                 const oldIndex = col.applications.findIndex(app => app.id === activeId);
@@ -249,10 +262,21 @@ export function ApplicationKanban() {
             });
         }
 
-        if (activeCol.id !== overCol.id) {
+        // 2. Status Changed (Persistence Fix)
+        if (sourceStatus !== targetStatus) {
             const loadingToastId = toast.loading(`Updating application status...`);
+            console.log('--- Status Update Debug ---');
+            console.log('Application ID:', activeId);
+            console.log('Target Status (Column):', targetStatus);
+            console.log('Payload structure:', { id: activeId, newStatus: targetStatus, reason: "" });
+
             try {
-                await applicationService.updateStatus(activeId as string, overCol.id as ApplicationStatus);
+                await applicationService.updateStatus(activeId as string, targetStatus);
+
+                // Trigger success animation
+                setUpdatedCardId(activeId as string);
+                setTimeout(() => setUpdatedCardId(null), 2000);
+
                 toast.success(`Application stage updated`, {
                     id: loadingToastId,
                     description: `${active.data.current?.application.fullName ?? 'Application'} moved to ${overCol.title}`,
@@ -267,6 +291,8 @@ export function ApplicationKanban() {
                 fetchData(true);
             }
         }
+
+        setSourceStatus(null);
     };
 
     if (isLoading) {
@@ -418,7 +444,11 @@ export function ApplicationKanban() {
                     >
                         <div className="flex gap-6 min-w-max px-2">
                             {filteredData?.map((column) => (
-                                <KanbanColumn key={column.id} column={column} />
+                                <KanbanColumn
+                                    key={column.id}
+                                    column={column}
+                                    updatedCardId={updatedCardId}
+                                />
                             ))}
                         </div>
 
@@ -453,8 +483,8 @@ export function ApplicationKanban() {
                                 </TableHeader>
                                 <TableBody>
                                     {allApplications.map((app) => (
-                                        <TableRow 
-                                            key={app.id} 
+                                        <TableRow
+                                            key={app.id}
                                             onClick={() => router.push(`/loans/${app.id}`)}
                                             className="hover:bg-muted/30 border-border/40 transition-colors group cursor-pointer"
                                         >
@@ -483,6 +513,7 @@ export function ApplicationKanban() {
                                                     app.status === 'APPROVED' && "bg-emerald-500/10 text-emerald-600",
                                                     app.status === 'REJECTED' && "bg-rose-500/10 text-rose-600",
                                                     app.status === 'DISBURSED' && "bg-teal-500/10 text-teal-600",
+                                                    app.status === 'CANCELLED' && "bg-slate-500/10 text-slate-600",
                                                 )}>
                                                     {app.status}
                                                 </Badge>

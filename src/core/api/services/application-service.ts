@@ -2,6 +2,7 @@ import { createPromiseClient } from "@connectrpc/connect";
 import { transport } from "../grpc-client";
 import { ApplicationService } from "@/gen/application/v1/application_connect";
 import { Application } from "@/shared/types/api";
+import { apiClient } from '../client';
 
 const client = createPromiseClient(ApplicationService, transport);
 
@@ -110,9 +111,10 @@ export const applicationService = {
             applicationChannel: data.applicationChannel || "",
             branchCode: data.branchCode || "",
             attributes: data.attributes?.map(a => ({
-                key: a.key,
+                attributeId: a.attributeId,
                 value: a.value,
-                dataType: a.dataType
+                dataType: a.dataType,
+                attributeOptionId: a.attributeOptionId
             })) || []
         });
         return response;
@@ -123,7 +125,30 @@ export const applicationService = {
             const app = DUMMY_APPLICATIONS.find(a => a.id === id);
             return app ? { ...app } : null;
         }
-        return client.getApplication({ id });
+        const response = await client.getApplication({ id });
+        return {
+            id: response.id,
+            applicantId: response.applicantId,
+            applicantName: response.applicantName,
+            productId: response.productId,
+            aoId: response.aoId,
+            loanAmount: response.loanAmount,
+            tenorMonths: response.tenorMonths,
+            interestType: response.interestType,
+            interestRate: response.interestRate,
+            loanPurpose: response.loanPurpose,
+            applicationChannel: response.applicationChannel,
+            status: response.status as any,
+            branchCode: response.branchCode,
+            attributes: (response.attributes || []).map((attr: any) => ({
+                attributeId: attr.attributeId,
+                value: attr.value,
+                dataType: attr.dataType,
+                attributeOptionId: attr.attributeOptionId
+            })),
+            createdAt: parseTimestamp(response.createdAt) || new Date().toISOString(),
+            submittedAt: parseTimestamp(response.submittedAt) || null,
+        };
     },
 
     list: async (params?: Record<string, string>) => {
@@ -151,6 +176,7 @@ export const applicationService = {
             applications: (response.applications || []).map((app: any) => ({
                 id: app.id || "unknown-id",
                 applicantId: app.applicantId || "unknown-applicant",
+                applicantName: app.applicantName || "",
                 productId: app.productId || "",
                 aoId: app.aoId || "",
                 loanAmount: app.loanAmount || "0",
@@ -161,7 +187,12 @@ export const applicationService = {
                 applicationChannel: app.applicationChannel || "",
                 status: (app.status || "UNKNOWN") as any,
                 branchCode: app.branchCode || "",
-                attributes: app.attributes || [],
+                attributes: (app.attributes || []).map((attr: any) => ({
+                    attributeId: attr.attributeId,
+                    value: attr.value,
+                    dataType: attr.dataType,
+                    attributeOptionId: attr.attributeOptionId
+                })),
                 createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
                 submittedAt: parseTimestamp(app.submittedAt) || null,
             })),
@@ -169,7 +200,7 @@ export const applicationService = {
         };
     },
 
-    updateStatus: async (id: string, status: string) => {
+    updateStatus: async (id: string, status: string, reason: string = "") => {
         if (USE_DUMMY_DATA) {
             const index = DUMMY_APPLICATIONS.findIndex(a => a.id === id);
             if (index !== -1) {
@@ -179,11 +210,10 @@ export const applicationService = {
             return { success: false };
         }
 
-        const response = await client.changeApplicationStatus({
+        return apiClient.put(`/v1/applications/${id}/status`, {
             id,
             newStatus: status,
-            reason: ""
+            reason: reason
         });
-        return response;
     },
 };

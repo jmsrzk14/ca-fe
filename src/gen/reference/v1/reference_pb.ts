@@ -7,6 +7,572 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
+ * @generated from message api.reference.v1.AttributeCategory
+ */
+export class AttributeCategory extends Message<AttributeCategory> {
+  /**
+   * @generated from field: string category_code = 1;
+   */
+  categoryCode = "";
+
+  /**
+   * @generated from field: string category_name = 2;
+   */
+  categoryName = "";
+
+  /**
+   * Nama icon Lucide/Heroicons, e.g. "id-card"
+   *
+   * @generated from field: string ui_icon = 3;
+   */
+  uiIcon = "";
+
+  /**
+   * @generated from field: int32 display_order = 4;
+   */
+  displayOrder = 0;
+
+  /**
+   * @generated from field: string description = 5;
+   */
+  description = "";
+
+  constructor(data?: PartialMessage<AttributeCategory>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.AttributeCategory";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "category_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "ui_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttributeCategory {
+    return new AttributeCategory().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttributeCategory {
+    return new AttributeCategory().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttributeCategory {
+    return new AttributeCategory().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AttributeCategory | PlainMessage<AttributeCategory> | undefined, b: AttributeCategory | PlainMessage<AttributeCategory> | undefined): boolean {
+    return proto3.util.equals(AttributeCategory, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.ListAttributeCategoriesResponse
+ */
+export class ListAttributeCategoriesResponse extends Message<ListAttributeCategoriesResponse> {
+  /**
+   * @generated from field: repeated api.reference.v1.AttributeCategory categories = 1;
+   */
+  categories: AttributeCategory[] = [];
+
+  constructor(data?: PartialMessage<ListAttributeCategoriesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.ListAttributeCategoriesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "categories", kind: "message", T: AttributeCategory, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAttributeCategoriesResponse {
+    return new ListAttributeCategoriesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAttributeCategoriesResponse {
+    return new ListAttributeCategoriesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAttributeCategoriesResponse {
+    return new ListAttributeCategoriesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListAttributeCategoriesResponse | PlainMessage<ListAttributeCategoriesResponse> | undefined, b: ListAttributeCategoriesResponse | PlainMessage<ListAttributeCategoriesResponse> | undefined): boolean {
+    return proto3.util.equals(ListAttributeCategoriesResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.GetAttributeCategoryRequest
+ */
+export class GetAttributeCategoryRequest extends Message<GetAttributeCategoryRequest> {
+  /**
+   * @generated from field: string category_code = 1;
+   */
+  categoryCode = "";
+
+  constructor(data?: PartialMessage<GetAttributeCategoryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.GetAttributeCategoryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAttributeCategoryRequest {
+    return new GetAttributeCategoryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetAttributeCategoryRequest {
+    return new GetAttributeCategoryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetAttributeCategoryRequest {
+    return new GetAttributeCategoryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetAttributeCategoryRequest | PlainMessage<GetAttributeCategoryRequest> | undefined, b: GetAttributeCategoryRequest | PlainMessage<GetAttributeCategoryRequest> | undefined): boolean {
+    return proto3.util.equals(GetAttributeCategoryRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.CreateAttributeCategoryRequest
+ */
+export class CreateAttributeCategoryRequest extends Message<CreateAttributeCategoryRequest> {
+  /**
+   * @generated from field: string category_code = 1;
+   */
+  categoryCode = "";
+
+  /**
+   * @generated from field: string category_name = 2;
+   */
+  categoryName = "";
+
+  /**
+   * @generated from field: string ui_icon = 3;
+   */
+  uiIcon = "";
+
+  /**
+   * @generated from field: int32 display_order = 4;
+   */
+  displayOrder = 0;
+
+  /**
+   * @generated from field: string description = 5;
+   */
+  description = "";
+
+  constructor(data?: PartialMessage<CreateAttributeCategoryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.CreateAttributeCategoryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "category_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "ui_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAttributeCategoryRequest {
+    return new CreateAttributeCategoryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateAttributeCategoryRequest {
+    return new CreateAttributeCategoryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateAttributeCategoryRequest {
+    return new CreateAttributeCategoryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateAttributeCategoryRequest | PlainMessage<CreateAttributeCategoryRequest> | undefined, b: CreateAttributeCategoryRequest | PlainMessage<CreateAttributeCategoryRequest> | undefined): boolean {
+    return proto3.util.equals(CreateAttributeCategoryRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.UpdateAttributeCategoryRequest
+ */
+export class UpdateAttributeCategoryRequest extends Message<UpdateAttributeCategoryRequest> {
+  /**
+   * @generated from field: string category_code = 1;
+   */
+  categoryCode = "";
+
+  /**
+   * @generated from field: string category_name = 2;
+   */
+  categoryName = "";
+
+  /**
+   * @generated from field: string ui_icon = 3;
+   */
+  uiIcon = "";
+
+  /**
+   * @generated from field: int32 display_order = 4;
+   */
+  displayOrder = 0;
+
+  /**
+   * @generated from field: string description = 5;
+   */
+  description = "";
+
+  constructor(data?: PartialMessage<UpdateAttributeCategoryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.UpdateAttributeCategoryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "category_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "ui_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAttributeCategoryRequest {
+    return new UpdateAttributeCategoryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAttributeCategoryRequest {
+    return new UpdateAttributeCategoryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAttributeCategoryRequest {
+    return new UpdateAttributeCategoryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateAttributeCategoryRequest | PlainMessage<UpdateAttributeCategoryRequest> | undefined, b: UpdateAttributeCategoryRequest | PlainMessage<UpdateAttributeCategoryRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateAttributeCategoryRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.DeleteAttributeCategoryRequest
+ */
+export class DeleteAttributeCategoryRequest extends Message<DeleteAttributeCategoryRequest> {
+  /**
+   * @generated from field: string category_code = 1;
+   */
+  categoryCode = "";
+
+  constructor(data?: PartialMessage<DeleteAttributeCategoryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.DeleteAttributeCategoryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAttributeCategoryRequest {
+    return new DeleteAttributeCategoryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAttributeCategoryRequest {
+    return new DeleteAttributeCategoryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAttributeCategoryRequest {
+    return new DeleteAttributeCategoryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteAttributeCategoryRequest | PlainMessage<DeleteAttributeCategoryRequest> | undefined, b: DeleteAttributeCategoryRequest | PlainMessage<DeleteAttributeCategoryRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteAttributeCategoryRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.AttributeOption
+ */
+export class AttributeOption extends Message<AttributeOption> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string attribute_id = 2;
+   */
+  attributeId = "";
+
+  /**
+   * @generated from field: string option_value = 3;
+   */
+  optionValue = "";
+
+  /**
+   * @generated from field: string option_label = 4;
+   */
+  optionLabel = "";
+
+  /**
+   * @generated from field: int32 display_order = 5;
+   */
+  displayOrder = 0;
+
+  /**
+   * @generated from field: bool is_active = 6;
+   */
+  isActive = false;
+
+  constructor(data?: PartialMessage<AttributeOption>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.AttributeOption";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "attribute_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "option_value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "option_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttributeOption {
+    return new AttributeOption().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttributeOption {
+    return new AttributeOption().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttributeOption {
+    return new AttributeOption().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AttributeOption | PlainMessage<AttributeOption> | undefined, b: AttributeOption | PlainMessage<AttributeOption> | undefined): boolean {
+    return proto3.util.equals(AttributeOption, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.AttributeRegistry
+ */
+export class AttributeRegistry extends Message<AttributeRegistry> {
+  /**
+   * @generated from field: string id = 13;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string attribute_code = 1;
+   */
+  attributeCode = "";
+
+  /**
+   * @generated from field: string applies_to = 2;
+   */
+  appliesTo = "";
+
+  /**
+   * @generated from field: string scope = 3;
+   */
+  scope = "";
+
+  /**
+   * @generated from field: string data_type = 4;
+   */
+  dataType = "";
+
+  /**
+   * FK ke attribute_categories
+   *
+   * @generated from field: string category_code = 5;
+   */
+  categoryCode = "";
+
+  /**
+   * Label per atribut (bisa beda dari description)
+   *
+   * @generated from field: string ui_label = 6;
+   */
+  uiLabel = "";
+
+  /**
+   * @generated from field: bool is_required = 7;
+   */
+  isRequired = false;
+
+  /**
+   * @generated from field: bool risk_relevant = 8;
+   */
+  riskRelevant = false;
+
+  /**
+   * @generated from field: bool is_active = 14;
+   */
+  isActive = false;
+
+  /**
+   * @generated from field: int32 display_order = 15;
+   */
+  displayOrder = 0;
+
+  /**
+   * @generated from field: string description = 9;
+   */
+  description = "";
+
+  /**
+   * Denormalized dari JOIN (read-only, tidak disimpan di tabel registry)
+   *
+   * @generated from field: string category_name = 10;
+   */
+  categoryName = "";
+
+  /**
+   * @generated from field: string category_icon = 11;
+   */
+  categoryIcon = "";
+
+  /**
+   * Daftar pilihan jika data_type = SELECT
+   *
+   * @generated from field: repeated api.reference.v1.AttributeOption options = 12;
+   */
+  options: AttributeOption[] = [];
+
+  constructor(data?: PartialMessage<AttributeRegistry>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.AttributeRegistry";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 13, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "attribute_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "applies_to", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "scope", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "data_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "ui_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "is_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "risk_relevant", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 14, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 15, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 9, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "category_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 11, name: "category_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 12, name: "options", kind: "message", T: AttributeOption, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttributeRegistry {
+    return new AttributeRegistry().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttributeRegistry {
+    return new AttributeRegistry().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttributeRegistry {
+    return new AttributeRegistry().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AttributeRegistry | PlainMessage<AttributeRegistry> | undefined, b: AttributeRegistry | PlainMessage<AttributeRegistry> | undefined): boolean {
+    return proto3.util.equals(AttributeRegistry, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.ListAttributeRegistryResponse
+ */
+export class ListAttributeRegistryResponse extends Message<ListAttributeRegistryResponse> {
+  /**
+   * @generated from field: repeated api.reference.v1.AttributeRegistry attributes = 1;
+   */
+  attributes: AttributeRegistry[] = [];
+
+  constructor(data?: PartialMessage<ListAttributeRegistryResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.ListAttributeRegistryResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "attributes", kind: "message", T: AttributeRegistry, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAttributeRegistryResponse {
+    return new ListAttributeRegistryResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAttributeRegistryResponse {
+    return new ListAttributeRegistryResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAttributeRegistryResponse {
+    return new ListAttributeRegistryResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListAttributeRegistryResponse | PlainMessage<ListAttributeRegistryResponse> | undefined, b: ListAttributeRegistryResponse | PlainMessage<ListAttributeRegistryResponse> | undefined): boolean {
+    return proto3.util.equals(ListAttributeRegistryResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.ListAttributeRegistryByCategoryRequest
+ */
+export class ListAttributeRegistryByCategoryRequest extends Message<ListAttributeRegistryByCategoryRequest> {
+  /**
+   * @generated from field: string category_code = 1;
+   */
+  categoryCode = "";
+
+  constructor(data?: PartialMessage<ListAttributeRegistryByCategoryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.ListAttributeRegistryByCategoryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAttributeRegistryByCategoryRequest {
+    return new ListAttributeRegistryByCategoryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAttributeRegistryByCategoryRequest {
+    return new ListAttributeRegistryByCategoryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAttributeRegistryByCategoryRequest {
+    return new ListAttributeRegistryByCategoryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListAttributeRegistryByCategoryRequest | PlainMessage<ListAttributeRegistryByCategoryRequest> | undefined, b: ListAttributeRegistryByCategoryRequest | PlainMessage<ListAttributeRegistryByCategoryRequest> | undefined): boolean {
+    return proto3.util.equals(ListAttributeRegistryByCategoryRequest, a, b);
+  }
+}
+
+/**
  * @generated from message api.reference.v1.CreateAttributeRegistryRequest
  */
 export class CreateAttributeRegistryRequest extends Message<CreateAttributeRegistryRequest> {
@@ -31,34 +597,39 @@ export class CreateAttributeRegistryRequest extends Message<CreateAttributeRegis
   valueType = "";
 
   /**
-   * @generated from field: string category = 5;
+   * @generated from field: string category_code = 5;
    */
-  category = "";
+  categoryCode = "";
 
   /**
-   * @generated from field: bool is_required = 6;
+   * @generated from field: string ui_label = 6;
+   */
+  uiLabel = "";
+
+  /**
+   * @generated from field: bool is_required = 7;
    */
   isRequired = false;
 
   /**
-   * @generated from field: bool risk_relevant = 7;
+   * @generated from field: bool risk_relevant = 8;
    */
   riskRelevant = false;
 
   /**
-   * @generated from field: string description = 8;
+   * @generated from field: bool is_active = 10;
+   */
+  isActive = false;
+
+  /**
+   * @generated from field: int32 display_order = 11;
+   */
+  displayOrder = 0;
+
+  /**
+   * @generated from field: string description = 9;
    */
   description = "";
-
-  /**
-   * @generated from field: string ui_icon = 9;
-   */
-  uiIcon = "";
-
-  /**
-   * @generated from field: string ui_label = 10;
-   */
-  uiLabel = "";
 
   constructor(data?: PartialMessage<CreateAttributeRegistryRequest>) {
     super();
@@ -72,12 +643,13 @@ export class CreateAttributeRegistryRequest extends Message<CreateAttributeRegis
     { no: 2, name: "applies_to", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "scope", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "value_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "is_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 7, name: "risk_relevant", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 8, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 9, name: "ui_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 10, name: "ui_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "ui_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "is_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "risk_relevant", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 10, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 11, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 9, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateAttributeRegistryRequest {
@@ -94,6 +666,146 @@ export class CreateAttributeRegistryRequest extends Message<CreateAttributeRegis
 
   static equals(a: CreateAttributeRegistryRequest | PlainMessage<CreateAttributeRegistryRequest> | undefined, b: CreateAttributeRegistryRequest | PlainMessage<CreateAttributeRegistryRequest> | undefined): boolean {
     return proto3.util.equals(CreateAttributeRegistryRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.UpdateAttributeRegistryRequest
+ */
+export class UpdateAttributeRegistryRequest extends Message<UpdateAttributeRegistryRequest> {
+  /**
+   * @generated from field: string id = 12;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string attribute_code = 1;
+   */
+  attributeCode = "";
+
+  /**
+   * @generated from field: string applies_to = 2;
+   */
+  appliesTo = "";
+
+  /**
+   * @generated from field: string scope = 3;
+   */
+  scope = "";
+
+  /**
+   * @generated from field: string value_type = 4;
+   */
+  valueType = "";
+
+  /**
+   * @generated from field: string category_code = 5;
+   */
+  categoryCode = "";
+
+  /**
+   * @generated from field: string ui_label = 6;
+   */
+  uiLabel = "";
+
+  /**
+   * @generated from field: bool is_required = 7;
+   */
+  isRequired = false;
+
+  /**
+   * @generated from field: bool risk_relevant = 8;
+   */
+  riskRelevant = false;
+
+  /**
+   * @generated from field: bool is_active = 10;
+   */
+  isActive = false;
+
+  /**
+   * @generated from field: int32 display_order = 11;
+   */
+  displayOrder = 0;
+
+  /**
+   * @generated from field: string description = 9;
+   */
+  description = "";
+
+  constructor(data?: PartialMessage<UpdateAttributeRegistryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.UpdateAttributeRegistryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 12, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "attribute_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "applies_to", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "scope", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "value_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "category_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "ui_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "is_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "risk_relevant", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 10, name: "is_active", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 11, name: "display_order", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 9, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateAttributeRegistryRequest {
+    return new UpdateAttributeRegistryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateAttributeRegistryRequest {
+    return new UpdateAttributeRegistryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateAttributeRegistryRequest {
+    return new UpdateAttributeRegistryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateAttributeRegistryRequest | PlainMessage<UpdateAttributeRegistryRequest> | undefined, b: UpdateAttributeRegistryRequest | PlainMessage<UpdateAttributeRegistryRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateAttributeRegistryRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.DeleteAttributeRegistryRequest
+ */
+export class DeleteAttributeRegistryRequest extends Message<DeleteAttributeRegistryRequest> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  constructor(data?: PartialMessage<DeleteAttributeRegistryRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.DeleteAttributeRegistryRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteAttributeRegistryRequest {
+    return new DeleteAttributeRegistryRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteAttributeRegistryRequest {
+    return new DeleteAttributeRegistryRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteAttributeRegistryRequest {
+    return new DeleteAttributeRegistryRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteAttributeRegistryRequest | PlainMessage<DeleteAttributeRegistryRequest> | undefined, b: DeleteAttributeRegistryRequest | PlainMessage<DeleteAttributeRegistryRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteAttributeRegistryRequest, a, b);
   }
 }
 
@@ -312,140 +1024,6 @@ export class ApplicationStatusRef extends Message<ApplicationStatusRef> {
 }
 
 /**
- * @generated from message api.reference.v1.AttributeRegistry
- */
-export class AttributeRegistry extends Message<AttributeRegistry> {
-  /**
-   * @generated from field: string attr_key = 1;
-   */
-  attrKey = "";
-
-  /**
-   * @generated from field: string attr_name = 2;
-   */
-  attrName = "";
-
-  /**
-   * @generated from field: string data_type = 3;
-   */
-  dataType = "";
-
-  /**
-   * @generated from field: string category = 4;
-   */
-  category = "";
-
-  /**
-   * @generated from field: bool required = 5;
-   */
-  required = false;
-
-  /**
-   * @generated from field: string ui_icon = 6;
-   */
-  uiIcon = "";
-
-  /**
-   * @generated from field: string ui_label = 7;
-   */
-  uiLabel = "";
-
-  constructor(data?: PartialMessage<AttributeRegistry>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.reference.v1.AttributeRegistry";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "attr_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "attr_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "data_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "category", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
-    { no: 6, name: "ui_icon", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "ui_label", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttributeRegistry {
-    return new AttributeRegistry().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttributeRegistry {
-    return new AttributeRegistry().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttributeRegistry {
-    return new AttributeRegistry().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: AttributeRegistry | PlainMessage<AttributeRegistry> | undefined, b: AttributeRegistry | PlainMessage<AttributeRegistry> | undefined): boolean {
-    return proto3.util.equals(AttributeRegistry, a, b);
-  }
-}
-
-/**
- * @generated from message api.reference.v1.SurveyTemplate
- */
-export class SurveyTemplate extends Message<SurveyTemplate> {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id = "";
-
-  /**
-   * @generated from field: string template_code = 2;
-   */
-  templateCode = "";
-
-  /**
-   * @generated from field: string template_name = 3;
-   */
-  templateName = "";
-
-  /**
-   * @generated from field: string applicant_type = 4;
-   */
-  applicantType = "";
-
-  /**
-   * @generated from field: string product_id = 5;
-   */
-  productId = "";
-
-  constructor(data?: PartialMessage<SurveyTemplate>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.reference.v1.SurveyTemplate";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "template_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "template_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "product_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SurveyTemplate {
-    return new SurveyTemplate().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SurveyTemplate {
-    return new SurveyTemplate().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SurveyTemplate {
-    return new SurveyTemplate().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: SurveyTemplate | PlainMessage<SurveyTemplate> | undefined, b: SurveyTemplate | PlainMessage<SurveyTemplate> | undefined): boolean {
-    return proto3.util.equals(SurveyTemplate, a, b);
-  }
-}
-
-/**
  * @generated from message api.reference.v1.FinancialGLAccount
  */
 export class FinancialGLAccount extends Message<FinancialGLAccount> {
@@ -521,6 +1099,67 @@ export class FinancialGLAccount extends Message<FinancialGLAccount> {
 
   static equals(a: FinancialGLAccount | PlainMessage<FinancialGLAccount> | undefined, b: FinancialGLAccount | PlainMessage<FinancialGLAccount> | undefined): boolean {
     return proto3.util.equals(FinancialGLAccount, a, b);
+  }
+}
+
+/**
+ * @generated from message api.reference.v1.SurveyTemplate
+ */
+export class SurveyTemplate extends Message<SurveyTemplate> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string template_code = 2;
+   */
+  templateCode = "";
+
+  /**
+   * @generated from field: string template_name = 3;
+   */
+  templateName = "";
+
+  /**
+   * @generated from field: string applicant_type = 4;
+   */
+  applicantType = "";
+
+  /**
+   * @generated from field: string product_id = 5;
+   */
+  productId = "";
+
+  constructor(data?: PartialMessage<SurveyTemplate>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.reference.v1.SurveyTemplate";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "template_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "template_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "applicant_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "product_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SurveyTemplate {
+    return new SurveyTemplate().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SurveyTemplate {
+    return new SurveyTemplate().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SurveyTemplate {
+    return new SurveyTemplate().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SurveyTemplate | PlainMessage<SurveyTemplate> | undefined, b: SurveyTemplate | PlainMessage<SurveyTemplate> | undefined): boolean {
+    return proto3.util.equals(SurveyTemplate, a, b);
   }
 }
 
@@ -747,39 +1386,39 @@ export class ListApplicationStatusesResponse extends Message<ListApplicationStat
 }
 
 /**
- * @generated from message api.reference.v1.ListAttributeRegistryResponse
+ * @generated from message api.reference.v1.ListFinancialGLAccountsResponse
  */
-export class ListAttributeRegistryResponse extends Message<ListAttributeRegistryResponse> {
+export class ListFinancialGLAccountsResponse extends Message<ListFinancialGLAccountsResponse> {
   /**
-   * @generated from field: repeated api.reference.v1.AttributeRegistry attributes = 1;
+   * @generated from field: repeated api.reference.v1.FinancialGLAccount accounts = 1;
    */
-  attributes: AttributeRegistry[] = [];
+  accounts: FinancialGLAccount[] = [];
 
-  constructor(data?: PartialMessage<ListAttributeRegistryResponse>) {
+  constructor(data?: PartialMessage<ListFinancialGLAccountsResponse>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.reference.v1.ListAttributeRegistryResponse";
+  static readonly typeName = "api.reference.v1.ListFinancialGLAccountsResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "attributes", kind: "message", T: AttributeRegistry, repeated: true },
+    { no: 1, name: "accounts", kind: "message", T: FinancialGLAccount, repeated: true },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListAttributeRegistryResponse {
-    return new ListAttributeRegistryResponse().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListFinancialGLAccountsResponse {
+    return new ListFinancialGLAccountsResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListAttributeRegistryResponse {
-    return new ListAttributeRegistryResponse().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListFinancialGLAccountsResponse {
+    return new ListFinancialGLAccountsResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListAttributeRegistryResponse {
-    return new ListAttributeRegistryResponse().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListFinancialGLAccountsResponse {
+    return new ListFinancialGLAccountsResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(a: ListAttributeRegistryResponse | PlainMessage<ListAttributeRegistryResponse> | undefined, b: ListAttributeRegistryResponse | PlainMessage<ListAttributeRegistryResponse> | undefined): boolean {
-    return proto3.util.equals(ListAttributeRegistryResponse, a, b);
+  static equals(a: ListFinancialGLAccountsResponse | PlainMessage<ListFinancialGLAccountsResponse> | undefined, b: ListFinancialGLAccountsResponse | PlainMessage<ListFinancialGLAccountsResponse> | undefined): boolean {
+    return proto3.util.equals(ListFinancialGLAccountsResponse, a, b);
   }
 }
 
@@ -860,43 +1499,6 @@ export class ListSurveyTemplatesResponse extends Message<ListSurveyTemplatesResp
 
   static equals(a: ListSurveyTemplatesResponse | PlainMessage<ListSurveyTemplatesResponse> | undefined, b: ListSurveyTemplatesResponse | PlainMessage<ListSurveyTemplatesResponse> | undefined): boolean {
     return proto3.util.equals(ListSurveyTemplatesResponse, a, b);
-  }
-}
-
-/**
- * @generated from message api.reference.v1.ListFinancialGLAccountsResponse
- */
-export class ListFinancialGLAccountsResponse extends Message<ListFinancialGLAccountsResponse> {
-  /**
-   * @generated from field: repeated api.reference.v1.FinancialGLAccount accounts = 1;
-   */
-  accounts: FinancialGLAccount[] = [];
-
-  constructor(data?: PartialMessage<ListFinancialGLAccountsResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "api.reference.v1.ListFinancialGLAccountsResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "accounts", kind: "message", T: FinancialGLAccount, repeated: true },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListFinancialGLAccountsResponse {
-    return new ListFinancialGLAccountsResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListFinancialGLAccountsResponse {
-    return new ListFinancialGLAccountsResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListFinancialGLAccountsResponse {
-    return new ListFinancialGLAccountsResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: ListFinancialGLAccountsResponse | PlainMessage<ListFinancialGLAccountsResponse> | undefined, b: ListFinancialGLAccountsResponse | PlainMessage<ListFinancialGLAccountsResponse> | undefined): boolean {
-    return proto3.util.equals(ListFinancialGLAccountsResponse, a, b);
   }
 }
 

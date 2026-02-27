@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { Empty, MethodKind } from "@bufbuild/protobuf";
-import { CreateAttributeRegistryRequest, GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeRegistryResponse, ListBranchesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct } from "./reference_pb";
+import { AttributeCategory, CreateAttributeCategoryRequest, CreateAttributeRegistryRequest, DeleteAttributeCategoryRequest, DeleteAttributeRegistryRequest, GetAttributeCategoryRequest, GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeCategoriesResponse, ListAttributeRegistryByCategoryRequest, ListAttributeRegistryResponse, ListBranchesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct, UpdateAttributeCategoryRequest, UpdateAttributeRegistryRequest } from "./reference_pb";
 
 /**
  * @generated from service api.reference.v1.ReferenceService
@@ -13,6 +13,8 @@ export const ReferenceService = {
   typeName: "api.reference.v1.ReferenceService",
   methods: {
     /**
+     * ---- Loan Products ----
+     *
      * @generated from rpc api.reference.v1.ReferenceService.ListLoanProducts
      */
     listLoanProducts: {
@@ -31,6 +33,8 @@ export const ReferenceService = {
       kind: MethodKind.Unary,
     },
     /**
+     * ---- Branches & Officers ----
+     *
      * @generated from rpc api.reference.v1.ReferenceService.ListBranches
      */
     listBranches: {
@@ -49,6 +53,8 @@ export const ReferenceService = {
       kind: MethodKind.Unary,
     },
     /**
+     * ---- Application Statuses ----
+     *
      * @generated from rpc api.reference.v1.ReferenceService.ListApplicationStatuses
      */
     listApplicationStatuses: {
@@ -58,6 +64,66 @@ export const ReferenceService = {
       kind: MethodKind.Unary,
     },
     /**
+     * ---- Financial GL Accounts ----
+     *
+     * @generated from rpc api.reference.v1.ReferenceService.ListFinancialGLAccounts
+     */
+    listFinancialGLAccounts: {
+      name: "ListFinancialGLAccounts",
+      I: Empty,
+      O: ListFinancialGLAccountsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ---- Attribute Categories (Dinamis — icon disimpan di sini) ----
+     *
+     * @generated from rpc api.reference.v1.ReferenceService.ListAttributeCategories
+     */
+    listAttributeCategories: {
+      name: "ListAttributeCategories",
+      I: Empty,
+      O: ListAttributeCategoriesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.reference.v1.ReferenceService.GetAttributeCategory
+     */
+    getAttributeCategory: {
+      name: "GetAttributeCategory",
+      I: GetAttributeCategoryRequest,
+      O: AttributeCategory,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.reference.v1.ReferenceService.CreateAttributeCategory
+     */
+    createAttributeCategory: {
+      name: "CreateAttributeCategory",
+      I: CreateAttributeCategoryRequest,
+      O: AttributeCategory,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.reference.v1.ReferenceService.UpdateAttributeCategory
+     */
+    updateAttributeCategory: {
+      name: "UpdateAttributeCategory",
+      I: UpdateAttributeCategoryRequest,
+      O: AttributeCategory,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.reference.v1.ReferenceService.DeleteAttributeCategory
+     */
+    deleteAttributeCategory: {
+      name: "DeleteAttributeCategory",
+      I: DeleteAttributeCategoryRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ---- Attribute Registry (icon TIDAK di sini — diambil dari category) ----
+     *
      * @generated from rpc api.reference.v1.ReferenceService.ListAttributeRegistry
      */
     listAttributeRegistry: {
@@ -67,21 +133,12 @@ export const ReferenceService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @generated from rpc api.reference.v1.ReferenceService.ListSurveyTemplates
+     * @generated from rpc api.reference.v1.ReferenceService.ListAttributeRegistryByCategory
      */
-    listSurveyTemplates: {
-      name: "ListSurveyTemplates",
-      I: ListSurveyTemplatesRequest,
-      O: ListSurveyTemplatesResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc api.reference.v1.ReferenceService.ListFinancialGLAccounts
-     */
-    listFinancialGLAccounts: {
-      name: "ListFinancialGLAccounts",
-      I: Empty,
-      O: ListFinancialGLAccountsResponse,
+    listAttributeRegistryByCategory: {
+      name: "ListAttributeRegistryByCategory",
+      I: ListAttributeRegistryByCategoryRequest,
+      O: ListAttributeRegistryResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -94,12 +151,32 @@ export const ReferenceService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @hand-written extension - mirrors CreateAttributeRegistry (same fields, different RPC name)
+     * @generated from rpc api.reference.v1.ReferenceService.UpdateAttributeRegistry
      */
     updateAttributeRegistry: {
       name: "UpdateAttributeRegistry",
-      I: CreateAttributeRegistryRequest,
+      I: UpdateAttributeRegistryRequest,
       O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.reference.v1.ReferenceService.DeleteAttributeRegistry
+     */
+    deleteAttributeRegistry: {
+      name: "DeleteAttributeRegistry",
+      I: DeleteAttributeRegistryRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ---- Survey Templates ----
+     *
+     * @generated from rpc api.reference.v1.ReferenceService.ListSurveyTemplates
+     */
+    listSurveyTemplates: {
+      name: "ListSurveyTemplates",
+      I: ListSurveyTemplatesRequest,
+      O: ListSurveyTemplatesResponse,
       kind: MethodKind.Unary,
     },
   }

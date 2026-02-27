@@ -11,9 +11,9 @@ import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
  */
 export class ApplicationAttribute extends Message<ApplicationAttribute> {
   /**
-   * @generated from field: string key = 1;
+   * @generated from field: string attribute_id = 1;
    */
-  key = "";
+  attributeId = "";
 
   /**
    * @generated from field: string value = 2;
@@ -25,6 +25,11 @@ export class ApplicationAttribute extends Message<ApplicationAttribute> {
    */
   dataType = "";
 
+  /**
+   * @generated from field: string attribute_option_id = 4;
+   */
+  attributeOptionId = "";
+
   constructor(data?: PartialMessage<ApplicationAttribute>) {
     super();
     proto3.util.initPartial(data, this);
@@ -33,9 +38,10 @@ export class ApplicationAttribute extends Message<ApplicationAttribute> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.application.v1.ApplicationAttribute";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "attribute_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "data_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "attribute_option_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApplicationAttribute {
@@ -105,6 +111,11 @@ export class Application extends Message<Application> {
    * @generated from field: string applicant_id = 2;
    */
   applicantId = "";
+
+  /**
+   * @generated from field: string applicant_name = 16;
+   */
+  applicantName = "";
 
   /**
    * @generated from field: string product_id = 3;
@@ -181,6 +192,7 @@ export class Application extends Message<Application> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "applicant_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "applicant_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "product_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "ao_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "loan_amount", kind: "scalar", T: 9 /* ScalarType.STRING */ },

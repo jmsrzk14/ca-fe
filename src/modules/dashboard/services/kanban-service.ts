@@ -1,6 +1,7 @@
 import { ApplicationListResponse, Application } from '@/shared/types/api';
 import { applicationService } from '@/core/api/services/application-service';
 import { applicantService } from '@/core/api/services/applicant-service';
+import { referenceService } from '@/core/api/services/reference-service';
 import {
     ApplicationCardData,
     APPLICATION_STATUS_COLUMNS,
@@ -39,8 +40,25 @@ function mapToCardData(app: any): ApplicationCardData {
 
 export const kanbanService = {
     getBoardData: async (): Promise<KanbanColumnData[]> => {
-        const response = await applicationService.list();
-        const applications = response.applications || [];
+        const [appResponse, statusResponse] = await Promise.all([
+            applicationService.list(),
+            referenceService.listApplicationStatuses()
+        ]);
+
+        const applications = appResponse.applications || [];
+        const statuses = statusResponse.statuses || [];
+
+        // Map status colors for fallback
+        const colorMap: Record<string, string> = {
+            'INTAKE': 'border-t-slate-400',
+            'ANALYSIS': 'border-t-blue-400',
+            'SURVEY': 'border-t-purple-400',
+            'COMMITTEE': 'border-t-orange-400',
+            'APPROVED': 'border-t-emerald-400',
+            'REJECTED': 'border-t-rose-400',
+            'DISBURSED': 'border-t-teal-400',
+            'CANCELLED': 'border-t-slate-300',
+        };
 
         // Fetch applicant details for each unique applicantId
         const uniqueApplicantIds = Array.from(new Set(applications.map((app: any) => app.applicantId).filter(Boolean)));
@@ -67,7 +85,7 @@ export const kanbanService = {
         // Build a map of status -> cards
         const cardsByStatus: Record<string, ApplicationCardData[]> = {};
         for (const app of applications) {
-            const status = app.status || "INTAKE";
+            const status = app.status || "UNKNOWN";
             if (!cardsByStatus[status]) {
                 cardsByStatus[status] = [];
             }
@@ -77,21 +95,22 @@ export const kanbanService = {
                 ...app,
                 applicantId: app.applicantId,
                 applicantType: applicant?.applicantType || "PERSONAL",
-                fullName: applicant?.fullName || "Unknown Applicant",
+                fullName: app.applicantName || applicant?.fullName || "Unknown Applicant",
                 identityNumber: applicant?.identityNumber || "unknown",
             };
 
             cardsByStatus[status].push(mapToCardData(enrichedApp));
         }
 
-        // Build columns in fixed order, filling in empty ones
-        return APPLICATION_STATUS_COLUMNS.map(col => {
-            const apps = cardsByStatus[col.id] ?? [];
+        // Build columns based on proto statuses
+        return statuses.map(s => {
+            const statusCode = s.statusCode as ApplicationStatus;
+            const apps = cardsByStatus[statusCode] ?? [];
             const totalAmount = apps.reduce((sum, a) => sum + a.amount, 0);
             return {
-                id: col.id,
-                title: col.title,
-                color: col.color,
+                id: statusCode,
+                title: s.statusCode || statusCode,
+                color: colorMap[statusCode] || 'border-t-slate-400',
                 count: apps.length,
                 totalAmount,
                 applications: apps,

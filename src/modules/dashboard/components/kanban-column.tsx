@@ -9,9 +9,10 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 
 interface KanbanColumnProps {
     column: KanbanColumnData;
+    updatedCardId?: string | null;
 }
 
-export function KanbanColumn({ column }: KanbanColumnProps) {
+export function KanbanColumn({ column, updatedCardId }: KanbanColumnProps) {
     const { setNodeRef } = useDroppable({
         id: column.id,
         data: {
@@ -50,7 +51,12 @@ export function KanbanColumn({ column }: KanbanColumnProps) {
                 <SortableContext items={applicationIds} strategy={verticalListSortingStrategy}>
                     {column.applications.length > 0 ? (
                         column.applications.map((app) => (
-                            <ApplicationCard key={app.id} application={app} />
+                            <ApplicationCard
+                                key={app.id}
+                                application={app}
+                                isSuccess={app.id === updatedCardId}
+                                borderColor={column.color}
+                            />
                         ))
                     ) : (
                         <div className="flex flex-col items-center gap-2 text-muted-foreground opacity-20">

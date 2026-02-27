@@ -221,7 +221,7 @@ export function DashboardSidebar() {
                 ))}
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar">
+            {/* <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>
@@ -264,7 +264,7 @@ export function DashboardSidebar() {
                         </DropdownMenu>
                     </SidebarMenuItem>
                 </SidebarMenu>
-            </SidebarFooter>
+            </SidebarFooter> */}
             <SidebarRail />
         </Sidebar>
     );

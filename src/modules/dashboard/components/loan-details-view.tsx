@@ -14,6 +14,7 @@ import { Button } from '@/shared/ui/button';
 import { useRouter, useParams } from 'next/navigation';
 import { applicationService } from '@/core/api/services/application-service';
 import { applicantService } from '@/core/api/services/applicant-service';
+import { referenceService } from '@/core/api/services/reference-service';
 
 // Import Tabs
 import { BorrowerProfileTab } from './loan-details/tabs/borrower-profile-tab';
@@ -34,16 +35,21 @@ const TABS = [
     'Histori'
 ];
 
-export function LoanDetailsView() {
+interface LoanDetailsViewProps {
+    id?: string;
+}
+
+export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
     const [activeTab, setActiveTab] = React.useState('Profil Peminjam');
     const [application, setApplication] = React.useState<any>(null);
     const [applicant, setApplicant] = React.useState<any>(null);
+    const [productName, setProductName] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
 
     const router = useRouter();
     const params = useParams();
-    const id = params.id as string;
+    const id = propId || params?.id as string;
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -56,6 +62,15 @@ export function LoanDetailsView() {
                     if (appData.applicantId) {
                         const applicantData = await applicantService.getById(appData.applicantId);
                         setApplicant(applicantData);
+                    }
+                    if (appData.productId) {
+                        try {
+                            const product = await referenceService.getLoanProduct(appData.productId);
+                            if (product) setProductName(product.productName);
+                        } catch (pErr) {
+                            console.warn('Failed to fetch product name:', pErr);
+                            setProductName(appData.productId); // Fallback to ID
+                        }
                     }
                 } else {
                     setError('Application not found');
@@ -95,7 +110,7 @@ export function LoanDetailsView() {
                         <BorrowerProfileTab applicant={applicant} />
                     </div>
                 );
-            case 'Pinjaman': return <LoanInfoTab application={application} applicant={applicant} />;
+            case 'Pinjaman': return <LoanInfoTab application={application} applicant={applicant} productName={productName} />;
             case 'Riwayat Hutang': return <DebtHistoryTab />;
             case 'Kelengkapan Dokumen': return <DocumentCompletenessTab />;
             case 'Finansial': return <FinancialInfoTab />;
@@ -140,7 +155,7 @@ export function LoanDetailsView() {
                 <CardContent className="p-0">
                     <div className="p-6 border-b border-border/50 ">
                         <h1 className="text-xl font-bold tracking-tight text-foreground">
-                            Peminjaman Kredit: <span className="text-foreground">{application?.productId || 'UMKM'}</span>
+                            Peminjaman Kredit: <span className="text-foreground">{productName || application?.productId || 'UMKM'}</span>
                         </h1>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/50 ">

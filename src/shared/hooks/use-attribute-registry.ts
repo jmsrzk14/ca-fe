@@ -12,13 +12,13 @@ export function useAttributeRegistry() {
     const registryMap = useMemo(() => {
         if (!data?.attributes) return {};
         return data.attributes.reduce((acc: Record<string, any>, attr: any) => {
-            acc[attr.attrKey] = attr;
+            acc[attr.attributeCode] = attr;
             return acc;
         }, {});
     }, [data]);
 
     const getLabel = (key: string, fallback?: string) => {
-        return registryMap[key]?.attrName || fallback || key;
+        return registryMap[key]?.uiLabel || fallback || key;
     };
 
     const getAttributeConfig = (key: string) => {
