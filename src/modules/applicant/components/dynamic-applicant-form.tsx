@@ -346,7 +346,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
             birthDate: type === 'PERSONAL' && formData.birthDate ? new Date(formData.birthDate).toISOString() : '',
-            establishmentDate: type === 'CORPORATE' && formData.establishmentDate ? new Date(formData.establishmentDate).toISOString() : '',
+            establishmentDate: type === 'CORPORATE' && formData.birthDate ? new Date(formData.birthDate).toISOString() : '',
             attributes,
             ...(applicantId ? {} : { createdAt: now })
         };
@@ -586,10 +586,10 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                         {type === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`}
                                     </Label>
                                     <Input
-                                        id={type === 'PERSONAL' ? "birthDate" : "establishmentDate"}
-                                        name={type === 'PERSONAL' ? "birthDate" : "establishmentDate"}
+                                        id={type === 'PERSONAL' ? "birthDate" : "birthDate"}
+                                        name={type === 'PERSONAL' ? "birthDate" : "birthDate"}
                                         type="date"
-                                        value={type === 'PERSONAL' ? formData.birthDate : formData.establishmentDate}
+                                        value={type === 'PERSONAL' ? formData.birthDate : formData.birthDate}
                                         onChange={handleInputChange}
                                         className="rounded-xl h-11 bg-slate-50 border-slate-200"
                                     />
