@@ -13,6 +13,7 @@ export const referenceService = {
     getAttributeRegistry: () => client.listAttributeRegistry(new Empty()),
     listApplicationStatuses: () => client.listApplicationStatuses(new Empty()),
     listAttributeCategories: () => client.listAttributeCategories(new Empty()),
+    listLoanOfficers: (branchCode: string) => client.listLoanOfficers({ branchCode }),
     createAttributeRegistry: (data: any) => client.createAttributeRegistry(data),
     updateAttributeRegistry: (data: any) => client.updateAttributeRegistry(data),
 };
