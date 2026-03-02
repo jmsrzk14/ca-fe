@@ -25,6 +25,17 @@ function parseTimestamp(ts: any): string | undefined {
     }
 }
 
+/**
+ * Normalizes applicantType from backend to 'PERSONAL' | 'CORPORATE'.
+ * Handles: COMPANY, company, CORPORATE, corporate → 'CORPORATE'
+ * Handles: PERSONAL, personal → 'PERSONAL'
+ */
+function normalizeType(val: string | undefined): 'PERSONAL' | 'CORPORATE' {
+    const upper = (val || '').toUpperCase().trim();
+    if (upper === 'CORPORATE' || upper === 'COMPANY') return 'CORPORATE';
+    return 'PERSONAL';
+}
+
 // --- DUMMY DATA BLOCK START ---
 const USE_DUMMY_DATA = false;
 
@@ -105,10 +116,22 @@ export const applicantService = {
 
         const response = await client.getApplicant({ id });
         return {
-            ...response,
-            applicantType: response.applicantType || "PERSONAL",
+            id: response.id || id,
+            applicantType: normalizeType(response.applicantType),
+            identityNumber: response.identityNumber || '',
+            taxId: response.taxId || '',
+            fullName: response.fullName || '',
+            birthDate: parseTimestamp(response.birthDate as any) || '',
+            establishmentDate: parseTimestamp(response.establishmentDate as any) || '',
+            attributes: (response.attributes || []).map((attr: any) => ({
+                key: attr.key || attr.attributeId || '',
+                value: attr.value || '',
+                dataType: attr.dataType || 'STRING',
+            })),
+            createdAt: parseTimestamp(response.createdAt as any) || '',
         };
     },
+
 
     update: async (id: string, data: any) => {
         if (USE_DUMMY_DATA) {
@@ -156,13 +179,17 @@ export const applicantService = {
         return {
             applicants: (response.applicants || []).map((app: any) => ({
                 id: app.id || "unknown",
-                applicantType: app.applicantType || "PERSONAL",
+                applicantType: normalizeType(app.applicantType),
                 identityNumber: app.identityNumber || "",
                 taxId: app.taxId || "",
                 fullName: app.fullName || "Unnamed Applicant",
                 birthDate: parseTimestamp(app.birthDate) || "",
                 establishmentDate: parseTimestamp(app.establishmentDate) || "",
-                attributes: app.attributes || [],
+                attributes: (app.attributes || []).map((attr: any) => ({
+                    key: attr.key || attr.attributeId || '',
+                    value: attr.value || '',
+                    dataType: attr.dataType || 'STRING',
+                })),
                 createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
             })),
             nextCursor: response.nextCursor || "",

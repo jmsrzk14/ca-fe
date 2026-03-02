@@ -99,7 +99,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     const COMMON_OPTIONS = React.useMemo(() => getCommonOptions(), []);
     const queryClient = useQueryClient();
     const [currentStep, setCurrentStep] = React.useState(0);
-    const [type, setType] = React.useState<ApplicantType>('PERSONAL');
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
 
     // 1. Fetch the "Buku Panduan" (Registry) and "Categories" from API
@@ -117,7 +116,32 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         queryKey: ['applicant', applicantId],
         queryFn: () => applicantService.getById(applicantId!),
         enabled: !!applicantId,
+        // Pre-populate from list cache so form renders immediately without waiting for getById
+        initialData: () => {
+            if (!applicantId) return undefined;
+            const cached = queryClient.getQueryData<any>(['applicants']);
+            const found = cached?.applicants?.find((a: any) => a.id === applicantId);
+            return found ?? undefined;
+        },
     });
+
+    // type: for edit mode, always follow applicantData (so it's correct on first render from cache)
+    // for add mode, use local state so toggle buttons work
+    const [localType, setLocalType] = React.useState<ApplicantType>('PERSONAL');
+
+    // Normalize backend value: handles CORPORATE, COMPANY, corporate, company → 'CORPORATE'
+    // and PERSONAL, personal → 'PERSONAL'
+    const normalizeApplicantType = (val: string | undefined): ApplicantType => {
+        const upper = (val || '').toUpperCase().trim();
+        if (upper === 'CORPORATE' || upper === 'COMPANY') return 'CORPORATE';
+        return 'PERSONAL';
+    };
+
+    const type: ApplicantType = applicantId
+        ? normalizeApplicantType(applicantData?.applicantType)
+        : localType;
+    const setType = (t: ApplicantType) => { if (!applicantId) setLocalType(t); };
+
 
 
     const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
@@ -132,25 +156,46 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         establishmentDate: '',
     });
 
+    // Helper to parse any timestamp format to YYYY-MM-DD string
+    const parseToDateString = (val: any): string => {
+        if (!val) return '';
+        if (typeof val === 'string') return val.split('T')[0];
+        // Proto timestamp: { seconds, nanos }
+        if (val.seconds !== undefined) {
+            try {
+                return new Date(Number(val.seconds) * 1000).toISOString().split('T')[0];
+            } catch { return ''; }
+        }
+        try {
+            const d = new Date(val);
+            return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+        } catch { return ''; }
+    };
+
+    // Populate form whenever applicantData changes (initial load or refetch)
     React.useEffect(() => {
         if (applicantData) {
-            setType(applicantData.applicantType || 'PERSONAL');
+            setCurrentStep(0);
 
             const newFormData: Record<string, any> = {
                 fullName: applicantData.fullName || '',
                 identityNumber: applicantData.identityNumber || '',
                 taxId: applicantData.taxId || '',
-                birthDate: applicantData.birthDate ? String(applicantData.birthDate).split('T')[0] : '',
-                establishmentDate: applicantData.establishmentDate ? String(applicantData.establishmentDate).split('T')[0] : '',
+                birthDate: parseToDateString(applicantData.birthDate),
+                establishmentDate: parseToDateString(applicantData.establishmentDate),
             };
 
+            // Map backend attributeId (UUID in attr.key) to form state (attributeCode)
             applicantData.attributes?.forEach((attr: any) => {
-                newFormData[attr.key] = attr.value;
+                // Try to find the registry item by UUID (attr.key) or by code (fallback)
+                const regItem = registry.find(r => r.id === attr.key || r.attributeCode === attr.key);
+                const formKey = regItem ? regItem.attributeCode : attr.key;
+                if (formKey) newFormData[formKey] = attr.value ?? '';
             });
 
             setFormData(newFormData);
         }
-    }, [applicantData]);
+    }, [applicantData, registry]);
 
     // 2. Group Registry by Category to create Steps dynamically
     const categories = React.useMemo(() => {
@@ -162,6 +207,8 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
         registry.forEach(attr => {
             if (primaryKeys.includes(attr.attributeCode)) return;
+            // Filter by appliesTo: only show fields relevant to the current applicant type
+            if (attr.appliesTo !== 'BOTH' && attr.appliesTo !== type) return;
 
             const catCode = attr.categoryCode || 'IDENTITAS';
             if (!groups[catCode]) {
@@ -192,7 +239,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 fields,
                 iconName: undefined
             }));
-    }, [registry, apiCategories, t]);
+    }, [registry, apiCategories, t, type]);
 
     // steps are now 100% driven by categories from registry
     const steps = React.useMemo(() => {
@@ -285,7 +332,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             .map(([key, value]) => {
                 const regItem = registry.find(r => r.attributeCode === key);
                 return {
-                    key,
+                    key: regItem?.id || key, // ALWAYS send attributeId (UUID) if available
                     value: String(value),
                     dataType: regItem?.dataType || 'STRING',
                     updatedAt: now
@@ -332,18 +379,42 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             </Label>
         );
 
-        // Check if we have common options for this field key
-        const options = COMMON_OPTIONS[id];
-        if (options) {
+        // Priority 1: Use registry SELECT options (from field.options array)
+        if (field.dataType?.toUpperCase() === 'SELECT' && field.options && field.options.length > 0) {
             return (
                 <div key={id} className="space-y-1">
                     {labelContent}
-                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id]}>
+                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
                         <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
                         <SelectContent>
-                            {options.map(opt => (
+                            {field.options
+                                .slice()
+                                .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+                                .map(opt => (
+                                    <SelectItem key={opt.id || opt.optionValue} value={opt.optionValue}>
+                                        {opt.optionLabel}
+                                    </SelectItem>
+                                ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            );
+        }
+
+        // Priority 2: Use hardcoded common options (fallback for known field keys)
+        const commonOptions = COMMON_OPTIONS[id];
+        if (commonOptions) {
+            return (
+                <div key={id} className="space-y-1">
+                    {labelContent}
+                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
+                        <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
+                            <SelectValue placeholder={t`Pilih ${label}...`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {commonOptions.map(opt => (
                                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                             ))}
                         </SelectContent>
@@ -353,11 +424,19 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         }
 
         switch (field.dataType?.toUpperCase()) {
+            case 'SELECT':
+                // SELECT with no options: fallback to text input
+                return (
+                    <div key={id} className="space-y-1">
+                        {labelContent}
+                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan ${label}`} />
+                    </div>
+                );
             case 'BOOLEAN':
                 return (
                     <div key={id} className="space-y-1">
                         {labelContent}
-                        <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id]}>
+                        <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
                             <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
                                 <SelectValue placeholder={t`Pilih...`} />
                             </SelectTrigger>
@@ -439,15 +518,19 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                     <div className="flex items-center justify-between">
                                         <div className="space-y-1">
                                             <h3 className="text-sm font-bold text-slate-800">{t`Tipe Peminjam`}:</h3>
+                                            {!!applicantId && <p className="text-xs text-muted-foreground">{t`Tipe tidak dapat diubah`}</p>}
                                         </div>
-                                        <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm">
+                                        <div className={cn("flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm", !!applicantId && "opacity-90")}>
                                             <button
                                                 onClick={() => setType('PERSONAL')}
+                                                disabled={!!applicantId}
                                                 className={cn(
                                                     "px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5",
                                                     type === 'PERSONAL'
                                                         ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
-                                                        : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                                                        : "text-slate-500",
+                                                    !applicantId && type !== 'PERSONAL' && "hover:text-slate-700 hover:bg-slate-50",
+                                                    !!applicantId && "cursor-default"
                                                 )}
                                             >
                                                 <User className="h-4 w-4" />
@@ -455,11 +538,14 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                             </button>
                                             <button
                                                 onClick={() => setType('CORPORATE')}
+                                                disabled={!!applicantId}
                                                 className={cn(
                                                     "px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5",
                                                     type === 'CORPORATE'
                                                         ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
-                                                        : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                                                        : "text-slate-500",
+                                                    !applicantId && type !== 'CORPORATE' && "hover:text-slate-700 hover:bg-slate-50",
+                                                    !!applicantId && "cursor-default"
                                                 )}
                                             >
                                                 <Building2 className="h-4 w-4" />
@@ -468,6 +554,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                         </div>
                                     </div>
                                 </div>
+
 
                                 <div className="space-y-1 col-span-full md:col-span-2">
                                     <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">

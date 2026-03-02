@@ -11,7 +11,11 @@ interface LoanInfoTabProps {
 }
 
 export function LoanInfoTab({ application, applicant, productName }: LoanInfoTabProps) {
-    const { getLabel } = useAttributeRegistry();
+    const { registry, getLabel, isLoading } = useAttributeRegistry();
+
+    if (isLoading) {
+        return <div className="p-8 text-center animate-pulse text-muted-foreground">Memuat data...</div>;
+    }
 
     if (!application) {
         return (
@@ -21,8 +25,13 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
         );
     }
 
+    // Filter attributes for application scope
+    const applicationAttributes = registry.filter((attr: any) =>
+        attr.scope === 'APPLICATION'
+    ).sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
     const formatCurrency = (amount?: string | number) => {
-        if (amount === undefined || amount === null) return '—';
+        if (amount === undefined || amount === null || amount === '') return '—';
         const num = typeof amount === 'string' ? parseFloat(amount) : amount;
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -32,7 +41,7 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
     };
 
     const formatDate = (dateStr?: string) => {
-        if (!dateStr) return '—';
+        if (!dateStr || dateStr === '—') return '—';
         try {
             return new Date(dateStr).toLocaleDateString('id-ID', {
                 year: 'numeric',
@@ -42,6 +51,24 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
         } catch {
             return dateStr;
         }
+    };
+
+    const getAttrValue = (attr: any) => {
+        const extraAttr = application.attributes?.find((a: any) => a.attributeId === attr.attributeCode || a.attributeId === attr.id);
+        if (!extraAttr) return '—';
+
+        const val = extraAttr.value;
+        if (!val || val === '' || val === '—') return '—';
+
+        if (attr.dataType === 'DATE') return formatDate(val);
+        if (attr.dataType === 'BOOLEAN') return val === 'true' || val === 'Y' || val === '1' ? 'Ya' : 'Tidak';
+        if (attr.dataType === 'SELECT' && attr.options) {
+            const option = attr.options.find((opt: any) => opt.optionValue === val);
+            return option?.optionLabel || val;
+        }
+        if (attr.dataType === 'NUMBER') return val;
+
+        return val;
     };
 
     return (
@@ -61,8 +88,8 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
                 <DetailItem label="Tanggal Diajukan" value={formatDate(application.createdAt)} />
                 <DetailItem label="Tanggal Diubah" value={formatDate(application.updatedAt || application.createdAt)} />
                 <DetailItem label="Plafon Diajukan" value={formatCurrency(application.loanAmount)} />
-                <DetailItem label="Jangka Waktu" value={`${application.tenorMonths || 0} Bulan`} />
-                <DetailItem label="Suku Bunga" value={`${application.interestRate || 0}%`} />
+                <DetailItem label="Jangka Waktu" value={application.tenorMonths ? `${application.tenorMonths} Bulan` : '—'} />
+                <DetailItem label="Suku Bunga" value={application.interestRate ? `${application.interestRate}%` : '—'} />
                 <DetailItem label="Tipe Suku Bunga" value={application.interestType || '—'} />
                 <DetailItem label="Angsuran Per Bulan" value="—" />
                 <DetailItem label="Plafon Max" value="—" />
@@ -77,27 +104,25 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
                 </div>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-border">
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <span className="w-1 h-5 bg-primary rounded-full"></span>
-                        Data Tambahan
-                    </h2>
+            {applicationAttributes.length > 0 && (
+                <div className="mt-8 pt-8 border-t border-border">
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+                            <span className="w-1 h-5 bg-primary rounded-full"></span>
+                            Data Tambahan
+                        </h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+                        {applicationAttributes.map((attr: any) => (
+                            <DetailItem
+                                key={attr.id}
+                                label={attr.uiLabel || attr.description}
+                                value={getAttrValue(attr)}
+                            />
+                        ))}
+                    </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                    {application.attributes?.map((attr: any) => (
-                        <DetailItem key={attr.attributeId} label={getLabel(attr.attributeId)} value={attr.value || '—'} />
-                    )) || (
-                            <>
-                                <DetailItem label="Asuransi" value="—" />
-                                <DetailItem label="Biaya Administrasi" value="—" />
-                                <DetailItem label="Biaya Provisi" value="—" />
-                                <DetailItem label="Materai" value="—" />
-                                <DetailItem label="Tabungan Rutin" value="—" />
-                            </>
-                        )}
-                </div>
-            </div>
+            )}
         </div>
     );
 }

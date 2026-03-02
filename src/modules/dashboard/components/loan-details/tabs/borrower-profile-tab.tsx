@@ -8,7 +8,11 @@ interface BorrowerProfileTabProps {
 }
 
 export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
-    const { getLabel } = useAttributeRegistry();
+    const { registry, isLoading } = useAttributeRegistry();
+
+    if (isLoading) {
+        return <div className="p-8 text-center animate-pulse text-muted-foreground">Memuat data...</div>;
+    }
 
     if (!applicant) {
         return (
@@ -18,8 +22,16 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
         );
     }
 
+    const type = applicant.applicantType || 'PERSONAL';
+
+    // Filter attributes for this profile
+    const profileAttributes = registry.filter((attr: any) =>
+        (attr.appliesTo === 'BOTH' || attr.appliesTo === type) &&
+        attr.scope === 'APPLICANT'
+    ).sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
     const formatDate = (dateStr?: string) => {
-        if (!dateStr) return '—';
+        if (!dateStr || dateStr === '—') return '—';
         try {
             return new Date(dateStr).toLocaleDateString('id-ID', {
                 year: 'numeric',
@@ -29,6 +41,41 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
         } catch {
             return dateStr;
         }
+    };
+
+    const getValue = (attr: any) => {
+        const attrCode = attr.attributeCode;
+
+        // Check top-level fields first (with mapping)
+        const TOP_LEVEL_MAPPING: Record<string, string> = {
+            'full_name': 'fullName',
+            'identity_number': 'identityNumber',
+            'tax_id': 'taxId',
+            'tanggal_lahir': 'birthDate',
+            'establishment_date': 'establishmentDate'
+        };
+
+        const topLevelField = TOP_LEVEL_MAPPING[attrCode];
+        let val = '—';
+
+        if (topLevelField && applicant[topLevelField]) {
+            val = applicant[topLevelField];
+        } else {
+            const extraAttr = applicant.attributes?.find((a: any) => a.key === attrCode);
+            if (extraAttr) val = extraAttr.value;
+        }
+
+        if (!val || val === '' || val === '—') return '—';
+
+        // Format based on type
+        if (attr.dataType === 'DATE') return formatDate(val);
+        if (attr.dataType === 'BOOLEAN') return val === 'true' || val === 'Y' || val === '1' ? 'Ya' : 'Tidak';
+        if (attr.dataType === 'SELECT' && attr.options) {
+            const option = attr.options.find((opt: any) => opt.optionValue === val);
+            return option?.optionLabel || val;
+        }
+
+        return val;
     };
 
     return (
@@ -42,19 +89,24 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
 
             <div className="border border-border/50 rounded-xl overflow-hidden mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 text-sm">
-                    {/* Left Column */}
+                    {/* Split attributes into two columns */}
                     <div className="flex flex-col divide-y divide-border/50 md:border-r border-border/50">
-                        <DetailItem label={getLabel('full_name', 'Nama Lengkap')} value={applicant.fullName || '—'} />
-                        <DetailItem label={getLabel('identity_number', 'NIK')} value={applicant.identityNumber || '—'} />
-                        <DetailItem label={getLabel('tempat_lahir', 'Tempat Lahir')} value={applicant.birthPlace || '—'} />
-                        <DetailItem label={getLabel('jenis_kelamin', 'Jenis Kelamin')} value={applicant.gender || '—'} />
+                        {profileAttributes.filter((_, i) => i % 2 === 0).map(attr => (
+                            <DetailItem
+                                key={attr.id}
+                                label={attr.uiLabel || attr.description}
+                                value={getValue(attr)}
+                            />
+                        ))}
                     </div>
-                    {/* Right Column */}
                     <div className="flex flex-col divide-y divide-border/50">
-                        <DetailItem label={getLabel('email_pribadi', 'Email')} value={applicant.email || '—'} />
-                        <DetailItem label={getLabel('tax_id', 'NPWP')} value={applicant.taxId || '—'} />
-                        <DetailItem label={getLabel('tanggal_lahir', 'Tanggal Lahir')} value={formatDate(applicant.birthDate)} />
-                        <DetailItem label={getLabel('no_hp_utama', 'Nomor Telepon')} value={applicant.phoneNumber || '—'} />
+                        {profileAttributes.filter((_, i) => i % 2 !== 0).map(attr => (
+                            <DetailItem
+                                key={attr.id}
+                                label={attr.uiLabel || attr.description}
+                                value={getValue(attr)}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>

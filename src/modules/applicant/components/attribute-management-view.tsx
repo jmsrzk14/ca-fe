@@ -137,11 +137,16 @@ const ICON_MAP: Record<string, React.ElementType> = Object.fromEntries(
 const EMPTY_FIELD = {
     attributeCode: '',
     description: '',
-    valueType: 'STRING',
-    category: 'LAINNYA',
+    dataType: 'STRING',
+    categoryCode: 'LAINNYA',
+    categoryName: 'Lainnya',
+    categoryIcon: 'User',
     isRequired: false,
-    uiIcon: 'User',
+    riskRelevant: false,
+    appliesTo: 'BOTH',
+    scope: 'APPLICANT',
     uiLabel: '',
+    options: [] as { optionValue: string; optionLabel: string; displayOrder: number }[],
 };
 
 function AttributeForm({
@@ -157,6 +162,22 @@ function AttributeForm({
     isPending: boolean;
     isEdit?: boolean;
 }) {
+    const handleAddOption = () => {
+        const newOptions = [...(value.options || []), { optionValue: '', optionLabel: '', displayOrder: (value.options?.length || 0) + 1 }];
+        onChange({ options: newOptions });
+    };
+
+    const handleOptionChange = (index: number, patch: any) => {
+        const newOptions = [...(value.options || [])];
+        newOptions[index] = { ...newOptions[index], ...patch };
+        onChange({ options: newOptions });
+    };
+
+    const handleRemoveOption = (index: number) => {
+        const newOptions = (value.options || []).filter((_, i) => i !== index);
+        onChange({ options: newOptions });
+    };
+
     return (
         <form onSubmit={onSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
@@ -199,21 +220,21 @@ function AttributeForm({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="uiIcon">{t`Pilih Icon`}</Label>
+                <Label htmlFor="categoryIcon">{t`Pilih Icon Kategori`}</Label>
                 <Select
-                    value={value.uiIcon}
-                    onValueChange={v => onChange({ uiIcon: v })}
+                    value={value.categoryIcon}
+                    onValueChange={v => onChange({ categoryIcon: v })}
                 >
                     <SelectTrigger className="h-12 rounded-xl">
                         {(() => {
-                            const SelIcon = ICON_MAP[value.uiIcon];
+                            const SelIcon = ICON_MAP[value.categoryIcon];
                             return SelIcon ? (
                                 <div className="flex items-center gap-2">
                                     <SelIcon className="h-4 w-4 text-orange-600" />
-                                    <span>{value.uiIcon}</span>
+                                    <span>{value.categoryIcon}</span>
                                 </div>
                             ) : (
-                                <SelectValue placeholder={t`Pilih Icon untuk Field`} />
+                                <SelectValue placeholder={t`Pilih Icon untuk Kategori`} />
                             );
                         })()}
                     </SelectTrigger>
@@ -240,50 +261,135 @@ function AttributeForm({
                 <div className="space-y-2">
                     <Label>{t`Tipe Data`}</Label>
                     <Select
-                        value={value.valueType}
-                        onValueChange={v => onChange({ valueType: v })}
+                        value={value.dataType}
+                        onValueChange={v => onChange({ dataType: v })}
                     >
                         <SelectTrigger>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="STRING">TEKS</SelectItem>
-                            <SelectItem value="NUMBER">ANGKA</SelectItem>
-                            <SelectItem value="DATE">TANGGAL</SelectItem>
-                            <SelectItem value="BOOLEAN">PILIHAN (Y/N)</SelectItem>
+                            <SelectItem value="STRING">STRING</SelectItem>
+                            <SelectItem value="NUMBER">NUMBER</SelectItem>
+                            <SelectItem value="DATE">DATE</SelectItem>
+                            <SelectItem value="BOOLEAN">BOOLEAN</SelectItem>
+                            <SelectItem value="SELECT">SELECT</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
                 <div className="space-y-2">
-                    <Label>{t`Kategori`}</Label>
+                    <Label htmlFor="categoryCode">{t`Kode Kategori`}</Label>
+                    <Input
+                        id="categoryCode"
+                        placeholder="identitas"
+                        value={value.categoryCode}
+                        onChange={e => onChange({ categoryCode: e.target.value })}
+                        required
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="categoryName">{t`Nama Kategori`}</Label>
+                    <Input
+                        id="categoryName"
+                        placeholder="1. Identitas"
+                        value={value.categoryName}
+                        onChange={e => onChange({ categoryName: e.target.value })}
+                        required
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>{t`Applies To`}</Label>
                     <Select
-                        value={value.category}
-                        onValueChange={v => onChange({ category: v })}
+                        value={value.appliesTo}
+                        onValueChange={v => onChange({ appliesTo: v })}
                     >
                         <SelectTrigger>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="IDENTITAS">IDENTITAS</SelectItem>
-                            <SelectItem value="KONTAK">KONTAK</SelectItem>
-                            <SelectItem value="PEKERJAAN">PEKERJAAN</SelectItem>
-                            <SelectItem value="FINANSIAL">FINANSIAL</SelectItem>
-                            <SelectItem value="PERILAKU">PERILAKU</SelectItem>
-                            <SelectItem value="LAINNYA">LAINNYA</SelectItem>
+                            <SelectItem value="PERSONAL">PERSONAL</SelectItem>
+                            <SelectItem value="CORPORATE">CORPORATE</SelectItem>
+                            <SelectItem value="BOTH">BOTH</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
             </div>
 
-            <div className="flex items-center space-x-2 pt-2">
-                <Checkbox
-                    id="required"
-                    checked={value.isRequired}
-                    onCheckedChange={(checked: boolean) => onChange({ isRequired: !!checked })}
-                />
-                <Label htmlFor="required" className="text-sm font-medium leading-none">
-                    {t`Field Wajib Diisi`}
-                </Label>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>{t`Scope`}</Label>
+                    <Select
+                        value={value.scope}
+                        onValueChange={v => onChange({ scope: v })}
+                    >
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="APPLICANT">APPLICANT</SelectItem>
+                            <SelectItem value="APPLICATION">APPLICATION</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+
+            {value.dataType === 'SELECT' && (
+                <div className="space-y-3 p-4 border rounded-xl bg-muted/30">
+                    <div className="flex items-center justify-between">
+                        <Label className="font-bold">{t`Opsi Pilihan (Select Options)`}</Label>
+                        <Button type="button" variant="outline" size="sm" onClick={handleAddOption} className="h-8 gap-1">
+                            <Plus className="h-3 w-3" /> {t`Tambah Opsi`}
+                        </Button>
+                    </div>
+                    <div className="space-y-2">
+                        {value.options?.map((opt, idx) => (
+                            <div key={idx} className="flex gap-2 items-start">
+                                <div className="grid grid-cols-2 gap-2 flex-1">
+                                    <Input
+                                        placeholder="Value (e.g. PT)"
+                                        value={opt.optionValue}
+                                        onChange={e => handleOptionChange(idx, { optionValue: e.target.value })}
+                                        className="h-8 text-xs"
+                                    />
+                                    <Input
+                                        placeholder="Label (e.g. Perseroan Terbatas)"
+                                        value={opt.optionLabel}
+                                        onChange={e => handleOptionChange(idx, { optionLabel: e.target.value })}
+                                        className="h-8 text-xs"
+                                    />
+                                </div>
+                                <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveOption(idx)} className="h-8 w-8 text-destructive">
+                                    <Plus className="h-4 w-4 rotate-45" />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="flex items-center gap-6 pt-2">
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="required"
+                        checked={value.isRequired}
+                        onCheckedChange={(checked: boolean) => onChange({ isRequired: !!checked })}
+                    />
+                    <Label htmlFor="required" className="text-sm font-medium leading-none">
+                        {t`Wajib Diisi`}
+                    </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="riskRelevant"
+                        checked={value.riskRelevant}
+                        onCheckedChange={(checked: boolean) => onChange({ riskRelevant: !!checked })}
+                    />
+                    <Label htmlFor="riskRelevant" className="text-sm font-medium leading-none">
+                        {t`Risk Relevant`}
+                    </Label>
+                </div>
             </div>
 
             <DialogFooter className="pt-4">
@@ -347,13 +453,8 @@ export function AttributeManagementView() {
 
     const openEdit = (attr: any) => {
         setEditingAttr({
-            attributeCode: attr.attrKey,
-            description: attr.attrName || '',
-            valueType: attr.dataType || 'STRING',
-            category: attr.category || 'LAINNYA',
-            isRequired: attr.required ?? false,
-            uiIcon: attr.uiIcon || 'User',
-            uiLabel: attr.uiLabel || '',
+            ...attr,
+            options: attr.options || [],
         });
     };
 
@@ -437,7 +538,6 @@ export function AttributeManagementView() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b">
-                                    <th className="px-6 py-4">{t`ID Field`}</th>
                                     <th className="px-6 py-4">{t`Label & Icon`}</th>
                                     <th className="px-6 py-4">{t`Tipe`}</th>
                                     <th className="px-6 py-4">{t`Kategori`}</th>
@@ -447,39 +547,53 @@ export function AttributeManagementView() {
                             </thead>
                             <tbody className="divide-y">
                                 {registry?.attributes?.map((attr: any) => {
-                                    const IconComp = ICON_MAP[attr.uiIcon] ?? Settings;
+                                    const IconComp = ICON_MAP[attr.categoryIcon] ?? Settings;
                                     return (
-                                        <tr key={attr.attrKey} className="hover:bg-muted/30 transition-colors group">
-                                            <td className="px-6 py-4 font-mono text-xs">{attr.attrKey}</td>
+                                        <tr key={attr.id} className="hover:bg-muted/30 transition-colors group">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
                                                         <IconComp className="h-4 w-4" />
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium">{attr.uiLabel || attr.attrName}</span>
-                                                        <span className="text-[10px] text-muted-foreground italic">{attr.attrName}</span>
+                                                        <span className="font-medium">{attr.uiLabel || attr.description}</span>
+                                                        <span className="text-[10px] text-muted-foreground italic">{attr.attributeCode}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="px-2 py-1 rounded-md bg-blue-100 text-blue-700 text-[10px] font-bold">
-                                                    {attr.dataType}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold">
-                                                    {attr.category}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {attr.required ? (
-                                                    <span className="flex items-center gap-1 text-xs text-orange-600 font-bold">
-                                                        <AlertCircle className="h-3 w-3" /> {t`Wajib`}
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="px-2 py-1 flex-1 rounded-md bg-blue-100 text-blue-700 text-[10px] font-bold text-center">
+                                                        {attr.dataType}
                                                     </span>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground italic">{t`Opsional`}</span>
-                                                )}
+                                                    <span className="text-[8px] text-muted-foreground text-center uppercase font-bold">{attr.scope}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col items-start gap-1">
+                                                    <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold">
+                                                        {attr.categoryName}
+                                                    </span>
+                                                    <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[8px] font-bold">
+                                                        {attr.appliesTo}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col gap-2">
+                                                    {attr.isRequired ? (
+                                                        <span className="flex items-center gap-1 text-[10px] text-orange-600 font-bold">
+                                                            <AlertCircle className="h-3 w-3" /> {t`Wajib`}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-[10px] text-muted-foreground italic">{t`Opsional`}</span>
+                                                    )}
+                                                    {attr.riskRelevant && (
+                                                        <span className="flex items-center gap-1 text-[10px] text-blue-600 font-bold">
+                                                            <Shield className="h-3 w-3" /> {t`Risk`}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <Button
