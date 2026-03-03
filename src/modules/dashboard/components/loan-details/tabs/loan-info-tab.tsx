@@ -83,7 +83,7 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
                 </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12 mb-12">
-                <DetailItem label="Peminjam" value={applicant?.fullName || '—'} />
+                <DetailItem label="Peminjam" value={(applicant?.fullName || applicant?.attributes?.find((a: any) => a.key === 'full_name' || a.key === '0195383f-4281-7000-bb34-812010000002')?.value) || '—'} />
                 <DetailItem label="Produk" value={productName || application.productId || '—'} />
                 <DetailItem label="Tanggal Diajukan" value={formatDate(application.createdAt)} />
                 <DetailItem label="Tanggal Diubah" value={formatDate(application.updatedAt || application.createdAt)} />

@@ -203,9 +203,7 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
             tenorMonths: parseInt(String(formData.tenorMonths)) || 0,
             attributes,
         };
-
-        console.log('DEBUG: Application Create Payload:', JSON.stringify(payload, null, 2));
-
+        
         mutation.mutate(payload);
     };
 

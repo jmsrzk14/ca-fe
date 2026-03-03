@@ -166,7 +166,6 @@ export const applicantService = {
         const response = await client.listApplicants({
             cursor: params?.cursor || "",
         });
-        console.log("DEBUG: gRPC raw response:", response);
         if (typeof window !== 'undefined') {
             (window as any).lastApplicants = response;
         }

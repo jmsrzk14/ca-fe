@@ -25,7 +25,6 @@ export const dashboardService = {
                 value: 0 // Count should ideally come from another analytics endpoint or calculated
             }));
         } catch (error) {
-            console.error('Failed to fetch application statuses:', error);
             return [];
         }
     },
@@ -47,7 +46,6 @@ export const dashboardService = {
                 createdAt: app.createdAt || new Date().toISOString()
             }));
         } catch (error) {
-            console.error('Failed to fetch recent applications:', error);
             return [];
         }
     },

@@ -69,7 +69,6 @@ export const kanbanService = {
                     const applicant = await applicantService.getById(id);
                     return { id, applicant };
                 } catch (e) {
-                    console.error(`Failed to fetch applicant ${id}`, e);
                     return { id, applicant: null };
                 }
             })
@@ -91,12 +90,31 @@ export const kanbanService = {
             }
 
             const applicant = applicantMap[app.applicantId];
+
+            // Fallback for name/identity if empty in top level
+            let fullName = app.applicantName || applicant?.fullName || "Unknown Applicant";
+            let identityNumber = applicant?.identityNumber || "unknown";
+
+            if (applicant && (!applicant.fullName || !applicant.identityNumber)) {
+                applicant.attributes?.forEach((attr: any) => {
+                    const key = attr.key || '';
+                    // Check for common full name keys/IDs
+                    if (['full_name', 'fullName', 'nama_lengkap', '0195383f-4281-7000-bb34-812010000002'].includes(key)) {
+                        if (!fullName || fullName === "Unknown Applicant") fullName = attr.value;
+                    }
+                    // Check for common identity number keys/IDs
+                    if (['identity_number', 'identityNumber', 'identitas_nik', '0195383f-4281-7000-bb34-812010000001'].includes(key)) {
+                        if (!identityNumber || identityNumber === "unknown") identityNumber = attr.value;
+                    }
+                });
+            }
+
             const enrichedApp = {
                 ...app,
                 applicantId: app.applicantId,
                 applicantType: applicant?.applicantType || "PERSONAL",
-                fullName: app.applicantName || applicant?.fullName || "Unknown Applicant",
-                identityNumber: applicant?.identityNumber || "unknown",
+                fullName,
+                identityNumber,
             };
 
             cardsByStatus[status].push(mapToCardData(enrichedApp));

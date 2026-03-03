@@ -8,6 +8,7 @@ interface BorrowerProfileTabProps {
 }
 
 export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
+    console.log("DEBUG: BorrowerProfileTab received applicant:", applicant);
     const { registry, isLoading } = useAttributeRegistry();
 
     if (isLoading) {
@@ -22,7 +23,8 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
         );
     }
 
-    const type = applicant.applicantType || 'PERSONAL';
+    let type = applicant.applicantType || 'PERSONAL';
+    if (type === 'COMPANY') type = 'CORPORATE';
 
     // Filter attributes for this profile
     const profileAttributes = registry.filter((attr: any) =>
@@ -61,7 +63,10 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
         if (topLevelField && applicant[topLevelField]) {
             val = applicant[topLevelField];
         } else {
-            const extraAttr = applicant.attributes?.find((a: any) => a.key === attrCode);
+            // Find in attributes by key (which could be UUID or attributeCode)
+            const extraAttr = applicant.attributes?.find((a: any) =>
+                a.key === attrCode || a.key === attr.id
+            );
             if (extraAttr) val = extraAttr.value;
         }
 

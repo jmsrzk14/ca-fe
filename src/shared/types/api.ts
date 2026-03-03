@@ -1,4 +1,4 @@
-export type ApplicantType = 'PERSONAL' | 'CORPORATE';
+export type ApplicantType = 'PERSONAL' | 'CORPORATE' | 'COMPANY';
 export type DataType = 'string' | 'number' | 'date' | 'boolean';
 
 export interface Attribute {
@@ -110,13 +110,23 @@ export interface SurveyTemplate {
     description: string;
 }
 
+export type SurveyStatus = 'UNASSIGNED' | 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'VERIFIED';
+
 export interface Survey {
     id: string;
     applicationId: string;
     templateId: string;
-    status: 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+    surveyType: string;
+    status: SurveyStatus;
     assignedTo: string;
-    createdAt: string;
+    surveyPurpose: string;
+    startedAt?: string;
+    submittedAt?: string;
+    submittedBy?: string;
+    applicantName?: string;
+    applicationStatus?: string;
+    totalQuestions?: number;
+    answeredQuestions?: number;
 }
 
 export interface SurveyAnswer {

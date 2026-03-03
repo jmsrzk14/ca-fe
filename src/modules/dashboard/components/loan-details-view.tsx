@@ -24,6 +24,7 @@ import { DocumentCompletenessTab } from './loan-details/tabs/document-completene
 import { FinancialInfoTab } from './loan-details/tabs/financial-info-tab';
 import { CRRTab } from './loan-details/tabs/crr-tab';
 import { HistoryTab } from './loan-details/tabs/history-tab';
+import { SurveyTab } from './loan-details/tabs/survey-tab';
 
 const TABS = [
     'Profil Peminjam',
@@ -32,6 +33,7 @@ const TABS = [
     'Kelengkapan Dokumen',
     'Finansial',
     'CRR',
+    'Survey',
     'Histori'
 ];
 
@@ -113,6 +115,7 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
             case 'Kelengkapan Dokumen': return <DocumentCompletenessTab />;
             case 'Finansial': return <FinancialInfoTab />;
             case 'CRR': return <CRRTab />;
+            case 'Survey': return <SurveyTab applicationId={id} />;
             case 'Histori': return <HistoryTab />;
             default: return <LoanInfoTab application={application} applicant={applicant} />;
         }
@@ -153,7 +156,7 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                 <CardContent className="p-0">
                     <div className="p-6 border-b border-border/50 ">
                         <h1 className="text-xl font-bold tracking-tight text-foreground">
-                            Peminjaman Kredit: <span className="text-foreground">{productName || application?.productId || 'UMKM'}</span>
+                            Nama Peminjam: <span className="text-foreground">{applicant?.applicantName || application?.applicantName || 'UMKM'}</span>
                         </h1>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/50 ">
