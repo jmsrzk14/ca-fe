@@ -179,10 +179,22 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
             .filter(([key, value]) => !CORE_APP_KEYS.includes(key) && value !== undefined && value !== '')
             .map(([key, value]) => {
                 const regItem = registry.find(r => r.attributeCode === key);
+                const attrId = regItem?.id || key;
+                const dataType = regItem?.dataType || 'STRING';
+
+                let attributeOptionId = undefined;
+                if (dataType === 'SELECT' || dataType === 'BOOLEAN') {
+                    const option = regItem?.options?.find(opt => opt.optionValue === String(value));
+                    if (option) {
+                        attributeOptionId = option.id;
+                    }
+                }
+
                 return {
-                    attributeId: key,
+                    attributeId: attrId,
                     value: String(value),
-                    dataType: regItem?.dataType || 'STRING',
+                    dataType: dataType,
+                    attributeOptionId,
                 };
             });
 
@@ -191,6 +203,8 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
             tenorMonths: parseInt(String(formData.tenorMonths)) || 0,
             attributes,
         };
+
+        console.log('DEBUG: Application Create Payload:', JSON.stringify(payload, null, 2));
 
         mutation.mutate(payload);
     };
@@ -262,7 +276,7 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                 <div className="p-10 space-y-8">
                     {currentStep === 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-2 duration-300">
-                                 {/* Applicant Selection (Searchable) */}
+                            {/* Applicant Selection (Searchable) */}
                             <div className="space-y-2">
                                 <Label>{t`Peminjam`}*</Label>
                                 <Popover open={isApplicantPopoverOpen} onOpenChange={setIsApplicantPopoverOpen}>
@@ -331,7 +345,7 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                     </PopoverContent>
                                 </Popover>
                             </div>
-                            
+
                             {/* Branch Selection */}
                             <div className="space-y-2">
                                 <Label>{t`Cabang`}*</Label>

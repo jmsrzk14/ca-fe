@@ -25,14 +25,9 @@ function parseTimestamp(ts: any): string | undefined {
     }
 }
 
-/**
- * Normalizes applicantType from backend to 'PERSONAL' | 'CORPORATE'.
- * Handles: COMPANY, company, CORPORATE, corporate → 'CORPORATE'
- * Handles: PERSONAL, personal → 'PERSONAL'
- */
-function normalizeType(val: string | undefined): 'PERSONAL' | 'CORPORATE' {
+function normalizeType(val: string | undefined): 'PERSONAL' | 'COMPANY' {
     const upper = (val || '').toUpperCase().trim();
-    if (upper === 'CORPORATE' || upper === 'COMPANY') return 'CORPORATE';
+    if (upper === 'CORPORATE' || upper === 'COMPANY') return 'COMPANY';
     return 'PERSONAL';
 }
 
