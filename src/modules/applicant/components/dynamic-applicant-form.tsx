@@ -142,8 +142,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         : localType;
     const setType = (t: ApplicantType) => { if (!applicantId) setLocalType(t); };
 
-
-
     const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
     const apiCategories = categoriesResponse?.categories || [];
 
@@ -177,12 +175,16 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         if (applicantData) {
             setCurrentStep(0);
 
+            const normalizedType = normalizeApplicantType(applicantData.applicantType);
+
             const newFormData: Record<string, any> = {
                 fullName: applicantData.fullName || '',
                 identityNumber: applicantData.identityNumber || '',
                 taxId: applicantData.taxId || '',
-                birthDate: parseToDateString(applicantData.birthDate),
-                establishmentDate: parseToDateString(applicantData.establishmentDate),
+                // Unified date field: PERSONAL → birthDate, CORPORATE → establishmentDate
+                birthDate: normalizedType === 'CORPORATE'
+                    ? parseToDateString(applicantData.establishmentDate)
+                    : parseToDateString(applicantData.birthDate),
             };
 
             // Map backend attributeId (UUID in attr.key) to form state (attributeCode)
@@ -345,12 +347,20 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             fullName: formData.fullName,
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
-            birthDate: type === 'PERSONAL' && formData.birthDate ? new Date(formData.birthDate).toISOString() : '',
-            establishmentDate: type === 'CORPORATE' && formData.birthDate ? new Date(formData.birthDate).toISOString() : '',
+            // 'type' is always 'PERSONAL' | 'CORPORATE' (from normalizeApplicantType)
+            // formData.birthDate is the unified date field for both types
+            birthDate: type === 'PERSONAL' && formData.birthDate
+                ? new Date(formData.birthDate).toISOString()
+                : '',
+            establishmentDate: type === 'CORPORATE' && formData.birthDate
+                ? new Date(formData.birthDate).toISOString()
+                : '',
             attributes,
             ...(applicantId ? {} : { createdAt: now })
         };
 
+        console.log('[ApplicantForm] type:', type, '| birthDate field:', formData.birthDate);
+        console.log('[ApplicantForm] payload:', JSON.stringify(payload, null, 2));
         mutation.mutate(payload);
     };
 
@@ -505,7 +515,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 })}
             </div>
 
-            <div className="flex-1 p-8 md:p-12 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 p-8 md:py-12 md:px-6 overflow-y-auto custom-scrollbar">
                 <div className="max-w-4xl mx-auto min-h-[400px]">
                     {/* 
                         We render the current step's fields.
