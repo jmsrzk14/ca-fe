@@ -42,23 +42,108 @@ import {
 } from '@/shared/ui/dialog';
 
 interface DynamicApplicantFormProps {
+    applicantId?: string;
     onSuccess?: () => void;
     onCancel?: () => void;
 }
 
-export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFormProps) {
+// Helper to get Icon Component from string
+const getIconWithName = (name?: string) => {
+    if (!name) return Settings;
+    try {
+        const icons: Record<string, any> = {
+            User, Building2, Settings, CheckCircle2,
+            Phone, Mail, MapPin, Briefcase, DollarSign, Activity, Heart,
+            GraduationCap, Home
+        };
+        return icons[name] || Settings;
+    } catch {
+        return Settings;
+    }
+};
+
+// Specific options for common fields to make the dynamic form feel premium
+const getCommonOptions = (): Record<string, { label: string; value: string; }[]> => ({
+    gender: [
+        { label: t`Laki-laki`, value: 'MALE' },
+        { label: t`Perempuan`, value: 'FEMALE' },
+    ],
+    maritalStatus: [
+        { label: t`Belum Menikah`, value: 'SINGLE' },
+        { label: t`Menikah`, value: 'MARRIED' },
+        { label: t`Cerai`, value: 'DIVORCED' },
+    ],
+    homeOwnership: [
+        { label: t`Milik Sendiri`, value: 'OWNED' },
+        { label: t`Sewa/Kontrak`, value: 'RENTED' },
+        { label: t`Milik Keluarga`, value: 'FAMILY' },
+    ],
+    jobStatus: [
+        { label: t`Karyawan Tetap`, value: 'PERMANENT' },
+        { label: t`Karyawan Kontrak`, value: 'CONTRACT' },
+        { label: t`Wiraswasta`, value: 'SELF_EMPLOYED' },
+    ],
+    lastEducation: [
+        { label: t`SMA/Sederajat`, value: 'SMA' },
+        { label: t`D3`, value: 'D3' },
+        { label: t`S1`, value: 'S1' },
+        { label: t`S2`, value: 'S2' },
+    ],
+    isKnownInArea: [
+        { label: t`Ya`, value: 'YES' },
+        { label: t`Tidak`, value: 'NO' },
+    ]
+});
+
+export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: DynamicApplicantFormProps) {
+    const COMMON_OPTIONS = React.useMemo(() => getCommonOptions(), []);
     const queryClient = useQueryClient();
     const [currentStep, setCurrentStep] = React.useState(0);
-    const [type, setType] = React.useState<ApplicantType>('PERSONAL');
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
 
-    // 1. Fetch the "Buku Panduan" (Registry) from API
+    // 1. Fetch the "Buku Panduan" (Registry) and "Categories" from API
     const { data: registryResponse, isLoading: isRegistryLoading } = useQuery({
         queryKey: ['attribute-registry'],
         queryFn: () => referenceService.getAttributeRegistry(),
     });
 
+    const { data: categoriesResponse, isLoading: isCategoriesLoading } = useQuery({
+        queryKey: ['attribute-categories'],
+        queryFn: () => referenceService.listAttributeCategories(),
+    });
+
+    const { data: applicantData, isLoading: isApplicantLoading } = useQuery({
+        queryKey: ['applicant', applicantId],
+        queryFn: () => applicantService.getById(applicantId!),
+        enabled: !!applicantId,
+        // Pre-populate from list cache so form renders immediately without waiting for getById
+        initialData: () => {
+            if (!applicantId) return undefined;
+            const cached = queryClient.getQueryData<any>(['applicants']);
+            const found = cached?.applicants?.find((a: any) => a.id === applicantId);
+            return found ?? undefined;
+        },
+    });
+
+    // type: for edit mode, always follow applicantData (so it's correct on first render from cache)
+    // for add mode, use local state so toggle buttons work
+    const [localType, setLocalType] = React.useState<ApplicantType>('PERSONAL');
+
+    // Normalize backend value: handles CORPORATE, COMPANY, corporate, company → 'CORPORATE'
+    // and PERSONAL, personal → 'PERSONAL'
+    const normalizeApplicantType = (val: string | undefined): ApplicantType => {
+        const upper = (val || '').toUpperCase().trim();
+        if (upper === 'CORPORATE' || upper === 'COMPANY') return 'CORPORATE';
+        return 'PERSONAL';
+    };
+
+    const type: ApplicantType = applicantId
+        ? normalizeApplicantType(applicantData?.applicantType)
+        : localType;
+    const setType = (t: ApplicantType) => { if (!applicantId) setLocalType(t); };
+
     const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
+    const apiCategories = categoriesResponse?.categories || [];
 
     // Form state: Core fields + Dynamic fields
     const [formData, setFormData] = React.useState<Record<string, any>>({
@@ -69,6 +154,51 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         establishmentDate: '',
     });
 
+    // Helper to parse any timestamp format to YYYY-MM-DD string
+    const parseToDateString = (val: any): string => {
+        if (!val) return '';
+        if (typeof val === 'string') return val.split('T')[0];
+        // Proto timestamp: { seconds, nanos }
+        if (val.seconds !== undefined) {
+            try {
+                return new Date(Number(val.seconds) * 1000).toISOString().split('T')[0];
+            } catch { return ''; }
+        }
+        try {
+            const d = new Date(val);
+            return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+        } catch { return ''; }
+    };
+
+    // Populate form whenever applicantData changes (initial load or refetch)
+    React.useEffect(() => {
+        if (applicantData) {
+            setCurrentStep(0);
+
+            const normalizedType = normalizeApplicantType(applicantData.applicantType);
+
+            const newFormData: Record<string, any> = {
+                fullName: applicantData.fullName || '',
+                identityNumber: applicantData.identityNumber || '',
+                taxId: applicantData.taxId || '',
+                // Unified date field: PERSONAL → birthDate, CORPORATE → establishmentDate
+                birthDate: normalizedType === 'CORPORATE'
+                    ? parseToDateString(applicantData.establishmentDate)
+                    : parseToDateString(applicantData.birthDate),
+            };
+
+            // Map backend attributeId (UUID in attr.key) to form state (attributeCode)
+            applicantData.attributes?.forEach((attr: any) => {
+                // Try to find the registry item by UUID (attr.key) or by code (fallback)
+                const regItem = registry.find(r => r.id === attr.key || r.attributeCode === attr.key);
+                const formKey = regItem ? regItem.attributeCode : attr.key;
+                if (formKey) newFormData[formKey] = attr.value ?? '';
+            });
+
+            setFormData(newFormData);
+        }
+    }, [applicantData, registry]);
+
     // 2. Group Registry by Category to create Steps dynamically
     const categories = React.useMemo(() => {
         const groups: Record<string, AttributeRegistry[]> = {};
@@ -78,39 +208,62 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         const primaryKeys = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate', 'applicantType'];
 
         registry.forEach(attr => {
-            if (primaryKeys.includes(attr.attrKey)) return;
+            if (primaryKeys.includes(attr.attributeCode)) return;
+            // Filter by appliesTo: only show fields relevant to the current applicant type
+            if (attr.appliesTo !== 'BOTH' && attr.appliesTo !== type) return;
 
-            const catName = attr.category || 'IDENTITAS';
-            if (!groups[catName]) {
-                groups[catName] = [];
+            const catCode = attr.categoryCode || 'IDENTITAS';
+            if (!groups[catCode]) {
+                groups[catCode] = [];
             }
-            groups[catName].push(attr);
+            groups[catCode].push(attr);
         });
 
-        // Convert to sorted array of steps based on category name
+        // If we have API categories, use them for the structure
+        if (apiCategories.length > 0) {
+            return apiCategories
+                .filter(cat => !!cat)
+                .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+                .map(cat => ({
+                    id: (cat.categoryCode || '').toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+                    title: cat.categoryName || 'Lainnya',
+                    fields: groups[cat.categoryCode] || [],
+                    iconName: cat.uiIcon
+                }));
+        }
+
+        // Fallback to registry-based categories
         return Object.entries(groups)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([name, fields]) => ({
-                id: name.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                title: t`${name}`,
-                fields
+                id: (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+                title: t`${name || 'Lainnya'}`,
+                fields,
+                iconName: undefined
             }));
-    }, [registry, t]);
+    }, [registry, apiCategories, t, type]);
 
     // steps are now 100% driven by categories from registry
     const steps = React.useMemo(() => {
         return categories.map(cat => {
             let Icon = Settings;
             const name = cat.title.toUpperCase();
-            if (name.includes('KONTAK')) Icon = Phone;
-            if (name.includes('PEKERJAAN')) Icon = Briefcase;
-            if (name.includes('FINANSIAL') || name.includes('USAHA')) Icon = DollarSign;
-            if (name.includes('IDENTITAS') || name.includes('BIO')) Icon = User;
-            if (name.includes('PERILAKU') || name.includes('KARAKTER')) Icon = Activity;
-            if (name.includes('PASANGAN')) Icon = Heart;
-            if (name.includes('DOKUMEN')) Icon = Building2;
-            if (name.includes('PENDIDIKAN')) Icon = GraduationCap;
-            if (name.includes('RUMAH')) Icon = Home;
+
+            // Priority 1: Use icon from API if available
+            if (cat.iconName) {
+                Icon = getIconWithName(cat.iconName);
+            } else {
+                // Priority 2: Fallback to name-based icons
+                if (name.includes('KONTAK')) Icon = Phone;
+                if (name.includes('PEKERJAAN')) Icon = Briefcase;
+                if (name.includes('FINANSIAL') || name.includes('USAHA')) Icon = DollarSign;
+                if (name.includes('IDENTITAS') || name.includes('BIO')) Icon = User;
+                if (name.includes('PERILAKU') || name.includes('KARAKTER')) Icon = Activity;
+                if (name.includes('PASANGAN')) Icon = Heart;
+                if (name.includes('DOKUMEN')) Icon = Building2;
+                if (name.includes('PENDIDIKAN')) Icon = GraduationCap;
+                if (name.includes('RUMAH')) Icon = Home;
+            }
 
             return { ...cat, icon: Icon };
         });
@@ -126,14 +279,22 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
     };
 
     const mutation = useMutation({
-        mutationFn: (data: any) => applicantService.create(data),
+        mutationFn: (data: any) => {
+            if (applicantId) {
+                return applicantService.update(applicantId, data);
+            }
+            return applicantService.create(data);
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['applicants'] });
-            toast.success(t`Applicant created successfully`);
+            if (applicantId) {
+                queryClient.invalidateQueries({ queryKey: ['applicant', applicantId] });
+            }
+            toast.success(applicantId ? t`Applicant updated successfully` : t`Applicant created successfully`);
             onSuccess?.();
         },
         onError: (error: any) => {
-            toast.error(error.message || t`Failed to create applicant`);
+            toast.error(error.message || (applicantId ? t`Failed to update applicant` : t`Failed to create applicant`));
         },
     });
 
@@ -171,9 +332,9 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         const attributes = Object.entries(formData)
             .filter(([key, value]) => !primaryKeys.includes(key) && value !== undefined && value !== '')
             .map(([key, value]) => {
-                const regItem = registry.find(r => r.attrKey === key);
+                const regItem = registry.find(r => r.attributeCode === key);
                 return {
-                    key,
+                    key: regItem?.id || key, // ALWAYS send attributeId (UUID) if available
                     value: String(value),
                     dataType: regItem?.dataType || 'STRING',
                     updatedAt: now
@@ -186,98 +347,84 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
             fullName: formData.fullName,
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
-            birthDate: type === 'PERSONAL' ? formData.birthDate : '',
-            establishmentDate: type === 'CORPORATE' ? formData.establishmentDate : '',
+            // 'type' is always 'PERSONAL' | 'CORPORATE' (from normalizeApplicantType)
+            // formData.birthDate is the unified date field for both types
+            birthDate: type === 'PERSONAL' && formData.birthDate
+                ? new Date(formData.birthDate).toISOString()
+                : '',
+            establishmentDate: type === 'CORPORATE' && formData.birthDate
+                ? new Date(formData.birthDate).toISOString()
+                : '',
             attributes,
-            createdAt: now
+            ...(applicantId ? {} : { createdAt: now })
         };
 
+        console.log('[ApplicantForm] type:', type, '| birthDate field:', formData.birthDate);
+        console.log('[ApplicantForm] payload:', JSON.stringify(payload, null, 2));
         mutation.mutate(payload);
     };
 
-    if (isRegistryLoading) {
+    if (isRegistryLoading || isCategoriesLoading || (applicantId && isApplicantLoading)) {
         return (
             <div className="flex h-64 items-center justify-center">
                 <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
-                <span className="ml-3 font-medium">{t`Memuat konfigurasi form...`}</span>
+                <span className="ml-3 font-medium">{t`Memuat data...`}</span>
             </div>
         );
     }
 
-    // Helper to get Icon Component from string
-    const getIconWithName = (name?: string) => {
-        if (!name) return Settings;
-        try {
-            const icons: Record<string, any> = {
-                User, Building2, Settings, CheckCircle2,
-                Phone, Mail, MapPin, Briefcase, DollarSign, Activity, Heart,
-                GraduationCap, Home
-            };
-            return icons[name] || Settings;
-        } catch {
-            return Settings;
-        }
-    };
 
-    // Specific options for common fields to make the dynamic form feel premium
-    const COMMON_OPTIONS: Record<string, { label: string, value: string }[]> = {
-        gender: [
-            { label: t`Laki-laki`, value: 'MALE' },
-            { label: t`Perempuan`, value: 'FEMALE' },
-        ],
-        maritalStatus: [
-            { label: t`Belum Menikah`, value: 'SINGLE' },
-            { label: t`Menikah`, value: 'MARRIED' },
-            { label: t`Cerai`, value: 'DIVORCED' },
-        ],
-        homeOwnership: [
-            { label: t`Milik Sendiri`, value: 'OWNED' },
-            { label: t`Sewa/Kontrak`, value: 'RENTED' },
-            { label: t`Milik Keluarga`, value: 'FAMILY' },
-        ],
-        jobStatus: [
-            { label: t`Karyawan Tetap`, value: 'PERMANENT' },
-            { label: t`Karyawan Kontrak`, value: 'CONTRACT' },
-            { label: t`Wiraswasta`, value: 'SELF_EMPLOYED' },
-        ],
-        lastEducation: [
-            { label: t`SMA/Sederajat`, value: 'SMA' },
-            { label: t`D3`, value: 'D3' },
-            { label: t`S1`, value: 'S1' },
-            { label: t`S2`, value: 'S2' },
-        ],
-        isKnownInArea: [
-            { label: t`Ya`, value: 'YES' },
-            { label: t`Tidak`, value: 'NO' },
-        ]
-    };
 
     const renderField = (field: AttributeRegistry) => {
-        const id = field.attrKey;
-        const rawLabel = field.uiLabel || field.attrName || id;
+        const id = field.attributeCode;
+        const rawLabel = field.uiLabel || field.description || id;
         const label = t`${rawLabel}`;
-        const isRequired = field.required;
-        const FieldIcon = getIconWithName(field.uiIcon);
+        const isRequired = field.isRequired;
+        const FieldIcon = getIconWithName(field.categoryIcon);
 
         const labelContent = (
             <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                {field.uiIcon && <FieldIcon className="h-4 w-4 text-orange-600/70" />}
+                {field.categoryIcon && <FieldIcon className="h-4 w-4 text-orange-600/70" />}
                 {label} {isRequired && <span className="text-red-500">*</span>}
             </Label>
         );
 
-        // Check if we have common options for this field key
-        const options = COMMON_OPTIONS[id];
-        if (options) {
+        // Priority 1: Use registry SELECT options (from field.options array)
+        if (field.dataType?.toUpperCase() === 'SELECT' && field.options && field.options.length > 0) {
             return (
                 <div key={id} className="space-y-1">
                     {labelContent}
-                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id]}>
+                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
                         <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
                         <SelectContent>
-                            {options.map(opt => (
+                            {field.options
+                                .slice()
+                                .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+                                .map(opt => (
+                                    <SelectItem key={opt.id || opt.optionValue} value={opt.optionValue}>
+                                        {opt.optionLabel}
+                                    </SelectItem>
+                                ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            );
+        }
+
+        // Priority 2: Use hardcoded common options (fallback for known field keys)
+        const commonOptions = COMMON_OPTIONS[id];
+        if (commonOptions) {
+            return (
+                <div key={id} className="space-y-1">
+                    {labelContent}
+                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
+                        <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
+                            <SelectValue placeholder={t`Pilih ${label}...`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {commonOptions.map(opt => (
                                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                             ))}
                         </SelectContent>
@@ -287,11 +434,19 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
         }
 
         switch (field.dataType?.toUpperCase()) {
+            case 'SELECT':
+                // SELECT with no options: fallback to text input
+                return (
+                    <div key={id} className="space-y-1">
+                        {labelContent}
+                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan ${label}`} />
+                    </div>
+                );
             case 'BOOLEAN':
                 return (
                     <div key={id} className="space-y-1">
                         {labelContent}
-                        <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id]}>
+                        <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
                             <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
                                 <SelectValue placeholder={t`Pilih...`} />
                             </SelectTrigger>
@@ -329,55 +484,87 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
     return (
         <div className="flex flex-col h-full bg-background rounded-3xl border border-border overflow-hidden shadow-2xl">
             {/* Dynamic Step Header */}
-            <div className="hidden lg:flex border-b bg-muted/30">
-                {steps.map((step, index) => (
-                    <div
-                        key={step.id}
-                        className={cn(
-                            "flex-1 flex items-center justify-center py-4 px-2 gap-2 transition-all cursor-pointer border-b-2",
-                            index === currentStep ? "border-orange-500 text-orange-600 bg-orange-50/50" : "border-transparent text-muted-foreground"
-                        )}
-                        onClick={() => index <= currentStep && setCurrentStep(index)}
-                    >
-                        <span className="text-[10px] font-bold uppercase tracking-wider">{step.title}</span>
-                    </div>
-                ))}
+            <div className="hidden lg:flex border-b bg-slate-50/50 backdrop-blur-md sticky top-0 z-20">
+                {steps.map((step, index) => {
+                    const StepIcon = step.icon;
+                    return (
+                        <div
+                            key={step.id}
+                            className={cn(
+                                "flex-1 flex flex-col items-center justify-center py-5 px-2 gap-2 transition-all cursor-pointer border-b-2 relative group",
+                                index === currentStep
+                                    ? "border-orange-500 text-orange-600 bg-orange-50/30"
+                                    : index < currentStep
+                                        ? "border-emerald-500 text-emerald-600 hover:bg-emerald-50/30"
+                                        : "border-transparent text-muted-foreground hover:bg-slate-100/50"
+                            )}
+                            onClick={() => index <= currentStep && setCurrentStep(index)}
+                        >
+                            <div className={cn(
+                                "h-8 w-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110",
+                                index === currentStep ? "bg-orange-100" : index < currentStep ? "bg-emerald-100" : "bg-slate-100"
+                            )}>
+                                {index < currentStep ? <CheckCircle2 className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
+                            </div>
+                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-center">{step.title}</span>
+                            {index === currentStep && (
+                                <div className="absolute -bottom-[2px] left-0 right-0 h-0.5 bg-orange-500 shadow-[0_2px_10px_rgba(249,115,22,0.5)]" />
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
-            <div className="flex-1 p-8 overflow-y-auto">
-                <div className="min-h-[400px]">
+            <div className="flex-1 p-8 md:py-12 md:px-6 overflow-y-auto custom-scrollbar">
+                <div className="max-w-4xl mx-auto min-h-[400px]">
                     {/* 
                         We render the current step's fields.
                         If it's the first step (Identitas), we also inject the CORE fields.
                     */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {currentStep === 0 && (
                             <>
-                                <div className="col-span-full mb-4">
-                                    <Label className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 block">{t`Tipe Applicant`}</Label>
-                                    <div className="flex bg-slate-100 p-1.5 rounded-2xl w-fit border border-slate-200 shadow-inner">
-                                        <button
-                                            onClick={() => setType('PERSONAL')}
-                                            className={cn(
-                                                "px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-                                                type === 'PERSONAL' ? "bg-white text-orange-600 shadow-md ring-1 ring-black/5" : "text-slate-500 hover:text-slate-700"
-                                            )}
-                                        >
-                                            <User className="h-4 w-4" />
-                                            {t`Individu`}
-                                        </button>
-                                        <button
-                                            onClick={() => setType('CORPORATE')}
-                                            className={cn(
-                                                "px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-                                                type === 'CORPORATE' ? "bg-white text-orange-600 shadow-md ring-1 ring-black/5" : "text-slate-500 hover:text-slate-700"
-                                            )}
-                                        >
-                                            <Building2 className="h-4 w-4" />
-                                            {t`Perusahaan`}
-                                        </button>
+                                <div className="col-span-full mb-8 flex flex-col gap-4 p-8 rounded-3xl bg-slate-50/50 border border-slate-200/50 shadow-inner">
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <h3 className="text-sm font-bold text-slate-800">{t`Tipe Peminjam`}:</h3>
+                                            {!!applicantId && <p className="text-xs text-muted-foreground">{t`Tipe tidak dapat diubah`}</p>}
+                                        </div>
+                                        <div className={cn("flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm", !!applicantId && "opacity-90")}>
+                                            <button
+                                                onClick={() => setType('PERSONAL')}
+                                                disabled={!!applicantId}
+                                                className={cn(
+                                                    "px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5",
+                                                    type === 'PERSONAL'
+                                                        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
+                                                        : "text-slate-500",
+                                                    !applicantId && type !== 'PERSONAL' && "hover:text-slate-700 hover:bg-slate-50",
+                                                    !!applicantId && "cursor-default"
+                                                )}
+                                            >
+                                                <User className="h-4 w-4" />
+                                                {t`Perorangan`}
+                                            </button>
+                                            <button
+                                                onClick={() => setType('CORPORATE')}
+                                                disabled={!!applicantId}
+                                                className={cn(
+                                                    "px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5",
+                                                    type === 'CORPORATE'
+                                                        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
+                                                        : "text-slate-500",
+                                                    !applicantId && type !== 'CORPORATE' && "hover:text-slate-700 hover:bg-slate-50",
+                                                    !!applicantId && "cursor-default"
+                                                )}
+                                            >
+                                                <Building2 className="h-4 w-4" />
+                                                {t`Perusahaan`}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+
 
                                 <div className="space-y-1 col-span-full md:col-span-2">
                                     <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
@@ -409,10 +596,10 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
                                         {type === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`}
                                     </Label>
                                     <Input
-                                        id={type === 'PERSONAL' ? "birthDate" : "establishmentDate"}
-                                        name={type === 'PERSONAL' ? "birthDate" : "establishmentDate"}
+                                        id={type === 'PERSONAL' ? "birthDate" : "birthDate"}
+                                        name={type === 'PERSONAL' ? "birthDate" : "birthDate"}
                                         type="date"
-                                        value={type === 'PERSONAL' ? formData.birthDate : formData.establishmentDate}
+                                        value={type === 'PERSONAL' ? formData.birthDate : formData.birthDate}
                                         onChange={handleInputChange}
                                         className="rounded-xl h-11 bg-slate-50 border-slate-200"
                                     />
@@ -434,7 +621,7 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
                 <Button
                     onClick={currentStep === steps.length - 1 ? () => setIsConfirmOpen(true) : nextStep}
                     className={cn(
-                        "rounded-xl px-8 h-12 font-bold",
+                        "rounded-xl px-8 h-12 font-bold text-white",
                         currentStep === steps.length - 1 ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"
                     )}
                 >
@@ -446,7 +633,7 @@ export function DynamicApplicantForm({ onSuccess, onCancel }: DynamicApplicantFo
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{t`Konfirmasi Simpan`}</DialogTitle>
-                        <DialogDescription>{t`Semua field dinamis akan disimpan ke sistem EAV.`}</DialogDescription>
+                        {/* <DialogDescription>{t`Semua field dinamis akan disimpan ke sistem EAV.`}</DialogDescription> */}
                     </DialogHeader>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>{t`Batal`}</Button>

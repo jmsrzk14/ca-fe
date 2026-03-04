@@ -1,5 +1,6 @@
 import { LoanAnalytics, ApplicationSummary, Task, ApplicationStatusData } from '../types';
 import { applicationService } from '@/core/api/services/application-service';
+import { referenceService } from '@/core/api/services/reference-service';
 
 export const dashboardService = {
     getAnalytics: async (): Promise<LoanAnalytics> => {
@@ -17,12 +18,15 @@ export const dashboardService = {
     },
 
     getApplicationStatusData: async (): Promise<ApplicationStatusData[]> => {
-        return [
-            { name: 'Sent', value: 400 },
-            { name: 'In Review', value: 300 },
-            { name: 'Approved', value: 300 },
-            { name: 'Declined', value: 200 },
-        ];
+        try {
+            const response = await referenceService.listApplicationStatuses();
+            return (response.statuses || []).map((s: any) => ({
+                name: s.statusCode || s.description,
+                value: 0 // Count should ideally come from another analytics endpoint or calculated
+            }));
+        } catch (error) {
+            return [];
+        }
     },
 
     getRecentApplications: async (): Promise<ApplicationSummary[]> => {
@@ -32,7 +36,7 @@ export const dashboardService = {
                 id: app.id,
                 applicantId: app.applicantId,
                 applicant: {
-                    name: app.applicantId ? `Applicant ${app.applicantId.slice(0, 6)}` : 'Unknown Applicant',
+                    name: app.applicantName || 'Unknown Applicant',
                     email: '-',
                     avatar: 'https://github.com/shadcn.png'
                 },
@@ -42,7 +46,6 @@ export const dashboardService = {
                 createdAt: app.createdAt || new Date().toISOString()
             }));
         } catch (error) {
-            console.error('Failed to fetch recent applications:', error);
             return [];
         }
     },

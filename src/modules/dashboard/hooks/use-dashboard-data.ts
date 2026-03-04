@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '../services/dashboard-service';
+import { referenceService } from '@/core/api/services/reference-service';
 
 export const useLoanAnalytics = () => {
     return useQuery({
@@ -26,5 +27,12 @@ export const usePendingTasks = () => {
     return useQuery({
         queryKey: ['dashboard', 'pending-tasks'],
         queryFn: dashboardService.getPendingTasks,
+    });
+};
+
+export const useAttributeCategories = () => {
+    return useQuery({
+        queryKey: ['reference', 'attribute-categories'],
+        queryFn: () => referenceService.listAttributeCategories(),
     });
 };

@@ -33,7 +33,13 @@ class ApiClient {
             throw new Error(error.message || `HTTP error! status: ${response.status}`);
         }
 
-        return response.json() as Promise<T>;
+        // Return empty object for 204 No Content or empty responses
+        if (response.status === 204) {
+            return {} as T;
+        }
+
+        const text = await response.text();
+        return text ? JSON.parse(text) : {} as T;
     }
 
     get<T>(endpoint: string, config?: RequestConfig) {

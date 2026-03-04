@@ -1,37 +1,131 @@
 'use client';
 
 import * as React from 'react';
+import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
 
-export function BorrowerProfileTab() {
+interface BorrowerProfileTabProps {
+    applicant?: any;
+}
+
+export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
+    console.log("DEBUG: BorrowerProfileTab received applicant:", applicant);
+    const { registry, isLoading } = useAttributeRegistry();
+
+    if (isLoading) {
+        return <div className="p-8 text-center animate-pulse text-muted-foreground">Memuat data...</div>;
+    }
+
+    if (!applicant) {
+        return (
+            <div className="p-8 text-center text-muted-foreground">
+                Data peminjam tidak ditemukan.
+            </div>
+        );
+    }
+
+    let type = applicant.applicantType || 'PERSONAL';
+    if (type === 'COMPANY') type = 'CORPORATE';
+
+    // Filter attributes for this profile
+    const profileAttributes = registry.filter((attr: any) =>
+        (attr.appliesTo === 'BOTH' || attr.appliesTo === type) &&
+        attr.scope === 'APPLICANT'
+    ).sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+    const formatDate = (dateStr?: string) => {
+        if (!dateStr || dateStr === '—') return '—';
+        try {
+            return new Date(dateStr).toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            });
+        } catch {
+            return dateStr;
+        }
+    };
+
+    const getValue = (attr: any) => {
+        const attrCode = attr.attributeCode;
+
+        // Check top-level fields first (with mapping)
+        const TOP_LEVEL_MAPPING: Record<string, string> = {
+            'full_name': 'fullName',
+            'identity_number': 'identityNumber',
+            'tax_id': 'taxId',
+            'tanggal_lahir': 'birthDate',
+            'establishment_date': 'establishmentDate'
+        };
+
+        const topLevelField = TOP_LEVEL_MAPPING[attrCode];
+        let val = '—';
+
+        if (topLevelField && applicant[topLevelField]) {
+            val = applicant[topLevelField];
+        } else {
+            // Find in attributes by key (which could be UUID or attributeCode)
+            const extraAttr = applicant.attributes?.find((a: any) =>
+                a.key === attrCode || a.key === attr.id
+            );
+            if (extraAttr) val = extraAttr.value;
+        }
+
+        if (!val || val === '' || val === '—') return '—';
+
+        // Format based on type
+        if (attr.dataType === 'DATE') return formatDate(val);
+        if (attr.dataType === 'BOOLEAN') return val === 'true' || val === 'Y' || val === '1' ? 'Ya' : 'Tidak';
+        if (attr.dataType === 'SELECT' && attr.options) {
+            const option = attr.options.find((opt: any) => opt.optionValue === val);
+            return option?.optionLabel || val;
+        }
+
+        return val;
+    };
+
     return (
         <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-            <div className="flex items-center justify-between mb-8">
-                <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <span className="w-1 h-5 bg-primary rounded-full"></span>
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                    <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
                     Profil Peminjam
                 </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                <DetailItem label="Nama Lengkap" value="Mesya Angelia Hutagalung" />
-                <DetailItem label="NIK" value="3174092837482934" />
-                <DetailItem label="Tempat, Tgl Lahir" value="Jakarta, 12 April 1992" />
-                <DetailItem label="Jenis Kelamin" value="Perempuan" />
-                <DetailItem label="Alamat" value="Jl. Melati No. 45, Tebet, Jakarta Selatan" />
-                <DetailItem label="Pekerjaan" value="Wirausaha" />
-                <DetailItem label="No. Telepon" value="0812-3456-7890" />
-                <DetailItem label="Email" value="mesya.angelia@gmail.com" />
+
+            <div className="border border-border/50 rounded-xl overflow-hidden mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 text-sm">
+                    {/* Split attributes into two columns */}
+                    <div className="flex flex-col divide-y divide-border/50 md:border-r border-border/50">
+                        {profileAttributes.filter((_, i) => i % 2 === 0).map(attr => (
+                            <DetailItem
+                                key={attr.id}
+                                label={attr.uiLabel || attr.description}
+                                value={getValue(attr)}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex flex-col divide-y divide-border/50">
+                        {profileAttributes.filter((_, i) => i % 2 !== 0).map(attr => (
+                            <DetailItem
+                                key={attr.id}
+                                label={attr.uiLabel || attr.description}
+                                value={getValue(attr)}
+                            />
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
 }
 
-function DetailItem({ label, value }: { label: string; value: string }) {
+function DetailItem({ label, value }: { label: string; value: React.ReactNode }) {
     return (
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between group">
-            <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors w-1/3">
+        <div className="flex px-6 py-4 hover:bg-muted/5 transition-colors">
+            <span className="text-xs font-bold text-foreground w-[160px] shrink-0 pt-0.5">
                 {label}
             </span>
-            <span className="text-sm font-medium text-foreground flex-1">
+            <span className="text-xs font-medium text-muted-foreground flex-1 break-words">
                 {value}
             </span>
         </div>

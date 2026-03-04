@@ -16,6 +16,7 @@ import {
     User,
     MoreHorizontal
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -56,6 +57,7 @@ import { cn } from '@/shared/lib/utils';
 import { ApplicationFormSheet } from './application-form-sheet';
 
 export function ApplicationKanban() {
+    const router = useRouter();
     const [loanType, setLoanType] = React.useState('Personal');
     const [viewMode, setViewMode] = React.useState<'board' | 'list'>('board');
     const [data, setData] = React.useState<KanbanColumnData[] | null>(null);
@@ -64,6 +66,8 @@ export function ApplicationKanban() {
     const [error, setError] = React.useState<string | null>(null);
     const [activeApp, setActiveApp] = React.useState<ApplicationCardData | null>(null);
     const [isNewAppDialogOpen, setIsNewAppDialogOpen] = React.useState(false);
+    const [updatedCardId, setUpdatedCardId] = React.useState<string | null>(null);
+    const [sourceStatus, setSourceStatus] = React.useState<ApplicationStatus | null>(null);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -85,7 +89,6 @@ export function ApplicationKanban() {
             const boardData = await kanbanService.getBoardData();
             setData(boardData);
             setError(null);
-            if (silent) toast.success('Data refreshed');
         } catch (err: any) {
             const errorMessage = err?.message || 'Failed to fetch data';
             if (!silent) {
@@ -109,7 +112,6 @@ export function ApplicationKanban() {
 
     const handleSort = () => {
         if (!data) return;
-        toast.info('Sorting by amount');
         setData(prev => {
             if (!prev) return prev;
             return prev.map(col => ({
@@ -119,13 +121,32 @@ export function ApplicationKanban() {
         });
     };
 
+    const filteredData = React.useMemo(() => {
+        if (!data) return null;
+        return data.map(col => {
+            const parsedType = loanType.toUpperCase();
+            const matchingApps = col.applications.filter(app => {
+                const appType = (app.applicantType || "UNKNOWN").toUpperCase();
+                return appType === parsedType;
+            });
+            return {
+                ...col,
+                applications: matchingApps,
+                count: matchingApps.length,
+                totalAmount: matchingApps.reduce((sum, a) => sum + a.amount, 0)
+            };
+        });
+    }, [data, loanType]);
+
     const handleNewApplication = () => {
         setIsNewAppDialogOpen(true);
     };
 
     const onDragStart = (event: DragStartEvent) => {
         if (event.active.data.current?.type === 'Application') {
-            setActiveApp(event.active.data.current.application);
+            const app = event.active.data.current.application;
+            setActiveApp(app);
+            setSourceStatus(app.status);
         }
     };
 
@@ -205,20 +226,29 @@ export function ApplicationKanban() {
         const { active, over } = event;
         setActiveApp(null);
 
-        if (!over || !data) return;
+        if (!over || !data || !sourceStatus) {
+            setSourceStatus(null);
+            return;
+        }
 
         const activeId = active.id;
         const overId = over.id;
 
-        const activeCol = data.find(col => col.applications.some(app => app.id === activeId));
+        // Find the OVER column even if dropping over an application card
         const overCol = data.find(col => col.applications.some(app => app.id === overId) || col.id === overId);
 
-        if (!activeCol || !overCol) return;
+        if (!overCol) {
+            setSourceStatus(null);
+            return;
+        }
 
-        if (activeId !== overId) {
+        const targetStatus = overCol.id as ApplicationStatus;
+
+        // 1. Reordering within the SAME column
+        if (sourceStatus === targetStatus && activeId !== overId) {
             setData(prev => {
                 if (!prev) return prev;
-                const col = prev.find(c => c.id === overCol.id);
+                const col = prev.find(c => c.id === targetStatus);
                 if (!col) return prev;
 
                 const oldIndex = col.applications.findIndex(app => app.id === activeId);
@@ -232,13 +262,20 @@ export function ApplicationKanban() {
             });
         }
 
-        if (activeCol.id !== overCol.id) {
+        // 2. Status Changed (Persistence Fix)
+        if (sourceStatus !== targetStatus) {
             const loadingToastId = toast.loading(`Updating application status...`);
+
             try {
-                await applicationService.updateStatus(activeId as string, overCol.id as ApplicationStatus);
+                await applicationService.updateStatus(activeId as string, targetStatus);
+
+                // Trigger success animation
+                setUpdatedCardId(activeId as string);
+                setTimeout(() => setUpdatedCardId(null), 2000);
+
                 toast.success(`Application stage updated`, {
                     id: loadingToastId,
-                    description: `${active.data.current?.application.borrowerName ?? 'Application'} moved to ${overCol.title}`,
+                    description: `${active.data.current?.application.fullName ?? 'Application'} moved to ${overCol.title}`,
                     duration: 3000,
                 });
             } catch (error) {
@@ -250,6 +287,8 @@ export function ApplicationKanban() {
                 fetchData(true);
             }
         }
+
+        setSourceStatus(null);
     };
 
     if (isLoading) {
@@ -271,7 +310,7 @@ export function ApplicationKanban() {
         );
     }
 
-    const allApplications = data?.flatMap(col => col.applications) ?? [];
+    const allApplications = filteredData?.flatMap(col => col.applications) ?? [];
 
     if (error) {
         return (
@@ -281,9 +320,6 @@ export function ApplicationKanban() {
                 </div>
                 <div className="space-y-2">
                     <h2 className="text-2xl font-bold text-foreground">Gagal memuat data pengajuan</h2>
-                    <p className="text-muted-foreground max-w-md mx-auto">
-                        {error}
-                    </p>
                 </div>
                 <Button
                     onClick={() => fetchData()}
@@ -403,8 +439,12 @@ export function ApplicationKanban() {
                         onDragEnd={onDragEnd}
                     >
                         <div className="flex gap-6 min-w-max px-2">
-                            {data?.map((column) => (
-                                <KanbanColumn key={column.id} column={column} />
+                            {filteredData?.map((column) => (
+                                <KanbanColumn
+                                    key={column.id}
+                                    column={column}
+                                    updatedCardId={updatedCardId}
+                                />
                             ))}
                         </div>
 
@@ -428,22 +468,27 @@ export function ApplicationKanban() {
                             <Table>
                                 <TableHeader className="bg-muted/50">
                                     <TableRow className="hover:bg-transparent border-border/50">
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">No. Reference</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">NIK/NIB</TableHead>
+                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Nama Lengkap</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Branch</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Loan Amount</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Tenor</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Status</TableHead>
                                         <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Date</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4 text-right">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {allApplications.map((app) => (
-                                        <TableRow key={app.id} className="hover:bg-muted/30 border-border/40 transition-colors group">
+                                        <TableRow
+                                            key={app.id}
+                                            onClick={() => router.push(`/loans/${app.id}`)}
+                                            className="hover:bg-muted/30 border-border/40 transition-colors group cursor-pointer"
+                                        >
                                             <TableCell className="py-4">
-                                                <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground bg-muted/20">
-                                                    #{app.refNumber}
-                                                </Badge>
+                                                {app.identityNumber}
+                                            </TableCell>
+                                            <TableCell className="py-4">
+                                                {app.fullName}
                                             </TableCell>
                                             <TableCell className="py-4 text-sm font-medium">
                                                 {app.branchCode || '—'}
@@ -464,17 +509,13 @@ export function ApplicationKanban() {
                                                     app.status === 'APPROVED' && "bg-emerald-500/10 text-emerald-600",
                                                     app.status === 'REJECTED' && "bg-rose-500/10 text-rose-600",
                                                     app.status === 'DISBURSED' && "bg-teal-500/10 text-teal-600",
+                                                    app.status === 'CANCELLED' && "bg-slate-500/10 text-slate-600",
                                                 )}>
                                                     {app.status}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="py-4 text-xs text-muted-foreground font-medium">
                                                 {app.date}
-                                            </TableCell>
-                                            <TableCell className="py-4 text-right">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}

@@ -18,7 +18,7 @@ import {
     ChevronRight,
     LogOut,
     MoreHorizontal,
-    Command,
+    LayoutDashboard,
 } from 'lucide-react';
 
 import { cn } from '@/shared/lib/utils';
@@ -85,6 +85,7 @@ const NAV_ITEMS: NavGroup[] = [
                     { title: 'Penilaian CRR', url: ROUTES.SETTINGS_CRR_ASSESSMENT },
                     { title: 'Status Peminjaman', url: ROUTES.SETTINGS_LOAN_STATUS },
                     { title: 'Registri Field', url: ROUTES.ATTRIBUTES },
+                    { title: 'Atur Dashboard', url: '/dashboard-settings' },
                 ]
             },
         ],
@@ -220,7 +221,7 @@ export function DashboardSidebar() {
                 ))}
             </SidebarContent>
 
-            <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar">
+            {/* <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>
@@ -263,7 +264,7 @@ export function DashboardSidebar() {
                         </DropdownMenu>
                     </SidebarMenuItem>
                 </SidebarMenu>
-            </SidebarFooter>
+            </SidebarFooter> */}
             <SidebarRail />
         </Sidebar>
     );

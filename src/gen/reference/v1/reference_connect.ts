@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { Empty, MethodKind } from "@bufbuild/protobuf";
-import { AttributeCategory, CreateAttributeCategoryRequest, CreateAttributeRegistryRequest, DeleteAttributeCategoryRequest, DeleteAttributeRegistryRequest, GetAttributeCategoryRequest, GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeCategoriesResponse, ListAttributeRegistryByCategoryRequest, ListAttributeRegistryResponse, ListBranchesResponse, ListCitiesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListProvincesResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct, UpdateAttributeCategoryRequest, UpdateAttributeRegistryRequest } from "./reference_pb";
+import { AttributeCategory, CreateAttributeCategoryRequest, CreateAttributeRegistryRequest, DeleteAttributeCategoryRequest, DeleteAttributeRegistryRequest, GetAttributeCategoryRequest, GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeCategoriesResponse, ListAttributeRegistryByCategoryRequest, ListAttributeRegistryResponse, ListBranchesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct, UpdateAttributeCategoryRequest, UpdateAttributeRegistryRequest } from "./reference_pb";
 
 /**
  * @generated from service api.reference.v1.ReferenceService
@@ -177,26 +177,6 @@ export const ReferenceService = {
       name: "ListSurveyTemplates",
       I: ListSurveyTemplatesRequest,
       O: ListSurveyTemplatesResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * ---- Choices: Provinces & Cities ----
-     *
-     * @generated from rpc api.reference.v1.ReferenceService.ListProvinces
-     */
-    listProvinces: {
-      name: "ListProvinces",
-      I: Empty,
-      O: ListProvincesResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc api.reference.v1.ReferenceService.ListCities
-     */
-    listCities: {
-      name: "ListCities",
-      I: Empty,
-      O: ListCitiesResponse,
       kind: MethodKind.Unary,
     },
   }

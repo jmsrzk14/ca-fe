@@ -3,16 +3,21 @@
 import * as React from 'react';
 import { Card, CardContent } from '@/shared/ui/card';
 import { MoreVertical, GripVertical, Building2, Clock } from 'lucide-react';
-import { ApplicationCardData, APPLICATION_STATUS_COLUMNS } from '../types/kanban';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ApplicationCardData } from '../types/kanban';
 import { cn } from '@/shared/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 interface ApplicationCardProps {
     application: ApplicationCardData;
+    isSuccess?: boolean;
+    borderColor?: string;
 }
 
-export function ApplicationCard({ application }: ApplicationCardProps) {
+export function ApplicationCard({ application, isSuccess, borderColor: propBorderColor }: ApplicationCardProps) {
+    const router = useRouter();
     const {
         attributes,
         listeners,
@@ -29,12 +34,11 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
     });
 
     const style = {
-        transform: CSS.Translate.toString(transform),
+        transform: CSS.Transform.toString(transform),
         transition,
     };
 
-    const colMeta = APPLICATION_STATUS_COLUMNS.find(c => c.id === application.status);
-    const borderColor = colMeta?.color ?? 'border-t-slate-400';
+    const borderColor = propBorderColor ?? 'border-t-slate-400';
 
     if (isDragging) {
         return (
@@ -59,11 +63,24 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
             ref={setNodeRef}
             style={style}
             {...attributes}
+            onClick={() => router.push(`/loans/${application.id}`)}
             className={cn(
-                "group relative overflow-hidden transition-all hover:shadow-lg border-t-4 bg-card/60 backdrop-blur-sm",
-                borderColor
+                "group relative overflow-hidden transition-all hover:shadow-lg border-t-4 bg-card/60 backdrop-blur-sm cursor-pointer",
+                borderColor,
+                isSuccess && "ring-2 ring-emerald-500 shadow-emerald-500/20 shadow-xl"
             )}
         >
+            <AnimatePresence>
+                {isSuccess && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.1 }}
+                        className="absolute inset-0 bg-emerald-500/5 pointer-events-none z-10"
+                    />
+                )}
+            </AnimatePresence>
+
             <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                     <div className="flex items-start gap-2">
@@ -75,10 +92,10 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
                         </div>
                         <div>
                             <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground/60 mb-0.5">
-                                {application.borrowerName || 'Guest'}
+                                {application.identityNumber}
                             </div>
                             <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors font-mono">
-                                #{application.refNumber}
+                                {application.fullName || 'Guest'}
                             </h4>
                             <div className="flex items-center gap-2 mt-1">
                                 <Building2 className="h-3 w-3 text-muted-foreground" />
@@ -93,9 +110,6 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
                             </div>
                         </div>
                     </div>
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded-md text-muted-foreground">
-                        <MoreVertical className="h-4 w-4" />
-                    </button>
                 </div>
 
                 <div className="flex justify-between items-end mt-4">

@@ -440,7 +440,6 @@ export default function AttributeManagementPage() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b">
-                                    <th className="px-6 py-4">{t`ID Field`}</th>
                                     <th className="px-6 py-4">{t`Label & Icon`}</th>
                                     <th className="px-6 py-4">{t`Tipe`}</th>
                                     <th className="px-6 py-4">{t`Kategori`}</th>
@@ -453,7 +452,6 @@ export default function AttributeManagementPage() {
                                     const IconComp = ICON_MAP[attr.uiIcon] ?? Settings;
                                     return (
                                         <tr key={attr.attrKey} className="hover:bg-muted/30 transition-colors group">
-                                            <td className="px-6 py-4 font-mono text-xs">{attr.attrKey}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
@@ -502,17 +500,6 @@ export default function AttributeManagementPage() {
                         </table>
                     </div>
                 )}
-            </div>
-
-            {/* Info banner */}
-            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 flex gap-4">
-                <Database className="h-6 w-6 text-orange-600 shrink-0" />
-                <div>
-                    <h4 className="font-bold text-orange-900">{t`Pola EAV Aktif`}</h4>
-                    <p className="text-sm text-orange-800 mt-1">
-                        {t`Setiap field yang Anda tambah di atas akan otomatis disimpan ke tabel 'applicant_attributes' dengan relasi dinamis.`}
-                    </p>
-                </div>
             </div>
         </div>
     );

@@ -3,10 +3,18 @@ import { SurveyTemplate, Survey, SurveyAnswer, SurveyEvidence } from '@/shared/t
 
 export const surveyService = {
     getTemplates: () =>
-        apiClient.get<SurveyTemplate[]>('/v1/surveys/templates'),
+        apiClient.get<{ templates: SurveyTemplate[] }>('/v1/survey-templates'),
 
-    assignSurvey: (applicationId: string, surveyData: Partial<Survey>) =>
-        apiClient.post<Survey>(`/v1/applications/${applicationId}/surveys`, surveyData),
+    assignSurvey: (applicationId: string, templateId: string, surveyPurpose: string = '') =>
+        apiClient.post<Survey>(`/v1/applications/${applicationId}/surveys`, {
+            templateId,
+            surveyPurpose,
+            surveyType: 'GENERAL', // Default type
+            assignedTo: '' // Optional for now
+        }),
+
+    listByApplication: (applicationId: string) =>
+        apiClient.get<{ surveys: Survey[] }>(`/v1/applications/${applicationId}/surveys`),
 
     updateStatus: (id: string, status: string) =>
         apiClient.patch<Survey>(`/v1/surveys/${id}/status`, { status }),

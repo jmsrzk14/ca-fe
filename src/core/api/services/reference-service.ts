@@ -7,9 +7,13 @@ const client = createPromiseClient(ReferenceService, transport);
 
 export const referenceService = {
     getLoanProducts: () => client.listLoanProducts(new Empty()),
+    getLoanProduct: (id: string) => client.getLoanProduct({ id }),
     getBranches: () => client.listBranches(new Empty()),
     getGLAccounts: () => client.listFinancialGLAccounts(new Empty()),
     getAttributeRegistry: () => client.listAttributeRegistry(new Empty()),
+    listApplicationStatuses: () => client.listApplicationStatuses(new Empty()),
+    listAttributeCategories: () => client.listAttributeCategories(new Empty()),
+    listLoanOfficers: (branchCode: string) => client.listLoanOfficers({ branchCode }),
     createAttributeRegistry: (data: any) => client.createAttributeRegistry(data),
     updateAttributeRegistry: (data: any) => client.updateAttributeRegistry(data),
 };

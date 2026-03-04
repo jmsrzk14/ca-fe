@@ -1,5 +1,7 @@
 import { ApplicationListResponse, Application } from '@/shared/types/api';
 import { applicationService } from '@/core/api/services/application-service';
+import { applicantService } from '@/core/api/services/applicant-service';
+import { referenceService } from '@/core/api/services/reference-service';
 import {
     ApplicationCardData,
     APPLICATION_STATUS_COLUMNS,
@@ -21,7 +23,9 @@ function mapToCardData(app: any): ApplicationCardData {
     return {
         id: app.id || "unknown",
         applicantId: app.applicantId || "unknown",
-        borrowerName: app.borrowerName || app.applicantName || "",
+        applicantType: app.applicantType || "PERSONAL",
+        identityNumber: app.identityNumber || "unknown",
+        fullName: app.fullName || "",
         productId: app.productId || "",
         aoId: app.aoId || "",
         refNumber: (app.id || "").slice(0, 8).toUpperCase() || "NEW",
@@ -36,27 +40,95 @@ function mapToCardData(app: any): ApplicationCardData {
 
 export const kanbanService = {
     getBoardData: async (): Promise<KanbanColumnData[]> => {
-        const response = await applicationService.list();
+        const [appResponse, statusResponse] = await Promise.all([
+            applicationService.list(),
+            referenceService.listApplicationStatuses()
+        ]);
+
+        const applications = appResponse.applications || [];
+        const statuses = statusResponse.statuses || [];
+
+        // Map status colors for fallback
+        const colorMap: Record<string, string> = {
+            'INTAKE': 'border-t-slate-400',
+            'ANALYSIS': 'border-t-blue-400',
+            'SURVEY': 'border-t-purple-400',
+            'COMMITTEE': 'border-t-orange-400',
+            'APPROVED': 'border-t-emerald-400',
+            'REJECTED': 'border-t-rose-400',
+            'DISBURSED': 'border-t-teal-400',
+            'CANCELLED': 'border-t-slate-300',
+        };
+
+        // Fetch applicant details for each unique applicantId
+        const uniqueApplicantIds = Array.from(new Set(applications.map((app: any) => app.applicantId).filter(Boolean)));
+
+        const applicantsData = await Promise.all(
+            uniqueApplicantIds.map(async (id: any) => {
+                try {
+                    const applicant = await applicantService.getById(id);
+                    return { id, applicant };
+                } catch (e) {
+                    return { id, applicant: null };
+                }
+            })
+        );
+
+        const applicantMap = applicantsData.reduce((acc, curr) => {
+            if (curr.applicant) {
+                acc[curr.id] = curr.applicant;
+            }
+            return acc;
+        }, {} as Record<string, any>);
 
         // Build a map of status -> cards
         const cardsByStatus: Record<string, ApplicationCardData[]> = {};
-        const applications = response.applications || [];
         for (const app of applications) {
-            const status = app.status || "INTAKE";
+            const status = app.status || "UNKNOWN";
             if (!cardsByStatus[status]) {
                 cardsByStatus[status] = [];
             }
-            cardsByStatus[status].push(mapToCardData(app));
+
+            const applicant = applicantMap[app.applicantId];
+
+            // Fallback for name/identity if empty in top level
+            let fullName = app.applicantName || applicant?.fullName || "Unknown Applicant";
+            let identityNumber = applicant?.identityNumber || "unknown";
+
+            if (applicant && (!applicant.fullName || !applicant.identityNumber)) {
+                applicant.attributes?.forEach((attr: any) => {
+                    const key = attr.key || '';
+                    // Check for common full name keys/IDs
+                    if (['full_name', 'fullName', 'nama_lengkap', '0195383f-4281-7000-bb34-812010000002'].includes(key)) {
+                        if (!fullName || fullName === "Unknown Applicant") fullName = attr.value;
+                    }
+                    // Check for common identity number keys/IDs
+                    if (['identity_number', 'identityNumber', 'identitas_nik', '0195383f-4281-7000-bb34-812010000001'].includes(key)) {
+                        if (!identityNumber || identityNumber === "unknown") identityNumber = attr.value;
+                    }
+                });
+            }
+
+            const enrichedApp = {
+                ...app,
+                applicantId: app.applicantId,
+                applicantType: applicant?.applicantType || "PERSONAL",
+                fullName,
+                identityNumber,
+            };
+
+            cardsByStatus[status].push(mapToCardData(enrichedApp));
         }
 
-        // Build columns in fixed order, filling in empty ones
-        return APPLICATION_STATUS_COLUMNS.map(col => {
-            const apps = cardsByStatus[col.id] ?? [];
+        // Build columns based on proto statuses
+        return statuses.map(s => {
+            const statusCode = s.statusCode as ApplicationStatus;
+            const apps = cardsByStatus[statusCode] ?? [];
             const totalAmount = apps.reduce((sum, a) => sum + a.amount, 0);
             return {
-                id: col.id,
-                title: col.title,
-                color: col.color,
+                id: statusCode,
+                title: s.statusCode || statusCode,
+                color: colorMap[statusCode] || 'border-t-slate-400',
                 count: apps.length,
                 totalAmount,
                 applications: apps,
