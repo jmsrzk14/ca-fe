@@ -7,7 +7,6 @@ import {
     Home,
     Users,
     ClipboardList,
-    FileText,
     Settings,
     ChevronRight,
     LogOut,
@@ -26,7 +25,6 @@ const NAV_ITEMS: NavItem[] = [
     { href: '/', label: 'Dashboards', icon: Home },
     { href: '/borrowers', label: 'Peminjam', icon: Users },
     { href: '/loans', label: 'Pinjaman', icon: ClipboardList },
-    { href: '/slik', label: 'SLIK', icon: FileText },
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
@@ -35,12 +33,7 @@ const ADMIN_ITEMS: NavItem[] = [
         label: 'Pengaturan',
         icon: Settings,
         children: [
-            { href: ROUTES.SETTINGS_LOAN_PRODUCTS, label: 'Produk Peminjaman' },
-            { href: ROUTES.SETTINGS_CRR_COMPONENTS, label: 'Komponen CRR' },
-            { href: ROUTES.SETTINGS_CRR_ASSESSMENT, label: 'Penilaian CRR' },
-            { href: ROUTES.SETTINGS_LOAN_STATUS, label: 'Status Peminjaman' },
             { href: ROUTES.ATTRIBUTES, label: 'Registri Field' },
-            { href: '/dashboard-settings', label: 'Atur Dashboard' },
         ],
     },
 ];

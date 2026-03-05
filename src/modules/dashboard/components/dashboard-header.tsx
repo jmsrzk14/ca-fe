@@ -19,7 +19,6 @@ export function DashboardHeader() {
             if (pathParts.length > 1) return 'Detail Pengajuan';
             return 'Pinjaman';
         }
-        if (pathname.includes('/slik')) return 'SLIK';
         if (pathname.includes('/survey')) return 'Survey';
         if (pathname.includes('/settings')) return 'Pengaturan';
         if (pathname.includes('/borrowers')) return 'Peminjam';
