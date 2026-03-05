@@ -1,8 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/shared/ui/button';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
+import { referenceService } from '@/core/api';
 import { DetailItem } from '@/shared/components/detail-item';
 
 interface LoanInfoTabProps {
@@ -13,6 +15,16 @@ interface LoanInfoTabProps {
 
 export function LoanInfoTab({ application, applicant, productName }: LoanInfoTabProps) {
     const { registry, getLabel, isLoading } = useAttributeRegistry();
+    const { data: citiesResponse } = useQuery({
+        queryKey: ['cities'],
+        queryFn: () => referenceService.listCities(),
+        staleTime: 1000 * 60 * 60,
+    });
+    const citiesMap = React.useMemo(() => {
+        const map: Record<string, string> = {};
+        (citiesResponse?.cities || []).forEach((c: any) => { map[c.code] = c.value; });
+        return map;
+    }, [citiesResponse]);
 
     if (isLoading) {
         return <div className="p-8 text-center animate-pulse text-muted-foreground">Memuat data...</div>;
@@ -63,9 +75,14 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
 
         if (attr.dataType === 'DATE') return formatDate(val);
         if (attr.dataType === 'BOOLEAN') return val === 'true' || val === 'Y' || val === '1' ? 'Ya' : 'Tidak';
-        if (attr.dataType === 'SELECT' && attr.choices) {
-            const choice = attr.choices.find((opt: any) => opt.code === val);
-            return choice?.value || val;
+        if (attr.dataType === 'SELECT') {
+            if (['kota_ktp', 'kota_domisili'].includes(attr.attributeCode)) {
+                return citiesMap[val] || val;
+            }
+            if (attr.choices) {
+                const choice = attr.choices.find((opt: any) => opt.code === val);
+                return choice?.value || val;
+            }
         }
         if (attr.dataType === 'NUMBER') return val;
 

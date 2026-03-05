@@ -1,7 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
+import { referenceService } from '@/core/api';
 import { DetailItem } from '@/shared/components/detail-item';
 
 interface BorrowerProfileTabProps {
@@ -10,6 +12,16 @@ interface BorrowerProfileTabProps {
 
 export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
     const { registry, isLoading } = useAttributeRegistry();
+    const { data: citiesResponse } = useQuery({
+        queryKey: ['cities'],
+        queryFn: () => referenceService.listCities(),
+        staleTime: 1000 * 60 * 60,
+    });
+    const citiesMap = React.useMemo(() => {
+        const map: Record<string, string> = {};
+        (citiesResponse?.cities || []).forEach((c: any) => { map[c.code] = c.value; });
+        return map;
+    }, [citiesResponse]);
 
     if (isLoading) {
         return <div className="p-8 text-center animate-pulse text-muted-foreground">Memuat data...</div>;
@@ -75,9 +87,14 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
         // Format based on type
         if (attr.dataType === 'DATE') return formatDate(val);
         if (attr.dataType === 'BOOLEAN') return val === 'true' || val === 'Y' || val === '1' ? 'Ya' : 'Tidak';
-        if (attr.dataType === 'SELECT' && attr.choices) {
-            const choice = attr.choices.find((opt: any) => opt.code === val);
-            return choice?.value || val;
+        if (attr.dataType === 'SELECT') {
+            if (['kota_ktp', 'kota_domisili'].includes(attrCode)) {
+                return citiesMap[val] || val;
+            }
+            if (attr.choices) {
+                const choice = attr.choices.find((opt: any) => opt.code === val);
+                return choice?.value || val;
+            }
         }
 
         return val;

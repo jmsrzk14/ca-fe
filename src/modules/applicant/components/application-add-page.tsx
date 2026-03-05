@@ -3,20 +3,16 @@
 import * as React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-    Save,
     Loader2,
     CheckCircle2,
     ChevronRight,
     ChevronLeft,
+    ArrowLeft,
     Search,
-    User,
     Check,
     Building2,
     Settings,
     DollarSign,
-    Briefcase,
-    Calendar,
-    Target,
     LayoutGrid,
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
@@ -26,6 +22,7 @@ import { AttributeRegistry } from '@/shared/types/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { Card, CardContent } from '@/shared/ui/card';
 import { cn } from '@/shared/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import {
@@ -37,28 +34,11 @@ import {
 } from '@/shared/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 interface ApplicationAddPageProps {
-    /** Redirect after success */
     redirectTo?: string;
 }
-
-// ──────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ──────────────────────────────────────────────────────────────────────────────
-
-const getIconWithName = (name?: string) => {
-    if (!name) return Settings;
-    const icons: Record<string, any> = {
-        Building2, Settings, CheckCircle2,
-        Briefcase, DollarSign, Target, Calendar,
-    };
-    return icons[name] || Settings;
-};
-
-// ──────────────────────────────────────────────────────────────────────────────
-// Component
-// ──────────────────────────────────────────────────────────────────────────────
 
 export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPageProps) {
     const router = useRouter();
@@ -142,7 +122,6 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
             .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
     }, [registry]);
 
-    // ── Handlers ───────────────────────────────────────────────────────────────
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -151,7 +130,6 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
     const handleSelectChange = (name: string, value: string) => {
         setFormData(prev => {
             const updated = { ...prev, [name]: value };
-            // Reset AO if branch changes
             if (name === 'branchCode') {
                 updated.aoId = '';
             }
@@ -159,7 +137,6 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
         });
     };
 
-    // ── Mutation ───────────────────────────────────────────────────────────────
     const mutation = useMutation({
         mutationFn: (data: any) => applicationService.create(data),
         onSuccess: () => {
@@ -203,11 +180,10 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
             tenorMonths: parseInt(String(formData.tenorMonths)) || 0,
             attributes,
         };
-        
+
         mutation.mutate(payload);
     };
 
-    // ── Steps ──────────────────────────────────────────────────────────────────
     const steps = [
         { id: 'core', title: t`Informasi Dasar`, icon: Building2 },
         { id: 'details', title: t`Detail Pinjaman`, icon: DollarSign },
@@ -234,320 +210,349 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
 
     if (isRegistryLoading) {
         return (
-            <div className="flex h-64 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-3 font-medium">{t`Memuat formulir...`}</span>
+            <div className="flex h-40 items-center justify-center gap-2 text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <span className="text-sm">{t`Memuat formulir...`}</span>
             </div>
         );
     }
 
+    const inputClass = "h-9 rounded-md";
+
+    const renderDynamicField = (attr: AttributeRegistry) => {
+        const id = attr.attributeCode;
+        const label = t`${attr.uiLabel || attr.description || id}`;
+
+        if (attr.dataType === 'SELECT') {
+            return (
+                <div key={id} className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                        {label} {attr.isRequired && <span className="text-destructive">*</span>}
+                    </Label>
+                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''}>
+                        <SelectTrigger className={inputClass}>
+                            <SelectValue placeholder={t`Pilih ${label}...`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {attr.choices?.map(opt => (
+                                <SelectItem key={opt.id} value={opt.code}>{opt.value}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            );
+        }
+
+        if (attr.dataType === 'BOOLEAN') {
+            return (
+                <div key={id} className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                        {label} {attr.isRequired && <span className="text-destructive">*</span>}
+                    </Label>
+                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''}>
+                        <SelectTrigger className={inputClass}>
+                            <SelectValue placeholder={t`Pilih...`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="true">{t`Ya`}</SelectItem>
+                            <SelectItem value="false">{t`Tidak`}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            );
+        }
+
+        return (
+            <div key={id} className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">
+                    {label} {attr.isRequired && <span className="text-destructive">*</span>}
+                </Label>
+                <Input
+                    name={id}
+                    type={attr.dataType === 'NUMBER' ? 'number' : attr.dataType === 'DATE' ? 'date' : 'text'}
+                    value={formData[id] || ''}
+                    onChange={handleInputChange}
+                    className={inputClass}
+                    placeholder={t`Masukkan ${label}`}
+                />
+            </div>
+        );
+    };
+
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-12">
-            <div className="flex flex-col gap-6">
-                <Button variant="ghost" size="sm" onClick={() => router.back()} className="w-fit">
-                    <ChevronLeft className="mr-2 h-4 w-4" /> {t`Kembali`}
+        <div className="space-y-5">
+            <div className="space-y-1">
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-muted-foreground -ml-2" asChild>
+                    <Link href="/loans">
+                        <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+                        {t`Kembali`}
+                    </Link>
                 </Button>
-                <h1 className="text-3xl font-bold">{t`Buat Pengajuan Pinjaman Baru`}</h1>
+                <h1 className="text-lg font-bold text-foreground">{t`Buat Pengajuan Pinjaman Baru`}</h1>
             </div>
 
-            <div className="flex flex-col bg-background rounded-3xl border border-border overflow-hidden shadow-xl">
-                {/* Tabs */}
-                <div className="flex border-b bg-muted/5 sticky top-0 z-10">
-                    {steps.map((step, index) => {
-                        const Icon = step.icon;
-                        return (
-                            <div
-                                key={step.id}
-                                className={cn(
-                                    'flex-1 flex flex-col items-center py-5 px-2 gap-2 border-b-2 transition-all cursor-pointer',
-                                    index === currentStep ? 'border-primary bg-primary/5 text-primary' : 'border-transparent text-muted-foreground'
-                                )}
-                                onClick={() => index <= currentStep && setCurrentStep(index)}
-                            >
-                                <Icon className="h-5 w-5" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider">{step.title}</span>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                <div className="p-10 space-y-8">
-                    {currentStep === 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-2 duration-300">
-                            {/* Applicant Selection (Searchable) */}
-                            <div className="space-y-2">
-                                <Label>{t`Peminjam`}*</Label>
-                                <Popover open={isApplicantPopoverOpen} onOpenChange={setIsApplicantPopoverOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={isApplicantPopoverOpen}
-                                            className="w-full justify-between rounded-xl h-12 bg-slate-50 font-normal px-4 hover:bg-slate-100 border-none shadow-none"
-                                        >
-                                            {selectedApplicant ? (
-                                                <div className="flex flex-col items-start overflow-hidden">
-                                                    <span className="font-bold text-sm truncate w-full">{selectedApplicant.fullName}</span>
-                                                    <span className="text-[10px] text-muted-foreground truncate w-full">
-                                                        {selectedApplicant.identityNumber || selectedApplicant.taxId}
-                                                    </span>
-                                                </div>
-                                            ) : (
-                                                <span className="text-muted-foreground">{t`Pilih Peminjam...`}</span>
-                                            )}
-                                            <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-2xl border-border/50 shadow-2xl overflow-hidden" align="start">
-                                        <div className="flex flex-col max-h-[400px]">
-                                            <div className="flex items-center border-b px-4 h-12 sticky top-0 bg-background z-10">
-                                                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                                                <input
-                                                    className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                                                    placeholder={t`Cari NIK atau Nama...`}
-                                                    value={applicantSearch}
-                                                    onChange={(e) => setApplicantSearch(e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="flex-1 overflow-y-auto py-2">
-                                                {filteredApplicants.length === 0 ? (
-                                                    <div className="py-10 text-center text-sm text-muted-foreground">
-                                                        {t`Peminjam tidak ditemukan.`}
-                                                    </div>
-                                                ) : (
-                                                    filteredApplicants.map((a: any) => (
-                                                        <div
-                                                            key={a.id}
-                                                            className={cn(
-                                                                "relative flex cursor-pointer select-none items-center rounded-sm px-4 py-3 text-sm outline-none transition-colors hover:bg-primary/5 mx-1",
-                                                                formData.applicantId === a.id && "bg-primary/5 text-primary"
-                                                            )}
-                                                            onClick={() => {
-                                                                handleSelectChange('applicantId', a.id);
-                                                                setIsApplicantPopoverOpen(false);
-                                                                setApplicantSearch('');
-                                                            }}
-                                                        >
-                                                            <div className="flex flex-col flex-1 min-w-0">
-                                                                <span className="font-bold text-sm truncate">{a.fullName}</span>
-                                                                <span className="text-[11px] opacity-70 truncate">{a.identityNumber || a.taxId}</span>
-                                                            </div>
-                                                            {formData.applicantId === a.id && (
-                                                                <Check className="h-4 w-4 ml-2 shrink-0 text-primary" />
-                                                            )}
-                                                        </div>
-                                                    ))
-                                                )}
-                                            </div>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-
-                            {/* Branch Selection */}
-                            <div className="space-y-2">
-                                <Label>{t`Cabang`}*</Label>
-                                <Select onValueChange={v => handleSelectChange('branchCode', v)} value={formData.branchCode}>
-                                    <SelectTrigger className="rounded-xl h-12 bg-slate-50">
-                                        <SelectValue placeholder={t`Pilih Cabang...`} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {branches.map(b => (
-                                            <SelectItem key={b.branchCode} value={b.branchCode}>{b.branchName}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Officer Selection (Dependent on Branch) */}
-                            <div className="space-y-2">
-                                <Label>{t`Petugas (AO)`}*</Label>
-                                <Select
-                                    onValueChange={v => handleSelectChange('aoId', v)}
-                                    value={formData.aoId}
-                                    disabled={!formData.branchCode || isOfficersLoading}
+            <Card>
+                <CardContent className="p-0">
+                    {/* Step Header */}
+                    <div className="flex border-b overflow-x-auto">
+                        {steps.map((step, index) => {
+                            const Icon = step.icon;
+                            return (
+                                <button
+                                    key={step.id}
+                                    type="button"
+                                    className={cn(
+                                        "flex-1 flex items-center justify-center gap-2 px-3 py-3 text-xs font-semibold whitespace-nowrap transition-colors relative",
+                                        index === currentStep
+                                            ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
+                                            : index < currentStep
+                                                ? "text-emerald-600"
+                                                : "text-muted-foreground hover:text-foreground"
+                                    )}
+                                    onClick={() => index <= currentStep && setCurrentStep(index)}
                                 >
-                                    <SelectTrigger className="rounded-xl h-12 bg-slate-50">
-                                        <SelectValue placeholder={isOfficersLoading ? t`Memuat...` : t`Pilih AO...`} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {officers.map(o => (
-                                            <SelectItem key={o.id} value={o.id}>{o.officerCode}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    {index < currentStep ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+                                    {step.title}
+                                </button>
+                            );
+                        })}
+                    </div>
 
-                            {/* Application Channel */}
-                            <div className="space-y-2">
-                                <Label>{t`Saluran Pengajuan`}</Label>
-                                <Select onValueChange={v => handleSelectChange('applicationChannel', v)} value={formData.applicationChannel}>
-                                    <SelectTrigger className="rounded-xl h-12 bg-slate-50">
-                                        <SelectValue placeholder={t`Pilih Saluran...`} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="BRANCH">{t`Cabang`}</SelectItem>
-                                        <SelectItem value="ONLINE">{t`Online`}</SelectItem>
-                                        <SelectItem value="MOBILE">{t`Mobile`}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    )}
+                    {/* Form Content */}
+                    <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                            {currentStep === 0 && (
+                                <>
+                                    {/* Applicant Selection */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">
+                                            {t`Peminjam`} <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Popover open={isApplicantPopoverOpen} onOpenChange={setIsApplicantPopoverOpen}>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    aria-expanded={isApplicantPopoverOpen}
+                                                    className={cn(inputClass, "w-full justify-between font-normal px-3")}
+                                                >
+                                                    {selectedApplicant ? (
+                                                        <div className="flex items-center gap-2 overflow-hidden">
+                                                            <span className="font-medium text-sm truncate">{selectedApplicant.fullName}</span>
+                                                            <span className="text-[10px] text-muted-foreground truncate">
+                                                                {selectedApplicant.identityNumber || selectedApplicant.taxId}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground text-sm">{t`Pilih Peminjam...`}</span>
+                                                    )}
+                                                    <Search className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-lg border-border/50 shadow-lg overflow-hidden" align="start">
+                                                <div className="flex flex-col max-h-[300px]">
+                                                    <div className="flex items-center border-b px-3 h-9 sticky top-0 bg-background z-10">
+                                                        <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+                                                        <input
+                                                            className="flex h-8 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                                                            placeholder={t`Cari NIK atau Nama...`}
+                                                            value={applicantSearch}
+                                                            onChange={(e) => setApplicantSearch(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1 overflow-y-auto py-1">
+                                                        {filteredApplicants.length === 0 ? (
+                                                            <div className="py-6 text-center text-xs text-muted-foreground">
+                                                                {t`Peminjam tidak ditemukan.`}
+                                                            </div>
+                                                        ) : (
+                                                            filteredApplicants.map((a: any) => (
+                                                                <div
+                                                                    key={a.id}
+                                                                    className={cn(
+                                                                        "flex cursor-pointer items-center px-3 py-2 text-sm transition-colors hover:bg-accent mx-1 rounded-sm",
+                                                                        formData.applicantId === a.id && "bg-accent text-primary"
+                                                                    )}
+                                                                    onClick={() => {
+                                                                        handleSelectChange('applicantId', a.id);
+                                                                        setIsApplicantPopoverOpen(false);
+                                                                        setApplicantSearch('');
+                                                                    }}
+                                                                >
+                                                                    <div className="flex flex-col flex-1 min-w-0">
+                                                                        <span className="font-medium text-sm truncate">{a.fullName}</span>
+                                                                        <span className="text-[10px] text-muted-foreground truncate">{a.identityNumber || a.taxId}</span>
+                                                                    </div>
+                                                                    {formData.applicantId === a.id && (
+                                                                        <Check className="h-3.5 w-3.5 ml-2 shrink-0 text-primary" />
+                                                                    )}
+                                                                </div>
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
 
-                    {currentStep === 1 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-2 duration-300">
-                            {/* Product */}
-                            <div className="space-y-2">
-                                <Label>{t`Produk Pinjaman`}*</Label>
-                                <Select onValueChange={v => handleSelectChange('productId', v)} value={formData.productId}>
-                                    <SelectTrigger className="rounded-xl h-12 bg-slate-50">
-                                        <SelectValue placeholder={t`Pilih Produk...`} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {products.map(p => (
-                                            <SelectItem key={p.id} value={p.id}>{p.productName}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    {/* Branch */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">
+                                            {t`Cabang`} <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select onValueChange={v => handleSelectChange('branchCode', v)} value={formData.branchCode}>
+                                            <SelectTrigger className={inputClass}>
+                                                <SelectValue placeholder={t`Pilih Cabang...`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {branches.map(b => (
+                                                    <SelectItem key={b.branchCode} value={b.branchCode}>{b.branchName}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                            {/* Loan Amount */}
-                            <div className="space-y-2">
-                                <Label>{t`Nilai Pinjaman`}*</Label>
-                                <Input
-                                    name="loanAmount"
-                                    type="number"
-                                    value={formData.loanAmount}
-                                    onChange={handleInputChange}
-                                    className="rounded-xl h-12 bg-slate-50"
-                                    placeholder="e.g. 50000000"
-                                />
-                            </div>
+                                    {/* AO */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">
+                                            {t`Petugas (AO)`} <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select
+                                            onValueChange={v => handleSelectChange('aoId', v)}
+                                            value={formData.aoId}
+                                            disabled={!formData.branchCode || isOfficersLoading}
+                                        >
+                                            <SelectTrigger className={inputClass}>
+                                                <SelectValue placeholder={isOfficersLoading ? t`Memuat...` : t`Pilih AO...`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {officers.map(o => (
+                                                    <SelectItem key={o.id} value={o.id}>{o.officerCode}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                            {/* Tenor */}
-                            <div className="space-y-2">
-                                <Label>{t`Tenor (Bulan)`}</Label>
-                                <Input
-                                    name="tenorMonths"
-                                    type="number"
-                                    value={formData.tenorMonths}
-                                    onChange={handleInputChange}
-                                    className="rounded-xl h-12 bg-slate-50"
-                                />
-                            </div>
+                                    {/* Channel */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">{t`Saluran Pengajuan`}</Label>
+                                        <Select onValueChange={v => handleSelectChange('applicationChannel', v)} value={formData.applicationChannel}>
+                                            <SelectTrigger className={inputClass}>
+                                                <SelectValue placeholder={t`Pilih Saluran...`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="BRANCH">{t`Cabang`}</SelectItem>
+                                                <SelectItem value="ONLINE">{t`Online`}</SelectItem>
+                                                <SelectItem value="MOBILE">{t`Mobile`}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </>
+                            )}
 
-                            {/* Interest Rate */}
-                            <div className="space-y-2">
-                                <Label>{t`Suku Bunga (%)`}</Label>
-                                <Input
-                                    name="interestRate"
-                                    type="number"
-                                    step="0.01"
-                                    value={formData.interestRate}
-                                    onChange={handleInputChange}
-                                    className="rounded-xl h-12 bg-slate-50"
-                                />
-                            </div>
+                            {currentStep === 1 && (
+                                <>
+                                    {/* Product */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">
+                                            {t`Produk Pinjaman`} <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select onValueChange={v => handleSelectChange('productId', v)} value={formData.productId}>
+                                            <SelectTrigger className={inputClass}>
+                                                <SelectValue placeholder={t`Pilih Produk...`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {products.map(p => (
+                                                    <SelectItem key={p.id} value={p.id}>{p.productName}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                            {/* Interest Type */}
-                            <div className="space-y-2">
-                                <Label>{t`Tipe Bunga`}</Label>
-                                <Select onValueChange={v => handleSelectChange('interestType', v)} value={formData.interestType}>
-                                    <SelectTrigger className="rounded-xl h-12 bg-slate-50">
-                                        <SelectValue placeholder={t`Pilih Tipe Bunga...`} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="FLAT">{t`Flat`}</SelectItem>
-                                        <SelectItem value="EFFECTIVE">{t`Efektif`}</SelectItem>
-                                        <SelectItem value="ANNUITY">{t`Anuitas`}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                                    {/* Loan Amount */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">
+                                            {t`Nilai Pinjaman`} <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Input name="loanAmount" type="number" value={formData.loanAmount} onChange={handleInputChange} className={inputClass} placeholder="e.g. 50000000" />
+                                    </div>
 
-                            {/* Loan Purpose */}
-                            <div className="col-span-full space-y-2">
-                                <Label>{t`Tujuan Pinjaman`}</Label>
-                                <Input
-                                    name="loanPurpose"
-                                    value={formData.loanPurpose}
-                                    onChange={handleInputChange}
-                                    className="rounded-xl h-12 bg-slate-50"
-                                    placeholder={t`Contoh: Modal Kerja, Investasi, dll`}
-                                />
-                            </div>
-                        </div>
-                    )}
+                                    {/* Tenor */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">{t`Tenor (Bulan)`}</Label>
+                                        <Input name="tenorMonths" type="number" value={formData.tenorMonths} onChange={handleInputChange} className={inputClass} />
+                                    </div>
 
-                    {currentStep === 2 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-2 duration-300">
-                            {dynamicAttributes.length > 0 ? (
-                                dynamicAttributes.map(attr => {
-                                    const id = attr.attributeCode;
-                                    const label = t`${attr.uiLabel || attr.description || id}`;
-                                    return (
-                                        <div key={id} className="space-y-2">
-                                            <Label>{label} {attr.isRequired && '*'}</Label>
-                                            {attr.dataType === 'SELECT' ? (
-                                                <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id]}>
-                                                    <SelectTrigger className="rounded-xl h-12 bg-slate-50 text-left">
-                                                        <SelectValue placeholder={t`Pilih...`} />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {attr.choices?.map(opt => (
-                                                            <SelectItem key={opt.id} value={opt.code}>{opt.value}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            ) : (
-                                                <Input
-                                                    name={id}
-                                                    type={attr.dataType === 'NUMBER' ? 'number' : attr.dataType === 'DATE' ? 'date' : 'text'}
-                                                    value={formData[id] || ''}
-                                                    onChange={handleInputChange}
-                                                    className="rounded-xl h-12 bg-slate-50"
-                                                />
-                                            )}
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <p className="col-span-full py-20 text-center text-muted-foreground">{t`Tidak ada atribut tambahan`}</p>
+                                    {/* Interest Rate */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">{t`Suku Bunga (%)`}</Label>
+                                        <Input name="interestRate" type="number" step="0.01" value={formData.interestRate} onChange={handleInputChange} className={inputClass} />
+                                    </div>
+
+                                    {/* Interest Type */}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">{t`Tipe Bunga`}</Label>
+                                        <Select onValueChange={v => handleSelectChange('interestType', v)} value={formData.interestType}>
+                                            <SelectTrigger className={inputClass}>
+                                                <SelectValue placeholder={t`Pilih Tipe Bunga...`} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="FLAT">{t`Flat`}</SelectItem>
+                                                <SelectItem value="EFFECTIVE">{t`Efektif`}</SelectItem>
+                                                <SelectItem value="ANNUITY">{t`Anuitas`}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {/* Loan Purpose */}
+                                    <div className="space-y-1.5 col-span-full">
+                                        <Label className="text-xs font-medium text-muted-foreground">{t`Tujuan Pinjaman`}</Label>
+                                        <Input name="loanPurpose" value={formData.loanPurpose} onChange={handleInputChange} className={inputClass} placeholder={t`Contoh: Modal Kerja, Investasi, dll`} />
+                                    </div>
+                                </>
+                            )}
+
+                            {currentStep === 2 && (
+                                <>
+                                    {dynamicAttributes.length > 0 ? (
+                                        dynamicAttributes.map(attr => renderDynamicField(attr))
+                                    ) : (
+                                        <p className="col-span-full py-12 text-center text-sm text-muted-foreground">{t`Tidak ada atribut tambahan`}</p>
+                                    )}
+                                </>
                             )}
                         </div>
-                    )}
-                </div>
+                    </div>
 
-                <div className="p-8 border-t bg-muted/10 flex items-center justify-between">
-                    <Button
-                        variant="ghost"
-                        onClick={currentStep === 0 ? () => router.back() : () => setCurrentStep(prev => prev - 1)}
-                    >
-                        {currentStep === 0 ? t`Batal` : t`Kembali`}
-                    </Button>
-                    <Button
-                        onClick={currentStep === steps.length - 1 ? () => setIsConfirmOpen(true) : nextStep}
-                        className="rounded-2xl px-10 h-14 font-bold"
-                    >
-                        {currentStep === steps.length - 1 ? t`Submit Pengajuan` : t`Lanjut`}
-                        {currentStep < steps.length - 1 && <ChevronRight className="ml-2 h-4 w-4" />}
-                    </Button>
-                </div>
-            </div>
+                    {/* Footer */}
+                    <div className="px-6 py-4 border-t flex items-center justify-between">
+                        <Button variant="outline" size="sm" onClick={currentStep === 0 ? () => router.push('/loans') : () => setCurrentStep(prev => prev - 1)}>
+                            <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                            {currentStep === 0 ? t`Batal` : t`Kembali`}
+                        </Button>
+
+                        <Button
+                            size="sm"
+                            onClick={currentStep === steps.length - 1 ? () => setIsConfirmOpen(true) : nextStep}
+                            className={currentStep === steps.length - 1 ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                        >
+                            {currentStep === steps.length - 1 ? t`Submit Pengajuan` : t`Lanjut`}
+                            {currentStep < steps.length - 1 && <ChevronRight className="h-3.5 w-3.5 ml-1" />}
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
 
             <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{t`Konfirmasi Pengajuan`}</DialogTitle>
                     </DialogHeader>
-                    <p>{t`Apakah Anda yakin data pengajuan ini sudah benar?`}</p>
+                    <p className="text-sm text-muted-foreground">{t`Apakah Anda yakin data pengajuan ini sudah benar?`}</p>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>{t`Batal`}</Button>
-                        <Button
-                            onClick={performSubmit}
-                            disabled={mutation.isPending}
-                        >
-                            {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Button variant="outline" size="sm" onClick={() => setIsConfirmOpen(false)}>{t`Batal`}</Button>
+                        <Button size="sm" onClick={performSubmit} disabled={mutation.isPending}>
+                            {mutation.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
                             {t`Ya, Buat Pengajuan`}
                         </Button>
                     </DialogFooter>

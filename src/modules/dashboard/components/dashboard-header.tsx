@@ -1,15 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { Users, Sun, Moon } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/shared/ui/button';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export function DashboardHeader() {
     const { setTheme, theme } = useTheme();
     const pathname = usePathname();
+    const { user } = useAuth();
 
     const getPageTitle = () => {
         if (pathname === '/') return 'Dashboard';
@@ -43,9 +45,13 @@ export function DashboardHeader() {
                 </Button>
 
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-accent transition-colors cursor-pointer border border-transparent hover:border-border">
-                    <span className="text-xs font-medium text-muted-foreground">admin.smp</span>
-                    <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                        <Users className="h-4 w-4" />
+                    <span className="text-xs font-medium text-muted-foreground">
+                        {user?.username ?? "—"}
+                    </span>
+                    <div className="h-7 w-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                        <span className="text-[11px] font-bold text-primary">
+                            {user?.fullName?.charAt(0)?.toUpperCase() ?? "?"}
+                        </span>
                     </div>
                 </div>
             </div>

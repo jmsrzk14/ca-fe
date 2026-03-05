@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { ROUTES } from '@/core/constants';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 interface NavItem {
     href: string;
@@ -40,6 +41,7 @@ const ADMIN_ITEMS: NavItem[] = [
 
 export function DashboardSidebar() {
     const pathname = usePathname();
+    const { user, logout } = useAuth();
 
     return (
         <aside className="w-60 flex flex-col shrink-0 bg-sidebar border-r border-sidebar-border">
@@ -61,7 +63,9 @@ export function DashboardSidebar() {
                 <p className="text-[10px] text-sidebar-foreground/40 uppercase tracking-wide font-medium">
                     Kantor Pusat
                 </p>
-                <p className="text-xs text-sidebar-foreground mt-0.5">admin.smp</p>
+                <p className="text-xs text-sidebar-foreground mt-0.5 truncate">
+                    {user?.username ?? "—"}
+                </p>
             </div>
 
             {/* Navigation */}
@@ -89,18 +93,23 @@ export function DashboardSidebar() {
             <div className="border-t border-sidebar-border p-3 space-y-1">
                 <div className="flex items-center gap-2.5 px-2 py-2 rounded-md">
                     <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                        <span className="text-[11px] font-bold text-primary">A</span>
+                        <span className="text-[11px] font-bold text-primary">
+                            {user?.fullName?.charAt(0)?.toUpperCase() ?? "?"}
+                        </span>
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-white truncate leading-none">
-                            admin.smp
+                            {user?.fullName ?? "—"}
                         </p>
                         <p className="text-[10px] text-sidebar-foreground/50 truncate mt-0.5">
-                            Administrator
+                            {user?.roles?.join(", ") || "—"}
                         </p>
                     </div>
                 </div>
-                <button className="flex items-center gap-2 w-full px-2 py-1.5 rounded-md text-xs text-sidebar-foreground/40 hover:text-red-400 hover:bg-sidebar-accent/40 transition-colors">
+                <button
+                    onClick={logout}
+                    className="flex items-center gap-2 w-full px-2 py-1.5 rounded-md text-xs text-sidebar-foreground/40 hover:text-red-400 hover:bg-sidebar-accent/40 transition-colors"
+                >
                     <LogOut className="w-3.5 h-3.5" />
                     Keluar
                 </button>

@@ -16,5 +16,6 @@ export const referenceService = {
     listLoanOfficers: (branchCode: string) => client.listLoanOfficers({ branchCode }),
     createAttributeRegistry: (data: any) => client.createAttributeRegistry(data),
     updateAttributeRegistry: (data: any) => client.updateAttributeRegistry(data),
+    listCities: () => client.listCities(new Empty()),
 };
 

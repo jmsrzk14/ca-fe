@@ -109,6 +109,12 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         queryFn: () => referenceService.listAttributeCategories(),
     });
 
+    const { data: citiesResponse } = useQuery({
+        queryKey: ['cities'],
+        queryFn: () => referenceService.listCities(),
+        staleTime: 1000 * 60 * 60,
+    });
+
     const { data: applicantData, isLoading: isApplicantLoading } = useQuery({
         queryKey: ['applicant', applicantId],
         queryFn: () => applicantService.getById(applicantId!),
@@ -347,7 +353,13 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             </Label>
         );
 
-        if (field.dataType?.toUpperCase() === 'SELECT' && field.choices && field.choices.length > 0) {
+        const CITY_FIELDS = ['kota_ktp', 'kota_domisili'];
+        const isCityField = CITY_FIELDS.includes(id);
+        const resolvedChoices = isCityField
+            ? (citiesResponse?.cities || []).map((c: any) => ({ id: c.code, code: c.code, value: c.value, displayOrder: 0 }))
+            : field.choices;
+
+        if (field.dataType?.toUpperCase() === 'SELECT' && resolvedChoices && resolvedChoices.length > 0) {
             return (
                 <div key={id} className="space-y-1.5">
                     {labelContent}
@@ -356,7 +368,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
                         <SelectContent>
-                            {field.choices
+                            {resolvedChoices
                                 .slice()
                                 .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
                                 .map(opt => (

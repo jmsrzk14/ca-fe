@@ -2,10 +2,11 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, UserCog } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { t } from '@/shared/lib/t';
 import { DynamicApplicantForm } from './dynamic-applicant-form';
+import Link from 'next/link';
 
 interface ApplicantEditViewProps {
     id: string;
@@ -15,28 +16,15 @@ export function ApplicantEditView({ id }: ApplicantEditViewProps) {
     const router = useRouter();
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-12">
-            <div className="flex flex-col gap-6">
-                <div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.back()}
-                        className="group -ml-2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                        <ChevronLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+        <div className="space-y-5">
+            <div className="space-y-1">
+                <Button variant="ghost" size="sm" className="h-7 px-2 text-muted-foreground -ml-2" asChild>
+                    <Link href={`/borrowers/${id}`}>
+                        <ArrowLeft className="h-3.5 w-3.5 mr-1" />
                         {t`Kembali`}
-                    </Button>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                        <UserCog className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t`Edit Peminjam`}</h1>
-                    </div>
-                </div>
+                    </Link>
+                </Button>
+                <h1 className="text-lg font-bold text-foreground">{t`Edit Peminjam`}</h1>
             </div>
 
             <DynamicApplicantForm
