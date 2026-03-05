@@ -63,9 +63,9 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
 
         if (attr.dataType === 'DATE') return formatDate(val);
         if (attr.dataType === 'BOOLEAN') return val === 'true' || val === 'Y' || val === '1' ? 'Ya' : 'Tidak';
-        if (attr.dataType === 'SELECT' && attr.options) {
-            const option = attr.options.find((opt: any) => opt.optionValue === val);
-            return option?.optionLabel || val;
+        if (attr.dataType === 'SELECT' && attr.choices) {
+            const choice = attr.choices.find((opt: any) => opt.code === val);
+            return choice?.value || val;
         }
         if (attr.dataType === 'NUMBER') return val;
 

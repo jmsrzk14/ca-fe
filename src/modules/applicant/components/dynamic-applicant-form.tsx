@@ -191,6 +191,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         registry.forEach(attr => {
             if (primaryKeys.includes(attr.attributeCode)) return;
             if (attr.appliesTo !== 'BOTH' && attr.appliesTo !== type) return;
+            if (!applicantId && attr.hideOnCreate) return;
 
             const catCode = attr.categoryCode || 'IDENTITAS';
             if (!groups[catCode]) groups[catCode] = [];
@@ -346,7 +347,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             </Label>
         );
 
-        if (field.dataType?.toUpperCase() === 'SELECT' && field.options && field.options.length > 0) {
+        if (field.dataType?.toUpperCase() === 'SELECT' && field.choices && field.choices.length > 0) {
             return (
                 <div key={id} className="space-y-1.5">
                     {labelContent}
@@ -355,12 +356,12 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
                         <SelectContent>
-                            {field.options
+                            {field.choices
                                 .slice()
                                 .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
                                 .map(opt => (
-                                    <SelectItem key={opt.id || opt.optionValue} value={opt.optionValue}>
-                                        {opt.optionLabel}
+                                    <SelectItem key={opt.id || opt.code} value={opt.code}>
+                                        {opt.value}
                                     </SelectItem>
                                 ))}
                         </SelectContent>

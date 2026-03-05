@@ -7,7 +7,7 @@ services:
       - "8001:8001"
       - "9001:9001"
     environment:
-      - DATA_DATABASE_SOURCE=${DATABASE_URL:-postgres://dots_user:dots_password@host.docker.internal:5432/dots_ca?sslmode=disable}
+      - DATA_DATABASE_SOURCE=${DATABASE_URL:-postgres://dots_user:dots_password@host.docker.internal:5432/dots_ca_v2?sslmode=disable}
       - DB_AUTO_MIGRATE=${DB_AUTO_MIGRATE:-false}
     restart: unless-stopped
 
@@ -16,11 +16,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=http://backend:8001
+        - NEXT_PUBLIC_API_URL=http://localhost:8001
     ports:
       - "3001:3001"
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:8001
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
     depends_on:
       - backend
     restart: unless-stopped

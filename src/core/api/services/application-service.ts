@@ -114,7 +114,7 @@ export const applicationService = {
                 attributeId: a.attributeId,
                 value: a.value,
                 dataType: a.dataType,
-                attributeOptionId: a.attributeOptionId
+                choiceId: a.choiceId
             })) || []
         });
         return response;
@@ -144,7 +144,7 @@ export const applicationService = {
                 attributeId: attr.attributeId,
                 value: attr.value,
                 dataType: attr.dataType,
-                attributeOptionId: attr.attributeOptionId
+                choiceId: attr.choiceId
             })),
             createdAt: parseTimestamp(response.createdAt) || new Date().toISOString(),
             submittedAt: parseTimestamp(response.submittedAt) || null,
@@ -191,7 +191,7 @@ export const applicationService = {
                     attributeId: attr.attributeId,
                     value: attr.value,
                     dataType: attr.dataType,
-                    attributeOptionId: attr.attributeOptionId
+                    choiceId: attr.choiceId
                 })),
                 createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
                 submittedAt: parseTimestamp(app.submittedAt) || null,

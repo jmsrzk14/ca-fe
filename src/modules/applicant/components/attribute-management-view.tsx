@@ -137,7 +137,7 @@ const EMPTY_FIELD = {
     appliesTo: 'BOTH',
     scope: 'APPLICANT',
     uiLabel: '',
-    options: [] as { optionValue: string; optionLabel: string; displayOrder: number }[],
+    choices: [] as { code: string; value: string; displayOrder: number }[],
 };
 
 function AttributeForm({
@@ -154,19 +154,19 @@ function AttributeForm({
     isEdit?: boolean;
 }) {
     const handleAddOption = () => {
-        const newOptions = [...(value.options || []), { optionValue: '', optionLabel: '', displayOrder: (value.options?.length || 0) + 1 }];
-        onChange({ options: newOptions });
+        const newChoices = [...(value.choices || []), { code: '', value: '', displayOrder: (value.choices?.length || 0) + 1 }];
+        onChange({ choices: newChoices });
     };
 
     const handleOptionChange = (index: number, patch: any) => {
-        const newOptions = [...(value.options || [])];
-        newOptions[index] = { ...newOptions[index], ...patch };
-        onChange({ options: newOptions });
+        const newChoices = [...(value.choices || [])];
+        newChoices[index] = { ...newChoices[index], ...patch };
+        onChange({ choices: newChoices });
     };
 
     const handleRemoveOption = (index: number) => {
-        const newOptions = (value.options || []).filter((_, i) => i !== index);
-        onChange({ options: newOptions });
+        const newChoices = (value.choices || []).filter((_, i) => i !== index);
+        onChange({ choices: newChoices });
     };
 
     return (
@@ -320,19 +320,19 @@ function AttributeForm({
                         </Button>
                     </div>
                     <div className="space-y-2">
-                        {value.options?.map((opt, idx) => (
+                        {value.choices?.map((opt, idx) => (
                             <div key={idx} className="flex gap-2 items-start">
                                 <div className="grid grid-cols-2 gap-2 flex-1">
                                     <Input
-                                        placeholder="Value (e.g. PT)"
-                                        value={opt.optionValue}
-                                        onChange={e => handleOptionChange(idx, { optionValue: e.target.value })}
+                                        placeholder="Code (e.g. PT)"
+                                        value={opt.code}
+                                        onChange={e => handleOptionChange(idx, { code: e.target.value })}
                                         className="h-8 text-xs"
                                     />
                                     <Input
-                                        placeholder="Label (e.g. Perseroan Terbatas)"
-                                        value={opt.optionLabel}
-                                        onChange={e => handleOptionChange(idx, { optionLabel: e.target.value })}
+                                        placeholder="Value (e.g. Perseroan Terbatas)"
+                                        value={opt.value}
+                                        onChange={e => handleOptionChange(idx, { value: e.target.value })}
                                         className="h-8 text-xs"
                                     />
                                 </div>
@@ -430,7 +430,7 @@ export function AttributeManagementView() {
     const openEdit = (attr: any) => {
         setEditingAttr({
             ...attr,
-            options: attr.options || [],
+            choices: attr.choices || [],
         });
     };
 

@@ -48,10 +48,11 @@ service ApplicantService {
 }
 
 message ApplicantAttribute {
-  string key = 1;
+  string attribute_id = 1;
   string value = 2;
   string data_type = 3;
   google.protobuf.Timestamp updated_at = 4;
+  string choice_id = 5;
 }
 
 message Applicant {

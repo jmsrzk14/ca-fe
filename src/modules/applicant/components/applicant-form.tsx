@@ -235,7 +235,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
     };
 
     const renderField = (attr: any) => {
-        const { attributeCode, uiLabel, description, dataType, isRequired, options } = attr;
+        const { attributeCode, uiLabel, description, dataType, isRequired, choices: options } = attr;
         const labelText = uiLabel || description;
 
         switch (dataType) {
@@ -254,8 +254,8 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                             </SelectTrigger>
                             <SelectContent>
                                 {options?.map((opt: any) => (
-                                    <SelectItem key={opt.id} value={opt.optionValue}>
-                                        {opt.optionLabel}
+                                    <SelectItem key={opt.id} value={opt.code}>
+                                        {opt.value}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

@@ -32,7 +32,7 @@ export interface ApplicationAttribute {
     attributeId: string;
     value: string;
     dataType: string;
-    attributeOptionId?: string;
+    choiceId?: string;
 }
 
 export type ApplicationStatus =
@@ -142,11 +142,11 @@ export interface SurveyEvidence {
     description: string;
 }
 
-export interface AttributeOption {
+export interface AttributeChoice {
     id: string;
     attributeId: string;
-    optionValue: string;
-    optionLabel: string;
+    code: string;
+    value: string;
     displayOrder: number;
     isActive: boolean;
 }
@@ -213,11 +213,12 @@ export interface AttributeRegistry {
     isRequired: boolean;
     riskRelevant: boolean;
     isActive: boolean;
+    hideOnCreate: boolean;
     displayOrder: number;
     description: string;
     categoryName?: string;
     categoryIcon?: string;
-    options?: AttributeOption[];
+    choices?: AttributeChoice[];
 }
 
 export interface PaginatedResponse<T> {

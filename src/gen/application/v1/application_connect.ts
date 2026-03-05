@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddPartyToApplicationRequest, Application, ApplicationAttributes, ApplicationDocument, ApplicationParty, ChangeApplicationStatusRequest, CreateApplicationRequest, GetApplicationAttributesRequest, GetApplicationRequest, GetPresignedUrlRequest, GetPresignedUrlResponse, ListApplicationDocumentsRequest, ListApplicationDocumentsResponse, ListApplicationPartiesRequest, ListApplicationPartiesResponse, ListApplicationsRequest, ListApplicationsResponse, RemovePartyFromApplicationRequest, UpdateApplicationRequest, UploadApplicationDocumentRequest, UpsertApplicationAttributesRequest } from "./application_pb";
+import { AddPartyToApplicationRequest, Application, ApplicationAttributes, ApplicationParty, ChangeApplicationStatusRequest, CreateApplicationRequest, GetApplicationAttributesRequest, GetApplicationRequest, ListApplicationPartiesRequest, ListApplicationPartiesResponse, ListApplicationsRequest, ListApplicationsResponse, RemovePartyFromApplicationRequest, UpdateApplicationRequest, UpsertApplicationAttributesRequest } from "./application_pb";
 import { Empty, MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -73,33 +73,6 @@ export const ApplicationService = {
       name: "ChangeApplicationStatus",
       I: ChangeApplicationStatusRequest,
       O: Application,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc api.application.v1.ApplicationService.UploadApplicationDocument
-     */
-    uploadApplicationDocument: {
-      name: "UploadApplicationDocument",
-      I: UploadApplicationDocumentRequest,
-      O: ApplicationDocument,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc api.application.v1.ApplicationService.ListApplicationDocuments
-     */
-    listApplicationDocuments: {
-      name: "ListApplicationDocuments",
-      I: ListApplicationDocumentsRequest,
-      O: ListApplicationDocumentsResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc api.application.v1.ApplicationService.GetPresignedUrl
-     */
-    getPresignedUrl: {
-      name: "GetPresignedUrl",
-      I: GetPresignedUrlRequest,
-      O: GetPresignedUrlResponse,
       kind: MethodKind.Unary,
     },
   }

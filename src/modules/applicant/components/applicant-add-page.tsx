@@ -269,7 +269,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
         );
 
         // SELECT with registry options
-        if (field.dataType?.toUpperCase() === 'SELECT' && field.options && field.options.length > 0) {
+        if (field.dataType?.toUpperCase() === 'SELECT' && field.choices && field.choices.length > 0) {
             return (
                 <div key={id} className="space-y-1">
                     {labelContent}
@@ -278,12 +278,12 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
                         <SelectContent>
-                            {field.options
+                            {field.choices
                                 .slice()
                                 .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
                                 .map(opt => (
-                                    <SelectItem key={opt.id || opt.optionValue} value={opt.optionValue}>
-                                        {opt.optionLabel}
+                                    <SelectItem key={opt.id || opt.code} value={opt.code}>
+                                        {opt.value}
                                     </SelectItem>
                                 ))}
                         </SelectContent>

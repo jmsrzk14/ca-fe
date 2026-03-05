@@ -11,9 +11,9 @@ import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
  */
 export class ApplicantAttribute extends Message<ApplicantAttribute> {
   /**
-   * @generated from field: string key = 1;
+   * @generated from field: string attribute_id = 1;
    */
-  key = "";
+  attributeId = "";
 
   /**
    * @generated from field: string value = 2;
@@ -30,6 +30,11 @@ export class ApplicantAttribute extends Message<ApplicantAttribute> {
    */
   updatedAt?: Timestamp;
 
+  /**
+   * @generated from field: string choice_id = 5;
+   */
+  choiceId = "";
+
   constructor(data?: PartialMessage<ApplicantAttribute>) {
     super();
     proto3.util.initPartial(data, this);
@@ -38,10 +43,11 @@ export class ApplicantAttribute extends Message<ApplicantAttribute> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.applicant.v1.ApplicantAttribute";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "attribute_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "value", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "data_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 5, name: "choice_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApplicantAttribute {

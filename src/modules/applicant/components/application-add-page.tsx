@@ -182,11 +182,11 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                 const attrId = regItem?.id || key;
                 const dataType = regItem?.dataType || 'STRING';
 
-                let attributeOptionId = undefined;
+                let choiceId = undefined;
                 if (dataType === 'SELECT' || dataType === 'BOOLEAN') {
-                    const option = regItem?.options?.find(opt => opt.optionValue === String(value));
-                    if (option) {
-                        attributeOptionId = option.id;
+                    const choice = regItem?.choices?.find(opt => opt.code === String(value));
+                    if (choice) {
+                        choiceId = choice.id;
                     }
                 }
 
@@ -194,7 +194,7 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                     attributeId: attrId,
                     value: String(value),
                     dataType: dataType,
-                    attributeOptionId,
+                    choiceId,
                 };
             });
 
@@ -494,8 +494,8 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                                         <SelectValue placeholder={t`Pilih...`} />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {attr.options?.map(opt => (
-                                                            <SelectItem key={opt.id} value={opt.optionValue}>{opt.optionLabel}</SelectItem>
+                                                        {attr.choices?.map(opt => (
+                                                            <SelectItem key={opt.id} value={opt.code}>{opt.value}</SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>

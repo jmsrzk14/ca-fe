@@ -86,6 +86,14 @@ service ReferenceService {
   rpc ListSurveyTemplates (ListSurveyTemplatesRequest) returns (ListSurveyTemplatesResponse) {
     option (google.api.http) = { get: "/v1/reference/survey-templates" };
   }
+
+  // ---- Choices: Provinces & Cities ----
+  rpc ListProvinces (google.protobuf.Empty) returns (ListProvincesResponse) {
+    option (google.api.http) = { get: "/v1/reference/provinces" };
+  }
+  rpc ListCities (google.protobuf.Empty) returns (ListCitiesResponse) {
+    option (google.api.http) = { get: "/v1/reference/cities" };
+  }
 }
 
 // ==============================
@@ -133,11 +141,11 @@ message DeleteAttributeCategoryRequest {
 // icon TIDAK di sini — diambil dari AttributeCategory via JOIN
 // ==============================
 
-message AttributeOption {
+message AttributeChoice {
   string id            = 1;
   string attribute_id  = 2;
-  string option_value  = 3;
-  string option_label  = 4;
+  string code          = 3;
+  string value         = 4;
   int32  display_order = 5;
   bool   is_active     = 6;
 }
@@ -158,7 +166,8 @@ message AttributeRegistry {
   // Denormalized dari JOIN (read-only, tidak disimpan di tabel registry)
   string category_name     = 10;
   string category_icon     = 11;
-  repeated AttributeOption options = 12; // Daftar pilihan jika data_type = SELECT
+  repeated AttributeChoice choices = 12; // Daftar pilihan jika data_type = SELECT
+  bool   hide_on_create   = 16;
 }
 
 message ListAttributeRegistryResponse {
@@ -181,6 +190,7 @@ message CreateAttributeRegistryRequest {
   bool   is_active      = 10;
   int32  display_order  = 11;
   string description    = 9;
+  bool   hide_on_create = 12;
 }
 
 message UpdateAttributeRegistryRequest {
@@ -196,6 +206,7 @@ message UpdateAttributeRegistryRequest {
   bool   is_active      = 10;
   int32  display_order  = 11;
   string description    = 9;
+  bool   hide_on_create = 13;
 }
 
 message DeleteAttributeRegistryRequest {
@@ -287,4 +298,21 @@ message ListSurveyTemplatesRequest {
 
 message ListSurveyTemplatesResponse {
   repeated SurveyTemplate templates = 1;
+}
+
+// ==============================
+// CHOICES (Provinces & Cities)
+// ==============================
+
+message Choice {
+  string code  = 1;
+  string value = 2;
+}
+
+message ListProvincesResponse {
+  repeated Choice provinces = 1;
+}
+
+message ListCitiesResponse {
+  repeated Choice cities = 1;
 }
