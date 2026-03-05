@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
+import { DetailItem } from '@/shared/components/detail-item';
 
 interface BorrowerProfileTabProps {
     applicant?: any;
@@ -101,6 +102,7 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
                                 key={attr.id}
                                 label={attr.uiLabel || attr.description}
                                 value={getValue(attr)}
+                                variant="inline"
                             />
                         ))}
                     </div>
@@ -110,24 +112,12 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
                                 key={attr.id}
                                 label={attr.uiLabel || attr.description}
                                 value={getValue(attr)}
+                                variant="inline"
                             />
                         ))}
                     </div>
                 </div>
             </div>
-        </div>
-    );
-}
-
-function DetailItem({ label, value }: { label: string; value: React.ReactNode }) {
-    return (
-        <div className="flex px-6 py-4 hover:bg-muted/5 transition-colors">
-            <span className="text-xs font-bold text-foreground w-[160px] shrink-0 pt-0.5">
-                {label}
-            </span>
-            <span className="text-xs font-medium text-muted-foreground flex-1 break-words">
-                {value}
-            </span>
         </div>
     );
 }

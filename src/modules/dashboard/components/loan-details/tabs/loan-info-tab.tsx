@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Button } from '@/shared/ui/button';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
+import { DetailItem } from '@/shared/components/detail-item';
 
 interface LoanInfoTabProps {
     application?: any;
@@ -123,19 +124,6 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
                     </div>
                 </div>
             )}
-        </div>
-    );
-}
-
-function DetailItem({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between group">
-            <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors w-1/3">
-                {label}
-            </span>
-            <span className="text-sm font-medium text-foreground flex-1">
-                {value}
-            </span>
         </div>
     );
 }

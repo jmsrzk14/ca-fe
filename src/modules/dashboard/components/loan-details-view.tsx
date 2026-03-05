@@ -137,7 +137,7 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
     }
 
     return (
-        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header Actions */}
             <div className="flex items-center justify-between px-2">
                 <Button
@@ -152,15 +152,15 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
             </div>
 
             {/* Top Header Card */}
-            <Card className="border border-border/50 shadow-sm overflow-hidden bg-card rounded-2xl mb-8">
+            <Card className="border border-border/50 shadow-sm overflow-hidden bg-card rounded-2xl mb-4">
                 <CardContent className="p-0">
-                    <div className="p-6 border-b border-border/50 ">
+                    <div className="p-4 border-b border-border/50">
                         <h1 className="text-xl font-bold tracking-tight text-foreground">
                             Nama Peminjam: <span className="text-foreground">{applicant?.applicantName || application?.applicantName || 'UMKM'}</span>
                         </h1>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/50 ">
-                        <div className="flex items-center gap-4 px-8 py-5">
+                        <div className="flex items-center gap-3 px-5 py-3">
                             <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                                 <Plus className="h-5 w-5" />
                             </div>
@@ -176,7 +176,7 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 px-8 py-5">
+                        <div className="flex items-center gap-3 px-5 py-3">
                             <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 shrink-0">
                                 <RotateCw className="h-5 w-5" />
                             </div>
@@ -201,13 +201,13 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
             <Card className="border-border shadow-sm min-h-[600px] bg-card">
                 <CardContent className="p-0">
                     {/* Tabs */}
-                    <div className="flex items-center border-b border-border px-6 overflow-x-auto no-scrollbar bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+                    <div className="flex items-center border-b border-border px-4 overflow-x-auto no-scrollbar bg-card/50 backdrop-blur-sm sticky top-0 z-10">
                         {TABS.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={cn(
-                                    "px-4 py-4 text-xs font-semibold whitespace-nowrap transition-all relative",
+                                    "px-3 py-3 text-xs font-semibold whitespace-nowrap transition-all relative",
                                     activeTab === tab
                                         ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
                                         : "text-muted-foreground hover:text-foreground"
@@ -218,7 +218,7 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                         ))}
                     </div>
 
-                    <div className="p-8">
+                    <div className="p-5">
                         {renderTabContent()}
                     </div>
                 </CardContent>

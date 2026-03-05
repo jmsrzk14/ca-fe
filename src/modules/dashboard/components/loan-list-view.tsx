@@ -151,14 +151,14 @@ export function LoanListView() {
     const router = useRouter();
 
     return (
-        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header Section */}
             <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-primary rounded-full"></div>
                     <h2 className="text-sm font-bold text-foreground">Daftar Peminjaman</h2>
                 </div>
-                <Button className="bg-[#1e5adb] hover:bg-[#1e5adb]/90 text-white font-bold rounded-lg shadow-lg shadow-blue-600/20 px-6 h-10 text-xs">
+                <Button variant="default" size="lg" className="font-bold rounded-lg text-xs">
                     Ajukan Peminjaman
                 </Button>
             </div>
@@ -166,8 +166,8 @@ export function LoanListView() {
             <Card className="border-border shadow-none bg-card overflow-hidden rounded-2xl">
                 <CardContent className="p-0">
                     {/* Filters Section */}
-                    <div className="p-8 border-b border-border/50 bg-muted/5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
+                    <div className="p-4 border-b border-border/50 bg-muted/5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tanggal Mulai</label>
                                 <div className="relative group">
@@ -191,7 +191,7 @@ export function LoanListView() {
                                 </div>
                             </div>
                             <div className="lg:col-span-1">
-                                <Button className="w-full h-11 bg-[#1e5adb] hover:bg-[#1e5adb]/90 text-white font-black rounded-xl shadow-lg shadow-blue-500/20 uppercase tracking-widest text-[10px]">
+                                <Button variant="default" className="w-full h-11 font-black rounded-xl uppercase tracking-widest text-[10px]">
                                     Filter
                                 </Button>
                             </div>
@@ -199,7 +199,7 @@ export function LoanListView() {
                     </div>
 
                     {/* Search & Entries */}
-                    <div className="px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-3 text-xs text-muted-foreground font-medium">
                             Show
                             <Select defaultValue="10">
@@ -229,26 +229,26 @@ export function LoanListView() {
                         <Table>
                             <TableHeader className="bg-muted/10">
                                 <TableRow className="hover:bg-transparent border-border/50">
-                                    <TableHead className="w-12 py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest text-center">No.</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">NIK</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">Nama Lengkap</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">Kredit</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">Status</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">Tanggal Pengajuan</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">Tanggal Diubah</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">Diubah Oleh</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest">Status Klaim</TableHead>
-                                    <TableHead className="py-4 px-4 font-bold text-[10px] text-muted-foreground uppercase tracking-widest text-center">Aksi</TableHead>
+                                    <TableHead className="w-12 text-center">No.</TableHead>
+                                    <TableHead>NIK</TableHead>
+                                    <TableHead>Nama Lengkap</TableHead>
+                                    <TableHead>Kredit</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Tanggal Pengajuan</TableHead>
+                                    <TableHead>Tanggal Diubah</TableHead>
+                                    <TableHead>Diubah Oleh</TableHead>
+                                    <TableHead>Status Klaim</TableHead>
+                                    <TableHead className="text-center">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {LOAN_DATA.map((row, i) => (
                                     <TableRow key={i} className="border-b border-border/40 hover:bg-primary/5 transition-colors group">
-                                        <TableCell className="py-5 px-4 text-center text-xs text-foreground/70">{row.no}</TableCell>
-                                        <TableCell className="py-5 px-4 text-xs font-mono text-foreground/70">{row.nik}</TableCell>
-                                        <TableCell className="py-5 px-4 text-xs font-bold text-foreground">{row.nama}</TableCell>
-                                        <TableCell className="py-5 px-4 text-xs font-black uppercase text-foreground/80">{row.kredit}</TableCell>
-                                        <TableCell className="py-5 px-4">
+                                        <TableCell className="text-center text-muted-foreground">{row.no}</TableCell>
+                                        <TableCell className="font-mono text-muted-foreground">{row.nik}</TableCell>
+                                        <TableCell className="font-semibold">{row.nama}</TableCell>
+                                        <TableCell className="font-bold uppercase text-foreground/80">{row.kredit}</TableCell>
+                                        <TableCell>
                                             <Badge className={cn(
                                                 "border-none uppercase text-[9px] font-black px-2.5 py-1 rounded-md",
                                                 row.status === 'Pending' && "bg-orange-500/10 text-orange-600",
@@ -260,10 +260,10 @@ export function LoanListView() {
                                                 {row.status}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="py-5 px-4 text-xs text-foreground/70">{row.tglPengajuan}</TableCell>
-                                        <TableCell className="py-5 px-4 text-xs text-foreground/70">{row.tglDiubah}</TableCell>
-                                        <TableCell className="py-5 px-4 text-xs font-medium text-foreground/80">{row.diubahOleh}</TableCell>
-                                        <TableCell className="py-5 px-4 text-xs font-semibold">
+                                        <TableCell className="text-muted-foreground">{row.tglPengajuan}</TableCell>
+                                        <TableCell className="text-muted-foreground">{row.tglDiubah}</TableCell>
+                                        <TableCell className="font-medium">{row.diubahOleh}</TableCell>
+                                        <TableCell>
                                             <span className={cn(
                                                 "px-3 py-1.5 rounded-md text-[10px] font-bold",
                                                 row.statusKlaim === 'Belum Diklaim' ? "bg-blue-500/10 text-blue-600" : "bg-orange-500/10 text-orange-600"
@@ -271,7 +271,7 @@ export function LoanListView() {
                                                 {row.statusKlaim}
                                             </span>
                                         </TableCell>
-                                        <TableCell className="py-5 px-4 text-center">
+                                        <TableCell className="text-center">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -288,7 +288,7 @@ export function LoanListView() {
                     </div>
 
                     {/* Footer / Pagination */}
-                    <div className="px-8 py-6 border-t border-border/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="px-4 py-3 border-t border-border/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <span className="text-xs text-muted-foreground font-medium">
                             Showing 1 to 10 of 11 entries
                         </span>
@@ -296,7 +296,7 @@ export function LoanListView() {
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground">
                                 Previous
                             </Button>
-                            <Button size="sm" className="h-8 w-8 p-0 bg-[#1e5adb] text-white font-bold">1</Button>
+                            <Button variant="default" size="sm" className="h-8 w-8 p-0 font-bold">1</Button>
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">2</Button>
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary font-bold">
                                 Next
