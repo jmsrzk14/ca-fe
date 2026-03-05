@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "standalone",
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/grpc/:path*",
-        destination: `https://creditanalyticsbackend-production.up.railway.app/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001"}/:path*`,
       },
     ];
   },
