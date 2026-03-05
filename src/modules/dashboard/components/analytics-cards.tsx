@@ -1,11 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { Landmark, FileText, Banknote, ListTodo, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Landmark, FileText, Banknote, ListTodo } from 'lucide-react';
+import { Card, CardContent } from '@/shared/ui/card';
 import { useLoanAnalytics } from '../hooks/use-dashboard-data';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { cn } from '@/shared/lib/utils';
 
 export function AnalyticsCards() {
     const { data, isLoading, isError } = useLoanAnalytics();
@@ -14,7 +13,7 @@ export function AnalyticsCards() {
         return (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {[1, 2, 3, 4].map((i) => (
-                    <Skeleton key={i} className="h-32 w-full rounded-xl border border-border" />
+                    <Skeleton key={i} className="h-24 w-full rounded-xl" />
                 ))}
             </div>
         );
@@ -22,7 +21,7 @@ export function AnalyticsCards() {
 
     if (isError || !data) {
         return (
-            <div className="rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
+            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
                 Failed to load analytics data.
             </div>
         );
@@ -54,17 +53,15 @@ export function AnalyticsCards() {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {cards.map((card) => (
-                <Card key={card.title} className="relative overflow-hidden transition-all hover:shadow-lg bg-card/50 backdrop-blur-sm border-border/50">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                            {card.title}
-                        </CardTitle>
-                        <div className="rounded-lg bg-primary/10 p-2.5 text-primary shadow-inner">
-                            <card.icon className="h-4 w-4" />
+                <Card key={card.title}>
+                    <CardContent className="p-5">
+                        <div className="flex items-center justify-between">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                {card.title}
+                            </p>
+                            <card.icon className="h-4 w-4 text-muted-foreground" />
                         </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold tracking-tight">{card.value}</div>
+                        <p className="text-3xl font-bold mt-1.5">{card.value}</p>
                     </CardContent>
                 </Card>
             ))}

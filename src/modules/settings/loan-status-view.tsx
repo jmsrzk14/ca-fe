@@ -36,7 +36,7 @@ export function LoanStatusView() {
                 if (col.key === 'tampilan') return (
                     <Badge className={cn(
                         "border-none uppercase text-[9px] font-black px-2.5 py-0.5 rounded-md",
-                        row.variant === 'warning' && "bg-orange-500 text-white",
+                        row.variant === 'warning' && "bg-amber-500 text-white",
                         row.variant === 'success' && "bg-green-500 text-white",
                         row.variant === 'danger' && "bg-rose-500 text-white",
                         row.variant === 'info' && "bg-cyan-500 text-white",

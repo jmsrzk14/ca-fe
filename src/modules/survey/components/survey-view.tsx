@@ -226,7 +226,7 @@ export function SurveyView() {
                                         <TableCell className="py-5 px-4">
                                             <Badge className={cn(
                                                 "border-none uppercase text-[10px] font-black px-2.5 py-1 rounded-md",
-                                                row.status === 'Pending' && "bg-orange-500/10 text-orange-500",
+                                                row.status === 'Pending' && "bg-primary/10 text-primary",
                                                 row.status === 'Diterima' && "bg-emerald-500/10 text-emerald-500",
                                                 row.status.includes('CRR') && "bg-blue-500/10 text-blue-500",
                                                 row.status.includes('Data Umum') && "bg-cyan-500/10 text-cyan-500",

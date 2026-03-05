@@ -58,7 +58,7 @@ export function DashboardSidebar() {
                 <div className="min-w-0">
                     <p className="text-white text-sm font-bold leading-none">DOTS</p>
                     <p className="text-sidebar-foreground/60 text-[10px] leading-tight mt-0.5 truncate">
-                        Credit Approval
+                        Credit Analyst
                     </p>
                 </div>
             </div>

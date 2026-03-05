@@ -263,7 +263,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
 
         const labelContent = (
             <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                {field.categoryIcon && <FieldIcon className="h-4 w-4 text-orange-600/70" />}
+                {field.categoryIcon && <FieldIcon className="h-4 w-4 text-primary/70" />}
                 {label} {isRequired && <span className="text-red-500">*</span>}
             </Label>
         );
@@ -356,7 +356,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
     if (isRegistryLoading || isCategoriesLoading) {
         return (
             <div className="flex h-64 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <span className="ml-3 font-medium">{t`Memuat data...`}</span>
             </div>
         );
@@ -380,8 +380,8 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                        <UserPlus className="h-6 w-6 text-orange-600" />
+                    <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                        <UserPlus className="h-6 w-6 text-primary" />
                     </div>
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight text-foreground">{t`Tambah Data Peminjam`}</h1>
@@ -403,7 +403,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                 className={cn(
                                     'flex-1 flex flex-col items-center justify-center py-5 px-2 gap-2 transition-all cursor-pointer border-b-2 relative group',
                                     index === currentStep
-                                        ? 'border-orange-500 text-orange-600 bg-orange-50/30'
+                                        ? 'border-primary text-primary bg-primary/5'
                                         : index < currentStep
                                             ? 'border-emerald-500 text-emerald-600 hover:bg-emerald-50/30'
                                             : 'border-transparent text-muted-foreground hover:bg-slate-100/50'
@@ -412,13 +412,13 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                             >
                                 <div className={cn(
                                     'h-8 w-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110',
-                                    index === currentStep ? 'bg-orange-100' : index < currentStep ? 'bg-emerald-100' : 'bg-slate-100'
+                                    index === currentStep ? 'bg-primary/10' : index < currentStep ? 'bg-emerald-100' : 'bg-slate-100'
                                 )}>
                                     {index < currentStep ? <CheckCircle2 className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
                                 </div>
                                 <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-center">{step.title}</span>
                                 {index === currentStep && (
-                                    <div className="absolute -bottom-[2px] left-0 right-0 h-0.5 bg-orange-500 shadow-[0_2px_10px_rgba(249,115,22,0.5)]" />
+                                    <div className="absolute -bottom-[2px] left-0 right-0 h-0.5 bg-primary shadow-primary/30" />
                                 )}
                             </div>
                         );
@@ -446,7 +446,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                                     className={cn(
                                                         'px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5',
                                                         type === 'PERSONAL'
-                                                            ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20'
+                                                            ? 'bg-primary text-white shadow-lg shadow-primary/20'
                                                             : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                                                     )}
                                                 >
@@ -459,7 +459,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                                     className={cn(
                                                         'px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5',
                                                         type === 'CORPORATE'
-                                                            ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/20'
+                                                            ? 'bg-primary text-white shadow-lg shadow-primary/20'
                                                             : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                                                     )}
                                                 >
@@ -473,7 +473,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     {/* Full Name */}
                                     <div className="space-y-1 col-span-full md:col-span-2">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                            <User className="h-4 w-4 text-orange-600/70" />
+                                            <User className="h-4 w-4 text-primary/70" />
                                             {t`Nama Lengkap`} <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
@@ -489,7 +489,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     {/* Identity Number */}
                                     <div className="space-y-1">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                            <CheckCircle2 className="h-4 w-4 text-orange-600/70" />
+                                            <CheckCircle2 className="h-4 w-4 text-primary/70" />
                                             {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NIB / No. Izin`} <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
@@ -505,7 +505,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     {/* Tax ID */}
                                     <div className="space-y-1">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                            <Activity className="h-4 w-4 text-orange-600/70" />
+                                            <Activity className="h-4 w-4 text-primary/70" />
                                             {t`NPWP (Opsional)`}
                                         </Label>
                                         <Input
@@ -521,7 +521,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     {/* Birth / Establishment Date */}
                                     <div className="space-y-1">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                            <Calendar className="h-4 w-4 text-orange-600/70" />
+                                            <Calendar className="h-4 w-4 text-primary/70" />
                                             {type === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`}
                                         </Label>
                                         <Input
@@ -553,7 +553,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                     </Button>
 
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span className="font-bold text-orange-600">{currentStep + 1}</span>
+                        <span className="font-bold text-primary">{currentStep + 1}</span>
                         <span>/</span>
                         <span>{steps.length || 1}</span>
                     </div>
@@ -564,7 +564,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                             'rounded-xl px-8 h-12 font-bold text-white gap-2',
                             currentStep === steps.length - 1
                                 ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-orange-600 hover:bg-orange-700'
+                                : 'bg-primary hover:bg-primary/90'
                         )}
                     >
                         {currentStep === steps.length - 1 ? (

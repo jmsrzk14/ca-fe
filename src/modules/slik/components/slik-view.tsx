@@ -134,7 +134,7 @@ export function SlikView() {
                                             {row.name}
                                         </TableCell>
                                         <TableCell className="py-5 px-4 text-center">
-                                            <Badge className="bg-orange-500/10 text-orange-500 border-none uppercase text-[10px] font-black px-2.5 py-1 rounded-md">
+                                            <Badge className="bg-primary/10 text-primary border-none uppercase text-[10px] font-black px-2.5 py-1 rounded-md">
                                                 {row.status}
                                             </Badge>
                                         </TableCell>

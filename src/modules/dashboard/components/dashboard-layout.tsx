@@ -14,8 +14,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <DashboardSidebar />
             <div className="flex flex-col flex-1 overflow-hidden">
                 <DashboardHeader />
-                <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-8">
-                    <div className="mx-auto flex w-full flex-col gap-6">
+                <main className="flex-1 overflow-y-auto px-5 py-4">
+                    <div className="mx-auto flex w-full flex-col gap-4">
                         {children}
                     </div>
                 </main>

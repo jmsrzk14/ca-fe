@@ -243,7 +243,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                 return (
                     <div key={attributeCode} className="space-y-2">
                         <Label className="text-sm font-medium">
-                            {labelText} {isRequired && <span className="text-orange-600">*</span>}
+                            {labelText} {isRequired && <span className="text-destructive">*</span>}
                         </Label>
                         <Select
                             onValueChange={(v) => handleSelectChange(attributeCode, v)}
@@ -266,7 +266,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                 return (
                     <div key={attributeCode} className="space-y-2">
                         <Label className="text-sm font-medium">
-                            {labelText} {isRequired && <span className="text-orange-600">*</span>}
+                            {labelText} {isRequired && <span className="text-destructive">*</span>}
                         </Label>
                         <Select
                             onValueChange={(v) => handleSelectChange(attributeCode, v === 'true' ? 'true' : 'false')}
@@ -286,7 +286,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                 return (
                     <div key={attributeCode} className="space-y-2">
                         <Label htmlFor={attributeCode} className="text-sm font-medium">
-                            {labelText} {isRequired && <span className="text-orange-600">*</span>}
+                            {labelText} {isRequired && <span className="text-destructive">*</span>}
                         </Label>
                         <Input
                             id={attributeCode}
@@ -303,7 +303,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                 return (
                     <div key={attributeCode} className="space-y-2">
                         <Label htmlFor={attributeCode} className="text-sm font-medium">
-                            {labelText} {isRequired && <span className="text-orange-600">*</span>}
+                            {labelText} {isRequired && <span className="text-destructive">*</span>}
                         </Label>
                         <Input
                             id={attributeCode}
@@ -320,7 +320,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                 return (
                     <div key={attributeCode} className="space-y-2">
                         <Label htmlFor={attributeCode} className="text-sm font-medium">
-                            {labelText} {isRequired && <span className="text-orange-600">*</span>}
+                            {labelText} {isRequired && <span className="text-destructive">*</span>}
                         </Label>
                         <Input
                             id={attributeCode}
@@ -363,7 +363,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                             key={step.id}
                             className={cn(
                                 "flex-1 flex items-center justify-center py-5 px-3 gap-2 transition-all cursor-pointer border-b-2 relative",
-                                isActive ? "bg-orange-500/5 border-orange-500 text-orange-600" :
+                                isActive ? "bg-primary/5 border-primary text-primary" :
                                     isCompleted ? "bg-green-500/5 border-green-500 text-green-600" :
                                         "border-transparent text-muted-foreground hover:bg-muted/30"
                             )}
@@ -371,7 +371,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                         >
                             <div className={cn(
                                 "h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
-                                isActive ? "bg-orange-600 text-white" :
+                                isActive ? "bg-primary text-white" :
                                     isCompleted ? "bg-green-600 text-white" :
                                         "bg-muted-foreground/20"
                             )}>
@@ -393,7 +393,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
             {/* Mobile Step Header */}
             <div className="lg:hidden p-4 border-b border-border/50 flex items-center justify-between bg-muted/20">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-2xl bg-orange-600 flex items-center justify-center text-white font-bold">
+                    <div className="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center text-white font-bold">
                         {(() => {
                             const StepIcon = ICON_MAP[STEPS[currentStep].icon] ?? Settings;
                             return <StepIcon className="h-5 w-5" />;
@@ -406,7 +406,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                 </div>
                 <div className="flex gap-1">
                     {STEPS.map((_, i) => (
-                        <div key={i} className={cn("h-1 w-4 rounded-full", i === currentStep ? "bg-orange-600" : i < currentStep ? "bg-green-600" : "bg-muted")} />
+                        <div key={i} className={cn("h-1 w-4 rounded-full", i === currentStep ? "bg-primary" : i < currentStep ? "bg-green-600" : "bg-muted")} />
                     ))}
                 </div>
             </div>
@@ -424,11 +424,11 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                         className="w-full"
                     >
                         <TabsList className="grid w-80 grid-cols-2 bg-muted/50 p-1 rounded-xl">
-                            <TabsTrigger value="PERSONAL" className="rounded-lg gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white h-9">
+                            <TabsTrigger value="PERSONAL" className="rounded-lg gap-2 data-[state=active]:bg-primary data-[state=active]:text-white h-9">
                                 <User className="h-4 w-4" />
                                 {t`Person`}
                             </TabsTrigger>
-                            <TabsTrigger value="CORPORATE" className="rounded-lg gap-2 data-[state=active]:bg-orange-600 data-[state=active]:text-white h-9">
+                            <TabsTrigger value="CORPORATE" className="rounded-lg gap-2 data-[state=active]:bg-primary data-[state=active]:text-white h-9">
                                 <Building2 className="h-4 w-4" />
                                 {t`Company`}
                             </TabsTrigger>
@@ -440,7 +440,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
             <div className="flex-1 p-8 overflow-y-auto max-h-[calc(100vh-250px)]">
                 {(isRegistryLoading || isRegistryLoading === undefined) ? (
                     <div className="h-full flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="h-10 w-10 animate-spin text-orange-600" />
+                        <Loader2 className="h-10 w-10 animate-spin text-primary" />
                         <p className="text-muted-foreground font-medium">{t`Memuat formulir...`}</p>
                     </div>
                 ) : (
@@ -481,7 +481,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                     {currentStep < STEPS.length - 1 ? (
                         <Button
                             type="button"
-                            className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl px-8 h-12 font-bold gap-2 shadow-lg shadow-orange-600/20"
+                            className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 h-12 font-bold gap-2 shadow-lg shadow-primary/20"
                             onClick={nextStep}
                         >
                             {t`Langkah Berikutnya`}

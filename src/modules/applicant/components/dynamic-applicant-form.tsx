@@ -29,7 +29,7 @@ import { ApplicantType, AttributeRegistry } from '@/shared/types/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { Card, CardContent } from '@/shared/ui/card';
 import { cn } from '@/shared/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import {
@@ -47,7 +47,6 @@ interface DynamicApplicantFormProps {
     onCancel?: () => void;
 }
 
-// Helper to get Icon Component from string
 const getIconWithName = (name?: string) => {
     if (!name) return Settings;
     try {
@@ -62,7 +61,6 @@ const getIconWithName = (name?: string) => {
     }
 };
 
-// Specific options for common fields to make the dynamic form feel premium
 const getCommonOptions = (): Record<string, { label: string; value: string; }[]> => ({
     gender: [
         { label: t`Laki-laki`, value: 'MALE' },
@@ -101,7 +99,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
 
-    // 1. Fetch the "Buku Panduan" (Registry) and "Categories" from API
     const { data: registryResponse, isLoading: isRegistryLoading } = useQuery({
         queryKey: ['attribute-registry'],
         queryFn: () => referenceService.getAttributeRegistry(),
@@ -116,7 +113,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         queryKey: ['applicant', applicantId],
         queryFn: () => applicantService.getById(applicantId!),
         enabled: !!applicantId,
-        // Pre-populate from list cache so form renders immediately without waiting for getById
         initialData: () => {
             if (!applicantId) return undefined;
             const cached = queryClient.getQueryData<any>(['applicants']);
@@ -125,12 +121,8 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         },
     });
 
-    // type: for edit mode, always follow applicantData (so it's correct on first render from cache)
-    // for add mode, use local state so toggle buttons work
     const [localType, setLocalType] = React.useState<ApplicantType>('PERSONAL');
 
-    // Normalize backend value: handles CORPORATE, COMPANY, corporate, company → 'CORPORATE'
-    // and PERSONAL, personal → 'PERSONAL'
     const normalizeApplicantType = (val: string | undefined): ApplicantType => {
         const upper = (val || '').toUpperCase().trim();
         if (upper === 'CORPORATE' || upper === 'COMPANY') return 'CORPORATE';
@@ -145,7 +137,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
     const apiCategories = categoriesResponse?.categories || [];
 
-    // Form state: Core fields + Dynamic fields
     const [formData, setFormData] = React.useState<Record<string, any>>({
         fullName: '',
         identityNumber: '',
@@ -154,11 +145,9 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         establishmentDate: '',
     });
 
-    // Helper to parse any timestamp format to YYYY-MM-DD string
     const parseToDateString = (val: any): string => {
         if (!val) return '';
         if (typeof val === 'string') return val.split('T')[0];
-        // Proto timestamp: { seconds, nanos }
         if (val.seconds !== undefined) {
             try {
                 return new Date(Number(val.seconds) * 1000).toISOString().split('T')[0];
@@ -170,7 +159,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         } catch { return ''; }
     };
 
-    // Populate form whenever applicantData changes (initial load or refetch)
     React.useEffect(() => {
         if (applicantData) {
             setCurrentStep(0);
@@ -181,15 +169,12 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 fullName: applicantData.fullName || '',
                 identityNumber: applicantData.identityNumber || '',
                 taxId: applicantData.taxId || '',
-                // Unified date field: PERSONAL → birthDate, CORPORATE → establishmentDate
                 birthDate: normalizedType === 'CORPORATE'
                     ? parseToDateString(applicantData.establishmentDate)
                     : parseToDateString(applicantData.birthDate),
             };
 
-            // Map backend attributeId (UUID in attr.key) to form state (attributeCode)
             applicantData.attributes?.forEach((attr: any) => {
-                // Try to find the registry item by UUID (attr.key) or by code (fallback)
                 const regItem = registry.find(r => r.id === attr.key || r.attributeCode === attr.key);
                 const formKey = regItem ? regItem.attributeCode : attr.key;
                 if (formKey) newFormData[formKey] = attr.value ?? '';
@@ -199,27 +184,19 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         }
     }, [applicantData, registry]);
 
-    // 2. Group Registry by Category to create Steps dynamically
     const categories = React.useMemo(() => {
         const groups: Record<string, AttributeRegistry[]> = {};
-
-        // Ensure categories are sorted (1. Identitas, 2. Pasangan, etc.)
-        // Also Filter out fields that are already handled as Primary Columns
         const primaryKeys = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate', 'applicantType'];
 
         registry.forEach(attr => {
             if (primaryKeys.includes(attr.attributeCode)) return;
-            // Filter by appliesTo: only show fields relevant to the current applicant type
             if (attr.appliesTo !== 'BOTH' && attr.appliesTo !== type) return;
 
             const catCode = attr.categoryCode || 'IDENTITAS';
-            if (!groups[catCode]) {
-                groups[catCode] = [];
-            }
+            if (!groups[catCode]) groups[catCode] = [];
             groups[catCode].push(attr);
         });
 
-        // If we have API categories, use them for the structure
         if (apiCategories.length > 0) {
             return apiCategories
                 .filter(cat => !!cat)
@@ -232,7 +209,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 }));
         }
 
-        // Fallback to registry-based categories
         return Object.entries(groups)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([name, fields]) => ({
@@ -243,17 +219,14 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             }));
     }, [registry, apiCategories, t, type]);
 
-    // steps are now 100% driven by categories from registry
     const steps = React.useMemo(() => {
         return categories.map(cat => {
             let Icon = Settings;
             const name = cat.title.toUpperCase();
 
-            // Priority 1: Use icon from API if available
             if (cat.iconName) {
                 Icon = getIconWithName(cat.iconName);
             } else {
-                // Priority 2: Fallback to name-based icons
                 if (name.includes('KONTAK')) Icon = Phone;
                 if (name.includes('PEKERJAAN')) Icon = Briefcase;
                 if (name.includes('FINANSIAL') || name.includes('USAHA')) Icon = DollarSign;
@@ -299,7 +272,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     });
 
     const nextStep = () => {
-        // Simple validation for the first step (Basic Info)
         if (currentStep === 0) {
             if (!formData.fullName || !formData.identityNumber) {
                 toast.error(t`Harap isi Nama dan NIK/NIB`);
@@ -316,39 +288,28 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         setIsConfirmOpen(false);
         const now = new Date().toISOString();
 
-        // 1. Primary Columns as specified by USER
         const primaryKeys = [
-            'applicantType',
-            'identityNumber',
-            'taxId',
-            'fullName',
-            'birthDate',
-            'establishmentDate',
-            'attributes',
-            'createdAt'
+            'applicantType', 'identityNumber', 'taxId', 'fullName',
+            'birthDate', 'establishmentDate', 'attributes', 'createdAt'
         ];
 
-        // 2. Map everything else to Attributes (Secondary Columns)
         const attributes = Object.entries(formData)
             .filter(([key, value]) => !primaryKeys.includes(key) && value !== undefined && value !== '')
             .map(([key, value]) => {
                 const regItem = registry.find(r => r.attributeCode === key);
                 return {
-                    key: regItem?.id || key, // ALWAYS send attributeId (UUID) if available
+                    key: regItem?.id || key,
                     value: String(value),
                     dataType: regItem?.dataType || 'STRING',
                     updatedAt: now
                 };
             });
 
-        // 3. Assemble Primary Payload
         const payload = {
             applicantType: type,
             fullName: formData.fullName,
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
-            // 'type' is always 'PERSONAL' | 'CORPORATE' (from normalizeApplicantType)
-            // formData.birthDate is the unified date field for both types
             birthDate: type === 'PERSONAL' && formData.birthDate
                 ? new Date(formData.birthDate).toISOString()
                 : '',
@@ -359,43 +320,38 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             ...(applicantId ? {} : { createdAt: now })
         };
 
-        console.log('[ApplicantForm] type:', type, '| birthDate field:', formData.birthDate);
-        console.log('[ApplicantForm] payload:', JSON.stringify(payload, null, 2));
         mutation.mutate(payload);
     };
 
     if (isRegistryLoading || isCategoriesLoading || (applicantId && isApplicantLoading)) {
         return (
-            <div className="flex h-64 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
-                <span className="ml-3 font-medium">{t`Memuat data...`}</span>
+            <div className="flex h-40 items-center justify-center gap-2 text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <span className="text-sm">{t`Memuat data...`}</span>
             </div>
         );
     }
 
-
+    const inputClass = "h-9 rounded-md";
 
     const renderField = (field: AttributeRegistry) => {
         const id = field.attributeCode;
         const rawLabel = field.uiLabel || field.description || id;
         const label = t`${rawLabel}`;
         const isRequired = field.isRequired;
-        const FieldIcon = getIconWithName(field.categoryIcon);
 
         const labelContent = (
-            <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                {field.categoryIcon && <FieldIcon className="h-4 w-4 text-orange-600/70" />}
-                {label} {isRequired && <span className="text-red-500">*</span>}
+            <Label className="text-xs font-medium text-muted-foreground">
+                {label} {isRequired && <span className="text-destructive">*</span>}
             </Label>
         );
 
-        // Priority 1: Use registry SELECT options (from field.options array)
         if (field.dataType?.toUpperCase() === 'SELECT' && field.options && field.options.length > 0) {
             return (
-                <div key={id} className="space-y-1">
+                <div key={id} className="space-y-1.5">
                     {labelContent}
                     <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
-                        <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
+                        <SelectTrigger className={inputClass}>
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
                         <SelectContent>
@@ -413,14 +369,13 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             );
         }
 
-        // Priority 2: Use hardcoded common options (fallback for known field keys)
         const commonOptions = COMMON_OPTIONS[id];
         if (commonOptions) {
             return (
-                <div key={id} className="space-y-1">
+                <div key={id} className="space-y-1.5">
                     {labelContent}
                     <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
-                        <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
+                        <SelectTrigger className={inputClass}>
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
                         <SelectContent>
@@ -435,19 +390,18 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
         switch (field.dataType?.toUpperCase()) {
             case 'SELECT':
-                // SELECT with no options: fallback to text input
                 return (
-                    <div key={id} className="space-y-1">
+                    <div key={id} className="space-y-1.5">
                         {labelContent}
-                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan ${label}`} />
+                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className={inputClass} placeholder={t`Masukkan ${label}`} />
                     </div>
                 );
             case 'BOOLEAN':
                 return (
-                    <div key={id} className="space-y-1">
+                    <div key={id} className="space-y-1.5">
                         {labelContent}
                         <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
-                            <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
+                            <SelectTrigger className={inputClass}>
                                 <SelectValue placeholder={t`Pilih...`} />
                             </SelectTrigger>
                             <SelectContent>
@@ -459,188 +413,173 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 );
             case 'DATE':
                 return (
-                    <div key={id} className="space-y-1">
+                    <div key={id} className="space-y-1.5">
                         {labelContent}
-                        <Input id={id} name={id} type="date" value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" />
+                        <Input id={id} name={id} type="date" value={formData[id] || ''} onChange={handleInputChange} className={inputClass} />
                     </div>
                 );
             case 'NUMBER':
                 return (
-                    <div key={id} className="space-y-1">
+                    <div key={id} className="space-y-1.5">
                         {labelContent}
-                        <Input id={id} name={id} type="number" value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" />
+                        <Input id={id} name={id} type="number" value={formData[id] || ''} onChange={handleInputChange} className={inputClass} />
                     </div>
                 );
             default:
                 return (
-                    <div key={id} className="space-y-1">
+                    <div key={id} className="space-y-1.5">
                         {labelContent}
-                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan ${label}`} />
+                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className={inputClass} placeholder={t`Masukkan ${label}`} />
                     </div>
                 );
         }
     };
 
     return (
-        <div className="flex flex-col h-full bg-background rounded-3xl border border-border overflow-hidden shadow-2xl">
-            {/* Dynamic Step Header */}
-            <div className="hidden lg:flex border-b bg-slate-50/50 backdrop-blur-md sticky top-0 z-20">
-                {steps.map((step, index) => {
-                    const StepIcon = step.icon;
-                    return (
-                        <div
-                            key={step.id}
-                            className={cn(
-                                "flex-1 flex flex-col items-center justify-center py-5 px-2 gap-2 transition-all cursor-pointer border-b-2 relative group",
-                                index === currentStep
-                                    ? "border-orange-500 text-orange-600 bg-orange-50/30"
-                                    : index < currentStep
-                                        ? "border-emerald-500 text-emerald-600 hover:bg-emerald-50/30"
-                                        : "border-transparent text-muted-foreground hover:bg-slate-100/50"
-                            )}
-                            onClick={() => index <= currentStep && setCurrentStep(index)}
-                        >
-                            <div className={cn(
-                                "h-8 w-8 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110",
-                                index === currentStep ? "bg-orange-100" : index < currentStep ? "bg-emerald-100" : "bg-slate-100"
-                            )}>
-                                {index < currentStep ? <CheckCircle2 className="h-4 w-4" /> : <StepIcon className="h-4 w-4" />}
-                            </div>
-                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-center">{step.title}</span>
-                            {index === currentStep && (
-                                <div className="absolute -bottom-[2px] left-0 right-0 h-0.5 bg-orange-500 shadow-[0_2px_10px_rgba(249,115,22,0.5)]" />
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
+        <Card>
+            <CardContent className="p-0">
+                {/* Step Header */}
+                <div className="hidden lg:flex border-b overflow-x-auto">
+                    {steps.map((step, index) => {
+                        const StepIcon = step.icon;
+                        return (
+                            <button
+                                key={step.id}
+                                type="button"
+                                className={cn(
+                                    "flex-1 flex items-center justify-center gap-2 px-3 py-3 text-xs font-semibold whitespace-nowrap transition-colors relative",
+                                    index === currentStep
+                                        ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
+                                        : index < currentStep
+                                            ? "text-emerald-600"
+                                            : "text-muted-foreground hover:text-foreground"
+                                )}
+                                onClick={() => index <= currentStep && setCurrentStep(index)}
+                            >
+                                {index < currentStep ? <CheckCircle2 className="h-3.5 w-3.5" /> : <StepIcon className="h-3.5 w-3.5" />}
+                                {step.title}
+                            </button>
+                        );
+                    })}
+                </div>
 
-            <div className="flex-1 p-8 md:py-12 md:px-6 overflow-y-auto custom-scrollbar">
-                <div className="max-w-4xl mx-auto min-h-[400px]">
-                    {/* 
-                        We render the current step's fields.
-                        If it's the first step (Identitas), we also inject the CORE fields.
-                    */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Form Content */}
+                <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                         {currentStep === 0 && (
                             <>
-                                <div className="col-span-full mb-8 flex flex-col gap-4 p-8 rounded-3xl bg-slate-50/50 border border-slate-200/50 shadow-inner">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <h3 className="text-sm font-bold text-slate-800">{t`Tipe Peminjam`}:</h3>
+                                {/* Type Selector */}
+                                <div className="col-span-full mb-2">
+                                    <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/20">
+                                        <div>
+                                            <p className="text-sm font-semibold">{t`Tipe Peminjam`}</p>
                                             {!!applicantId && <p className="text-xs text-muted-foreground">{t`Tipe tidak dapat diubah`}</p>}
                                         </div>
-                                        <div className={cn("flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm", !!applicantId && "opacity-90")}>
+                                        <div className={cn("flex bg-background p-0.5 rounded-md border", !!applicantId && "opacity-70")}>
                                             <button
+                                                type="button"
                                                 onClick={() => setType('PERSONAL')}
                                                 disabled={!!applicantId}
                                                 className={cn(
-                                                    "px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5",
+                                                    "px-4 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5",
                                                     type === 'PERSONAL'
-                                                        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
-                                                        : "text-slate-500",
-                                                    !applicantId && type !== 'PERSONAL' && "hover:text-slate-700 hover:bg-slate-50",
+                                                        ? "bg-primary text-primary-foreground"
+                                                        : "text-muted-foreground hover:text-foreground",
                                                     !!applicantId && "cursor-default"
                                                 )}
                                             >
-                                                <User className="h-4 w-4" />
+                                                <User className="h-3.5 w-3.5" />
                                                 {t`Perorangan`}
                                             </button>
                                             <button
+                                                type="button"
                                                 onClick={() => setType('CORPORATE')}
                                                 disabled={!!applicantId}
                                                 className={cn(
-                                                    "px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5",
+                                                    "px-4 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5",
                                                     type === 'CORPORATE'
-                                                        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
-                                                        : "text-slate-500",
-                                                    !applicantId && type !== 'CORPORATE' && "hover:text-slate-700 hover:bg-slate-50",
+                                                        ? "bg-primary text-primary-foreground"
+                                                        : "text-muted-foreground hover:text-foreground",
                                                     !!applicantId && "cursor-default"
                                                 )}
                                             >
-                                                <Building2 className="h-4 w-4" />
+                                                <Building2 className="h-3.5 w-3.5" />
                                                 {t`Perusahaan`}
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-
-                                <div className="space-y-1 col-span-full md:col-span-2">
-                                    <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                        <User className="h-4 w-4 text-orange-600/70" />
-                                        {t`Nama Lengkap`} <span className="text-red-500">*</span>
+                                <div className="space-y-1.5 col-span-full md:col-span-2">
+                                    <Label className="text-xs font-medium text-muted-foreground">
+                                        {t`Nama Lengkap`} <span className="text-destructive">*</span>
                                     </Label>
-                                    <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan Nama Sesuai Identitas`} />
+                                    <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} className={inputClass} placeholder={t`Masukkan Nama Sesuai Identitas`} />
                                 </div>
 
-                                <div className="space-y-1">
-                                    <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                        <CheckCircle2 className="h-4 w-4 text-orange-600/70" />
-                                        {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NIB / No. Izin`} <span className="text-red-500">*</span>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-medium text-muted-foreground">
+                                        {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NIB / No. Izin`} <span className="text-destructive">*</span>
                                     </Label>
-                                    <Input id="identityNumber" name="identityNumber" value={formData.identityNumber} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder="1234567890..." />
+                                    <Input id="identityNumber" name="identityNumber" value={formData.identityNumber} onChange={handleInputChange} className={inputClass} placeholder="1234567890..." />
                                 </div>
 
-                                <div className="space-y-1">
-                                    <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                        <Activity className="h-4 w-4 text-orange-600/70" />
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-medium text-muted-foreground">
                                         {t`NPWP (Opsional)`}
                                     </Label>
-                                    <Input id="taxId" name="taxId" value={formData.taxId} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder="00.000.000.0-000.000" />
+                                    <Input id="taxId" name="taxId" value={formData.taxId} onChange={handleInputChange} className={inputClass} placeholder="00.000.000.0-000.000" />
                                 </div>
 
-                                <div className="space-y-1">
-                                    <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                        <Calendar className="h-4 w-4 text-orange-600/70" />
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-medium text-muted-foreground">
                                         {type === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`}
                                     </Label>
                                     <Input
-                                        id={type === 'PERSONAL' ? "birthDate" : "birthDate"}
-                                        name={type === 'PERSONAL' ? "birthDate" : "birthDate"}
+                                        id="birthDate"
+                                        name="birthDate"
                                         type="date"
-                                        value={type === 'PERSONAL' ? formData.birthDate : formData.birthDate}
+                                        value={formData.birthDate}
                                         onChange={handleInputChange}
-                                        className="rounded-xl h-11 bg-slate-50 border-slate-200"
+                                        className={inputClass}
                                     />
                                 </div>
                             </>
                         )}
 
-                        {/* Registry Fields for Current Step */}
                         {steps[currentStep]?.fields?.map((field: AttributeRegistry) => renderField(field))}
                     </div>
                 </div>
-            </div>
 
-            <div className="p-8 border-t bg-muted/10 flex items-center justify-between">
-                <Button variant="outline" onClick={currentStep === 0 ? onCancel : () => setCurrentStep(prev => prev - 1)} className="rounded-xl px-8 h-12">
-                    {currentStep === 0 ? t`Batal` : t`Kembali`}
-                </Button>
+                {/* Footer */}
+                <div className="px-6 py-4 border-t flex items-center justify-between">
+                    <Button variant="outline" size="sm" onClick={currentStep === 0 ? onCancel : () => setCurrentStep(prev => prev - 1)}>
+                        <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                        {currentStep === 0 ? t`Batal` : t`Kembali`}
+                    </Button>
 
-                <Button
-                    onClick={currentStep === steps.length - 1 ? () => setIsConfirmOpen(true) : nextStep}
-                    className={cn(
-                        "rounded-xl px-8 h-12 font-bold text-white",
-                        currentStep === steps.length - 1 ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"
-                    )}
-                >
-                    {currentStep === steps.length - 1 ? t`Simpan Applicant` : t`Langkah Berikutnya`}
-                </Button>
-            </div>
+                    <Button
+                        size="sm"
+                        onClick={currentStep === steps.length - 1 ? () => setIsConfirmOpen(true) : nextStep}
+                        className={currentStep === steps.length - 1 ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                    >
+                        {currentStep === steps.length - 1 ? t`Simpan Applicant` : t`Langkah Berikutnya`}
+                        {currentStep < steps.length - 1 && <ChevronRight className="h-3.5 w-3.5 ml-1" />}
+                    </Button>
+                </div>
+            </CardContent>
 
             <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{t`Konfirmasi Simpan`}</DialogTitle>
-                        {/* <DialogDescription>{t`Semua field dinamis akan disimpan ke sistem EAV.`}</DialogDescription> */}
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>{t`Batal`}</Button>
-                        <Button onClick={performSubmit} disabled={mutation.isPending}>{t`Ya, Simpan`}</Button>
+                        <Button variant="outline" size="sm" onClick={() => setIsConfirmOpen(false)}>{t`Batal`}</Button>
+                        <Button size="sm" onClick={performSubmit} disabled={mutation.isPending}>{t`Ya, Simpan`}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </Card>
     );
 }

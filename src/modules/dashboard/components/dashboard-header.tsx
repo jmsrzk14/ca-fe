@@ -16,7 +16,7 @@ export function DashboardHeader() {
         if (pathname.includes('/applications')) return 'Pengajuan';
         if (pathname.includes('/loans')) {
             const pathParts = pathname.split('/').filter(Boolean);
-            if (pathParts.length > 1) return 'Peminjaman Kredit';
+            if (pathParts.length > 1) return 'Detail Pengajuan';
             return 'Pinjaman';
         }
         if (pathname.includes('/slik')) return 'SLIK';

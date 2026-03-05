@@ -3,14 +3,9 @@
 import * as React from 'react';
 import {
     Search,
-    Plus,
     Calendar as CalendarIcon,
-    Filter,
     ChevronLeft,
     ChevronRight,
-    MoreHorizontal,
-    FileText,
-    Download
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import {
@@ -23,15 +18,7 @@ import {
 } from '@/shared/ui/table';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/shared/ui/select";
 import { useRouter } from 'next/navigation';
 
 const LOAN_DATA = [
@@ -151,160 +138,127 @@ export function LoanListView() {
     const router = useRouter();
 
     return (
-        <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Header Section */}
-            <div className="flex items-center justify-between px-2">
-                <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-                    <h2 className="text-sm font-bold text-foreground">Daftar Peminjaman</h2>
+        <div className="space-y-4">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex gap-2 flex-wrap items-center">
+                    <div className="relative">
+                        <Input
+                            type="text"
+                            placeholder="dd/mm/yyyy"
+                            className="h-8 w-36 text-xs rounded-md pr-8"
+                        />
+                        <CalendarIcon className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <span className="text-xs text-muted-foreground">—</span>
+                    <div className="relative">
+                        <Input
+                            type="text"
+                            placeholder="dd/mm/yyyy"
+                            className="h-8 w-36 text-xs rounded-md pr-8"
+                        />
+                        <CalendarIcon className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <Button size="sm" className="h-8 text-xs">
+                        Filter
+                    </Button>
+                    <span className="text-xs text-muted-foreground px-1">
+                        {LOAN_DATA.length} pengajuan
+                    </span>
                 </div>
-                <Button variant="default" size="lg" className="font-bold rounded-lg text-xs">
-                    Ajukan Peminjaman
-                </Button>
+
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                        <Input
+                            className="h-8 w-56 pl-8 text-xs rounded-md"
+                            placeholder="Cari nama atau NIK..."
+                        />
+                    </div>
+                    <Button size="sm">
+                        Ajukan Peminjaman
+                    </Button>
+                </div>
             </div>
 
-            <Card className="border-border shadow-none bg-card overflow-hidden rounded-2xl">
-                <CardContent className="p-0">
-                    {/* Filters Section */}
-                    <div className="p-4 border-b border-border/50 bg-muted/5">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tanggal Mulai</label>
-                                <div className="relative group">
-                                    <Input
-                                        type="text"
-                                        placeholder="hh/bb/tttt"
-                                        className="h-11 bg-background border-border/50 rounded-xl pr-10 text-xs"
-                                    />
-                                    <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tanggal Akhir</label>
-                                <div className="relative group">
-                                    <Input
-                                        type="text"
-                                        placeholder="hh/bb/tttt"
-                                        className="h-11 bg-background border-border/50 rounded-xl pr-10 text-xs"
-                                    />
-                                    <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                </div>
-                            </div>
-                            <div className="lg:col-span-1">
-                                <Button variant="default" className="w-full h-11 font-black rounded-xl uppercase tracking-widest text-[10px]">
-                                    Filter
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
+            {/* Table */}
+            <div className="rounded-xl border bg-card overflow-hidden">
+                <Table>
+                    <TableHeader>
+                        <TableRow className="bg-muted/30 hover:bg-muted/30">
+                            <TableHead className="w-12 text-center">No.</TableHead>
+                            <TableHead>NIK</TableHead>
+                            <TableHead>Nama Lengkap</TableHead>
+                            <TableHead>Kredit</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Tgl Pengajuan</TableHead>
+                            <TableHead>Tgl Diubah</TableHead>
+                            <TableHead>Diubah Oleh</TableHead>
+                            <TableHead>Status Klaim</TableHead>
+                            <TableHead className="text-center">Aksi</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {LOAN_DATA.map((row, i) => (
+                            <TableRow key={i}>
+                                <TableCell className="text-center text-muted-foreground">{row.no}</TableCell>
+                                <TableCell className="font-mono text-muted-foreground text-xs">{row.nik}</TableCell>
+                                <TableCell className="font-medium">{row.nama}</TableCell>
+                                <TableCell className="text-muted-foreground">{row.kredit}</TableCell>
+                                <TableCell>
+                                    <Badge variant="outline" className={cn(
+                                        "text-xs font-semibold border",
+                                        row.status === 'Pending' && "bg-amber-100 text-amber-700 border-amber-200",
+                                        row.status === 'Diterima' && "bg-emerald-100 text-emerald-700 border-emerald-200",
+                                        row.status === 'Ditolak' && "bg-red-100 text-red-700 border-red-200",
+                                        row.status.includes('Survey') && "bg-blue-100 text-blue-700 border-blue-200",
+                                        row.status.includes('Komite') && "bg-slate-100 text-slate-700 border-slate-200",
+                                    )}>
+                                        {row.status}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell className="text-muted-foreground">{row.tglPengajuan}</TableCell>
+                                <TableCell className="text-muted-foreground">{row.tglDiubah}</TableCell>
+                                <TableCell>{row.diubahOleh}</TableCell>
+                                <TableCell>
+                                    <Badge variant="outline" className={cn(
+                                        "text-xs font-semibold border",
+                                        row.statusKlaim === 'Belum Diklaim'
+                                            ? "bg-blue-100 text-blue-700 border-blue-200"
+                                            : "bg-amber-100 text-amber-700 border-amber-200"
+                                    )}>
+                                        {row.statusKlaim}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => router.push(`/loans/${row.no}`)}
+                                        className="h-7 px-3 text-xs text-primary hover:text-primary"
+                                    >
+                                        Detail
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
 
-                    {/* Search & Entries */}
-                    <div className="px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground font-medium">
-                            Show
-                            <Select defaultValue="10">
-                                <SelectTrigger className="h-9 w-[70px] bg-background border-border/50 rounded-lg">
-                                    <SelectValue placeholder="10" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="10">10</SelectItem>
-                                    <SelectItem value="25">25</SelectItem>
-                                    <SelectItem value="50">50</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            entries
-                        </div>
-
-                        <div className="relative group min-w-[300px]">
-                            <Input
-                                className="h-9 w-full pr-10 bg-background border-border/50 rounded-lg text-xs focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all placeholder:text-muted-foreground/60"
-                                placeholder="Search..."
-                            />
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                        </div>
+                {/* Pagination */}
+                <div className="flex items-center justify-between text-xs text-muted-foreground px-4 py-3 border-t">
+                    <span>Showing 1–10 of 11</span>
+                    <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <ChevronLeft className="h-3.5 w-3.5" />
+                        </Button>
+                        <span className="px-2 text-xs">1 / 2</span>
+                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <ChevronRight className="h-3.5 w-3.5" />
+                        </Button>
                     </div>
-
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader className="bg-muted/10">
-                                <TableRow className="hover:bg-transparent border-border/50">
-                                    <TableHead className="w-12 text-center">No.</TableHead>
-                                    <TableHead>NIK</TableHead>
-                                    <TableHead>Nama Lengkap</TableHead>
-                                    <TableHead>Kredit</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Tanggal Pengajuan</TableHead>
-                                    <TableHead>Tanggal Diubah</TableHead>
-                                    <TableHead>Diubah Oleh</TableHead>
-                                    <TableHead>Status Klaim</TableHead>
-                                    <TableHead className="text-center">Aksi</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {LOAN_DATA.map((row, i) => (
-                                    <TableRow key={i} className="border-b border-border/40 hover:bg-primary/5 transition-colors group">
-                                        <TableCell className="text-center text-muted-foreground">{row.no}</TableCell>
-                                        <TableCell className="font-mono text-muted-foreground">{row.nik}</TableCell>
-                                        <TableCell className="font-semibold">{row.nama}</TableCell>
-                                        <TableCell className="font-bold uppercase text-foreground/80">{row.kredit}</TableCell>
-                                        <TableCell>
-                                            <Badge className={cn(
-                                                "border-none uppercase text-[9px] font-black px-2.5 py-1 rounded-md",
-                                                row.status === 'Pending' && "bg-orange-500/10 text-orange-600",
-                                                row.status === 'Diterima' && "bg-green-500/10 text-green-600",
-                                                row.status === 'Ditolak' && "bg-rose-500/10 text-rose-600",
-                                                row.status.includes('Survey') && "bg-blue-500/10 text-blue-600",
-                                                row.status.includes('Komite') && "bg-cyan-500/10 text-cyan-600",
-                                            )}>
-                                                {row.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-muted-foreground">{row.tglPengajuan}</TableCell>
-                                        <TableCell className="text-muted-foreground">{row.tglDiubah}</TableCell>
-                                        <TableCell className="font-medium">{row.diubahOleh}</TableCell>
-                                        <TableCell>
-                                            <span className={cn(
-                                                "px-3 py-1.5 rounded-md text-[10px] font-bold",
-                                                row.statusKlaim === 'Belum Diklaim' ? "bg-blue-500/10 text-blue-600" : "bg-orange-500/10 text-orange-600"
-                                            )}>
-                                                {row.statusKlaim}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => router.push(`/loans/${row.no}`)}
-                                                className="h-8 px-4 text-[10px] font-bold uppercase text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-all rounded-md border border-blue-200"
-                                            >
-                                                Detail
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-
-                    {/* Footer / Pagination */}
-                    <div className="px-4 py-3 border-t border-border/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <span className="text-xs text-muted-foreground font-medium">
-                            Showing 1 to 10 of 11 entries
-                        </span>
-                        <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground">
-                                Previous
-                            </Button>
-                            <Button variant="default" size="sm" className="h-8 w-8 p-0 font-bold">1</Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">2</Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-primary font-bold">
-                                Next
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 }

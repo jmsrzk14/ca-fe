@@ -14,23 +14,14 @@ import {
     AlertCircle,
     Database,
     Pencil,
-    // Orang & Identitas
     User, UserCheck, UserX, Users, Baby, PersonStanding, Fingerprint, ScanFace, IdCard,
-    // Komunikasi
     Phone, Mail, MessageSquare, Send, AtSign, Bell, Rss, Radio,
-    // Pekerjaan & Bisnis
     Building2, Briefcase, Factory, Store, Landmark, Newspaper, ClipboardList, Award, Star,
-    // Keuangan
     DollarSign, CreditCard, Banknote, Wallet, PiggyBank, TrendingUp, TrendingDown, BarChart2, Receipt,
-    // Kesehatan & Risiko
     Heart, Activity, Shield, Stethoscope, AlertTriangle, ThumbsUp, ThumbsDown,
-    // Lokasi & Properti
     MapPin, Globe, Home, Car, Truck, Plane, Anchor, Navigation,
-    // Dokumen & Data
     FileText, File, FolderOpen, BookOpen, Link, Hash, Tag, Paperclip,
-    // Waktu
     Calendar, Clock, Timer, Hourglass,
-    // Lainnya
     Zap, Lock, Key, Eye, Cpu, Wifi, Image, Smile,
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
@@ -46,9 +37,17 @@ import {
 } from '@/shared/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { Checkbox } from '@/shared/ui/checkbox';
+import { Badge } from '@/shared/ui/badge';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@/shared/ui/table';
 
 const ICON_OPTIONS = [
-    // Orang & Identitas
     { name: 'User', icon: User },
     { name: 'UserCheck', icon: UserCheck },
     { name: 'UserX', icon: UserX },
@@ -58,7 +57,6 @@ const ICON_OPTIONS = [
     { name: 'Fingerprint', icon: Fingerprint },
     { name: 'ScanFace', icon: ScanFace },
     { name: 'IdCard', icon: IdCard },
-    // Komunikasi
     { name: 'Phone', icon: Phone },
     { name: 'Mail', icon: Mail },
     { name: 'MessageSquare', icon: MessageSquare },
@@ -67,7 +65,6 @@ const ICON_OPTIONS = [
     { name: 'Bell', icon: Bell },
     { name: 'Rss', icon: Rss },
     { name: 'Radio', icon: Radio },
-    // Pekerjaan & Bisnis
     { name: 'Building', icon: Building2 },
     { name: 'Briefcase', icon: Briefcase },
     { name: 'Factory', icon: Factory },
@@ -77,7 +74,6 @@ const ICON_OPTIONS = [
     { name: 'ClipboardList', icon: ClipboardList },
     { name: 'Award', icon: Award },
     { name: 'Star', icon: Star },
-    // Keuangan
     { name: 'DollarSign', icon: DollarSign },
     { name: 'CreditCard', icon: CreditCard },
     { name: 'Banknote', icon: Banknote },
@@ -87,7 +83,6 @@ const ICON_OPTIONS = [
     { name: 'TrendingDown', icon: TrendingDown },
     { name: 'BarChart2', icon: BarChart2 },
     { name: 'Receipt', icon: Receipt },
-    // Kesehatan & Risiko
     { name: 'Heart', icon: Heart },
     { name: 'Activity', icon: Activity },
     { name: 'Shield', icon: Shield },
@@ -95,7 +90,6 @@ const ICON_OPTIONS = [
     { name: 'AlertTriangle', icon: AlertTriangle },
     { name: 'ThumbsUp', icon: ThumbsUp },
     { name: 'ThumbsDown', icon: ThumbsDown },
-    // Lokasi & Properti
     { name: 'MapPin', icon: MapPin },
     { name: 'Globe', icon: Globe },
     { name: 'Home', icon: Home },
@@ -104,7 +98,6 @@ const ICON_OPTIONS = [
     { name: 'Plane', icon: Plane },
     { name: 'Anchor', icon: Anchor },
     { name: 'Navigation', icon: Navigation },
-    // Dokumen & Data
     { name: 'FileText', icon: FileText },
     { name: 'File', icon: File },
     { name: 'FolderOpen', icon: FolderOpen },
@@ -113,12 +106,10 @@ const ICON_OPTIONS = [
     { name: 'Hash', icon: Hash },
     { name: 'Tag', icon: Tag },
     { name: 'Paperclip', icon: Paperclip },
-    // Waktu
     { name: 'Calendar', icon: Calendar },
     { name: 'Clock', icon: Clock },
     { name: 'Timer', icon: Timer },
     { name: 'Hourglass', icon: Hourglass },
-    // Lainnya
     { name: 'Zap', icon: Zap },
     { name: 'Lock', icon: Lock },
     { name: 'Key', icon: Key },
@@ -181,7 +172,7 @@ function AttributeForm({
     return (
         <form onSubmit={onSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <Label htmlFor="attributeCode">{t`Kode Field`}</Label>
                     <Input
                         id="attributeCode"
@@ -196,7 +187,7 @@ function AttributeForm({
                         <p className="text-[10px] text-muted-foreground italic">{t`Kode tidak bisa diubah.`}</p>
                     )}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <Label htmlFor="description">{t`Nama Internal`}</Label>
                     <Input
                         id="description"
@@ -208,29 +199,29 @@ function AttributeForm({
                 </div>
             </div>
 
-            <div className="space-y-2 border-l-4 border-orange-500 pl-4 py-1 bg-orange-50/50">
-                <Label htmlFor="uiLabel" className="text-orange-700 font-bold">{t`Label di Form (Opsional)`}</Label>
+            <div className="space-y-1.5 border-l-4 border-primary pl-4 py-1 bg-primary/5 rounded-r-md">
+                <Label htmlFor="uiLabel" className="text-primary font-semibold">{t`Label di Form (Opsional)`}</Label>
                 <Input
                     id="uiLabel"
                     placeholder="Masukkan label cantik untuk user..."
                     value={value.uiLabel}
                     onChange={e => onChange({ uiLabel: e.target.value })}
                 />
-                <p className="text-[10px] text-orange-600 mt-1 italic">{t`Jika dikosongkan, akan menggunakan Nama Internal.`}</p>
+                <p className="text-[10px] text-muted-foreground italic">{t`Jika dikosongkan, akan menggunakan Nama Internal.`}</p>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
                 <Label htmlFor="categoryIcon">{t`Pilih Icon Kategori`}</Label>
                 <Select
                     value={value.categoryIcon}
                     onValueChange={v => onChange({ categoryIcon: v })}
                 >
-                    <SelectTrigger className="h-12 rounded-xl">
+                    <SelectTrigger>
                         {(() => {
                             const SelIcon = ICON_MAP[value.categoryIcon];
                             return SelIcon ? (
                                 <div className="flex items-center gap-2">
-                                    <SelIcon className="h-4 w-4 text-orange-600" />
+                                    <SelIcon className="h-4 w-4 text-primary" />
                                     <span>{value.categoryIcon}</span>
                                 </div>
                             ) : (
@@ -244,10 +235,10 @@ function AttributeForm({
                                 <SelectItem
                                     key={opt.name}
                                     value={opt.name}
-                                    className="flex items-center justify-center p-1.5 rounded-lg hover:bg-orange-50 cursor-pointer data-[state=checked]:bg-orange-100"
+                                    className="flex items-center justify-center p-1.5 rounded-md hover:bg-muted cursor-pointer data-[state=checked]:bg-primary/10"
                                 >
                                     <div className="flex flex-col items-center gap-0.5 min-w-0">
-                                        <opt.icon className="h-5 w-5 text-orange-600 shrink-0" />
+                                        <opt.icon className="h-4 w-4 text-primary shrink-0" />
                                         <span className="text-[7px] uppercase font-bold opacity-40 truncate w-full text-center leading-none">{opt.name}</span>
                                     </div>
                                 </SelectItem>
@@ -258,15 +249,10 @@ function AttributeForm({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <Label>{t`Tipe Data`}</Label>
-                    <Select
-                        value={value.dataType}
-                        onValueChange={v => onChange({ dataType: v })}
-                    >
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
+                    <Select value={value.dataType} onValueChange={v => onChange({ dataType: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="STRING">STRING</SelectItem>
                             <SelectItem value="NUMBER">NUMBER</SelectItem>
@@ -276,7 +262,7 @@ function AttributeForm({
                         </SelectContent>
                     </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <Label htmlFor="categoryCode">{t`Kode Kategori`}</Label>
                     <Input
                         id="categoryCode"
@@ -289,7 +275,7 @@ function AttributeForm({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <Label htmlFor="categoryName">{t`Nama Kategori`}</Label>
                     <Input
                         id="categoryName"
@@ -299,15 +285,10 @@ function AttributeForm({
                         required
                     />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <Label>{t`Applies To`}</Label>
-                    <Select
-                        value={value.appliesTo}
-                        onValueChange={v => onChange({ appliesTo: v })}
-                    >
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
+                    <Select value={value.appliesTo} onValueChange={v => onChange({ appliesTo: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="PERSONAL">PERSONAL</SelectItem>
                             <SelectItem value="CORPORATE">CORPORATE</SelectItem>
@@ -318,15 +299,10 @@ function AttributeForm({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     <Label>{t`Scope`}</Label>
-                    <Select
-                        value={value.scope}
-                        onValueChange={v => onChange({ scope: v })}
-                    >
-                        <SelectTrigger>
-                            <SelectValue />
-                        </SelectTrigger>
+                    <Select value={value.scope} onValueChange={v => onChange({ scope: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="APPLICANT">APPLICANT</SelectItem>
                             <SelectItem value="APPLICATION">APPLICATION</SelectItem>
@@ -336,10 +312,10 @@ function AttributeForm({
             </div>
 
             {value.dataType === 'SELECT' && (
-                <div className="space-y-3 p-4 border rounded-xl bg-muted/30">
+                <div className="space-y-3 p-4 border rounded-xl bg-muted/20">
                     <div className="flex items-center justify-between">
-                        <Label className="font-bold">{t`Opsi Pilihan (Select Options)`}</Label>
-                        <Button type="button" variant="outline" size="sm" onClick={handleAddOption} className="h-8 gap-1">
+                        <Label className="font-semibold">{t`Opsi Pilihan (Select Options)`}</Label>
+                        <Button type="button" variant="outline" size="sm" onClick={handleAddOption} className="h-7 gap-1 text-xs">
                             <Plus className="h-3 w-3" /> {t`Tambah Opsi`}
                         </Button>
                     </div>
@@ -393,7 +369,7 @@ function AttributeForm({
             </div>
 
             <DialogFooter className="pt-4">
-                <Button type="submit" className="w-full bg-orange-600" disabled={isPending}>
+                <Button type="submit" className="w-full" disabled={isPending}>
                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {isEdit ? t`Simpan Perubahan` : t`Simpan Konfigurasi`}
                 </Button>
@@ -459,24 +435,20 @@ export function AttributeManagementView() {
     };
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-5">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-                        <Settings className="h-8 w-8 text-orange-600" />
-                        {t`Manajemen Field Dinamis`}
-                    </h1>
-                    <p className="text-muted-foreground mt-2">
+                    <h1 className="text-xl font-bold text-foreground">{t`Manajemen Field Dinamis`}</h1>
+                    <p className="text-sm text-muted-foreground mt-0.5">
                         {t`Kelola field kuesioner applicant tanpa menyentuh database.`}
                     </p>
                 </div>
 
-                {/* Create Dialog */}
                 <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                     <DialogTrigger asChild>
-                        <Button className="bg-orange-600 hover:bg-orange-700 rounded-xl h-12 px-6 gap-2">
-                            <Plus className="h-5 w-5" />
+                        <Button size="sm">
+                            <Plus className="h-3.5 w-3.5" />
                             {t`Tambah Field Baru`}
                         </Button>
                     </DialogTrigger>
@@ -502,7 +474,7 @@ export function AttributeManagementView() {
                 <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <Pencil className="h-4 w-4 text-orange-600" />
+                            <Pencil className="h-4 w-4 text-primary" />
                             {t`Edit Field Registry`}
                         </DialogTitle>
                         <DialogDescription>
@@ -522,96 +494,81 @@ export function AttributeManagementView() {
             </Dialog>
 
             {/* Table */}
-            <div className="bg-card rounded-3xl border border-border overflow-hidden shadow-sm">
-                <div className="p-6 border-b bg-muted/20 flex items-center gap-2">
-                    <TableIcon className="h-5 w-5 text-muted-foreground" />
-                    <h2 className="font-bold">{t`Daftar Field Terdaftar (Registry)`}</h2>
-                </div>
-
+            <div className="rounded-xl border bg-card overflow-hidden">
                 {isLoading ? (
-                    <div className="p-20 flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="h-10 w-10 animate-spin text-orange-600" />
-                        <p className="text-muted-foreground font-medium">{t`Menghubungkan ke Registry...`}</p>
+                    <div className="p-12 flex flex-col items-center justify-center gap-3">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <p className="text-sm text-muted-foreground">{t`Menghubungkan ke Registry...`}</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b">
-                                    <th className="px-6 py-4">{t`Label & Icon`}</th>
-                                    <th className="px-6 py-4">{t`Tipe`}</th>
-                                    <th className="px-6 py-4">{t`Kategori`}</th>
-                                    <th className="px-6 py-4">{t`Status`}</th>
-                                    <th className="px-6 py-4">{t`Aksi`}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y">
-                                {registry?.attributes?.map((attr: any) => {
-                                    const IconComp = ICON_MAP[attr.categoryIcon] ?? Settings;
-                                    return (
-                                        <tr key={attr.id} className="hover:bg-muted/30 transition-colors group">
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
-                                                        <IconComp className="h-4 w-4" />
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium">{attr.uiLabel || attr.description}</span>
-                                                        <span className="text-[10px] text-muted-foreground italic">{attr.attributeCode}</span>
-                                                    </div>
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-muted/30 hover:bg-muted/30">
+                                <TableHead>{t`Label & Icon`}</TableHead>
+                                <TableHead>{t`Tipe`}</TableHead>
+                                <TableHead>{t`Kategori`}</TableHead>
+                                <TableHead>{t`Status`}</TableHead>
+                                <TableHead className="text-center">{t`Aksi`}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {registry?.attributes?.map((attr: any) => {
+                                const IconComp = ICON_MAP[attr.categoryIcon] ?? Settings;
+                                return (
+                                    <TableRow key={attr.id} className="group">
+                                        <TableCell>
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center text-primary">
+                                                    <IconComp className="h-3.5 w-3.5" />
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="px-2 py-1 flex-1 rounded-md bg-blue-100 text-blue-700 text-[10px] font-bold text-center">
-                                                        {attr.dataType}
-                                                    </span>
-                                                    <span className="text-[8px] text-muted-foreground text-center uppercase font-bold">{attr.scope}</span>
+                                                <div>
+                                                    <p className="font-medium text-sm">{attr.uiLabel || attr.description}</p>
+                                                    <p className="text-[10px] text-muted-foreground">{attr.attributeCode}</p>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col items-start gap-1">
-                                                    <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold">
-                                                        {attr.categoryName}
-                                                    </span>
-                                                    <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[8px] font-bold">
-                                                        {attr.appliesTo}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col gap-2">
-                                                    {attr.isRequired ? (
-                                                        <span className="flex items-center gap-1 text-[10px] text-orange-600 font-bold">
-                                                            <AlertCircle className="h-3 w-3" /> {t`Wajib`}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-[10px] text-muted-foreground italic">{t`Opsional`}</span>
-                                                    )}
-                                                    {attr.riskRelevant && (
-                                                        <span className="flex items-center gap-1 text-[10px] text-blue-600 font-bold">
-                                                            <Shield className="h-3 w-3" /> {t`Risk`}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 gap-1.5 text-orange-600 hover:text-orange-700 hover:bg-orange-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    onClick={() => openEdit(attr)}
-                                                >
-                                                    <Pencil className="h-3.5 w-3.5" />
-                                                    {t`Edit`}
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700 border-blue-200">
+                                                {attr.dataType}
+                                            </Badge>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 uppercase">{attr.scope}</p>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline" className="text-xs bg-slate-100 text-slate-700 border-slate-200">
+                                                {attr.categoryName}
+                                            </Badge>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5">{attr.appliesTo}</p>
+                                        </TableCell>
+                                        <TableCell>
+                                            {attr.isRequired ? (
+                                                <span className="flex items-center gap-1 text-xs text-amber-600 font-medium">
+                                                    <AlertCircle className="h-3 w-3" /> {t`Wajib`}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">{t`Opsional`}</span>
+                                            )}
+                                            {attr.riskRelevant && (
+                                                <span className="flex items-center gap-1 text-xs text-blue-600 font-medium mt-0.5">
+                                                    <Shield className="h-3 w-3" /> {t`Risk`}
+                                                </span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => openEdit(attr)}
+                                            >
+                                                <Pencil className="h-3 w-3" />
+                                                {t`Edit`}
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
                 )}
             </div>
         </div>

@@ -12,9 +12,7 @@ export default function LoansPage() {
     return (
         <ErrorBoundary>
             <Suspense fallback={<LoanLoadingSkeleton />}>
-                <div className="h-[calc(100vh-8rem)]">
-                    <ApplicationKanban />
-                </div>
+                <ApplicationKanban />
             </Suspense>
         </ErrorBoundary>
     );

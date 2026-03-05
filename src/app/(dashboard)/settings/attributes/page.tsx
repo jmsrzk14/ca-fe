@@ -7,8 +7,6 @@ export const metadata: Metadata = {
 
 export default function AttributeManagementPage() {
     return (
-        <div className="h-full overflow-y-auto">
-            <AttributeManagementView />
-        </div>
+        <AttributeManagementView />
     );
 }

@@ -9,7 +9,6 @@ interface BorrowerProfileTabProps {
 }
 
 export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
-    console.log("DEBUG: BorrowerProfileTab received applicant:", applicant);
     const { registry, isLoading } = useAttributeRegistry();
 
     if (isLoading) {

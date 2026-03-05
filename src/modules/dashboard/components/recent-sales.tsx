@@ -38,7 +38,7 @@ export function RecentApplications() {
             case 'REJECTED':
             case 'DECLINED': return 'bg-rose-500/10 text-rose-500 border-rose-500/20';
             case 'SURVEY': return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
-            case 'COMMITTEE': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+            case 'COMMITTEE': return 'bg-primary/10 text-primary border-primary/20';
             default: return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
         }
     };

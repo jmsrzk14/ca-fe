@@ -27,17 +27,17 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
         : '??';
 
     return (
-        <Card className="group overflow-hidden border-border/50 bg-card/30 backdrop-blur-sm hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:shadow-orange-600/5 hover:-translate-y-1">
+        <Card className="group overflow-hidden border-border/50 bg-card/30 backdrop-blur-sm hover:bg-card/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
             <CardHeader className="p-5 pb-0">
                 <div className="flex justify-between items-start">
-                    <Avatar className="h-12 w-12 border-2 border-background shadow-sm ring-2 ring-primary/5 group-hover:ring-orange-500/20 transition-all">
-                        <AvatarFallback className="bg-orange-100 text-orange-700 font-bold text-base">
+                    <Avatar className="h-12 w-12 border-2 border-background shadow-sm ring-2 ring-primary/5 group-hover:ring-primary/20 transition-all">
+                        <AvatarFallback className="bg-primary/10 text-primary font-bold text-base">
                             {initials}
                         </AvatarFallback>
                     </Avatar>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-orange-500/10 hover:text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -53,7 +53,7 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
                 </div>
                 <div className="mt-4 space-y-1">
                     <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-lg text-foreground truncate group-hover:text-orange-500 transition-colors">
+                        <h3 className="font-bold text-lg text-foreground truncate group-hover:text-primary transition-colors">
                             {applicant.fullName}
                         </h3>
                         {applicant.applicantType === 'CORPORATE' ? (
@@ -89,7 +89,7 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
                 </div>
             </CardContent>
             <CardFooter className="p-5 pt-0">
-                <Button asChild variant="outline" className="w-full rounded-xl h-9 text-xs font-bold border-border/50 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all">
+                <Button asChild variant="outline" className="w-full rounded-xl h-9 text-xs font-bold border-border/50 hover:bg-primary hover:text-white hover:border-primary transition-all">
                     <Link href={`/borrowers/${applicant.id}`}>{t`View Profile`}</Link>
                 </Button>
             </CardFooter>

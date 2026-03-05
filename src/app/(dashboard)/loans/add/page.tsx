@@ -9,10 +9,8 @@ export const metadata: Metadata = {
 
 export default function LoanApplicationAddPage() {
     return (
-        <div className="h-full px-6 py-6 overflow-y-auto">
-            <Suspense fallback={<div className="flex items-center justify-center h-full"><Loader2 className="animate-spin" /></div>}>
-                <ApplicationAddPage redirectTo="/loans" />
-            </Suspense>
-        </div>
+        <Suspense fallback={<div className="flex items-center justify-center h-full"><Loader2 className="animate-spin" /></div>}>
+            <ApplicationAddPage redirectTo="/loans" />
+        </Suspense>
     );
 }

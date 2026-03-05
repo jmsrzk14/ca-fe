@@ -2,13 +2,12 @@
 
 import * as React from 'react';
 import {
-    Plus,
-    RotateCw,
-    ChevronLeft,
-    Loader2
+    ArrowLeft,
+    Loader2,
+    Pencil,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
-import { Card, CardContent } from '@/shared/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { useRouter, useParams } from 'next/navigation';
@@ -16,8 +15,6 @@ import { applicationService } from '@/core/api/services/application-service';
 import { applicantService } from '@/core/api/services/applicant-service';
 import { referenceService } from '@/core/api/services/reference-service';
 
-// Import Tabs
-import { BorrowerProfileTab } from './loan-details/tabs/borrower-profile-tab';
 import { LoanInfoTab } from './loan-details/tabs/loan-info-tab';
 import { DebtHistoryTab } from './loan-details/tabs/debt-history-tab';
 import { DocumentCompletenessTab } from './loan-details/tabs/document-completeness-tab';
@@ -25,9 +22,9 @@ import { FinancialInfoTab } from './loan-details/tabs/financial-info-tab';
 import { CRRTab } from './loan-details/tabs/crr-tab';
 import { HistoryTab } from './loan-details/tabs/history-tab';
 import { SurveyTab } from './loan-details/tabs/survey-tab';
+import Link from 'next/link';
 
 const TABS = [
-    'Profil Peminjam',
     'Pinjaman',
     'Riwayat Hutang',
     'Kelengkapan Dokumen',
@@ -41,8 +38,14 @@ interface LoanDetailsViewProps {
     id?: string;
 }
 
+const STATUS_VARIANT: Record<string, string> = {
+    APPROVED: 'bg-emerald-100 text-emerald-700',
+    DECLINED: 'bg-red-100 text-red-700',
+    PENDING: 'bg-amber-100 text-amber-700',
+};
+
 export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
-    const [activeTab, setActiveTab] = React.useState('Profil Peminjam');
+    const [activeTab, setActiveTab] = React.useState('Pinjaman');
     const [application, setApplication] = React.useState<any>(null);
     const [applicant, setApplicant] = React.useState<any>(null);
     const [productName, setProductName] = React.useState<string | null>(null);
@@ -69,14 +72,14 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                         try {
                             const product = await referenceService.getLoanProduct(appData.productId);
                             if (product) setProductName(product.productName);
-                        } catch (pErr) {
-                            setProductName(appData.productId); // Fallback to ID
+                        } catch {
+                            setProductName(appData.productId);
                         }
                     }
                 } else {
                     setError('Application not found');
                 }
-            } catch (err) {
+            } catch {
                 setError('Failed to load loan details');
             } finally {
                 setLoading(false);
@@ -89,27 +92,21 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
     const renderTabContent = () => {
         if (loading) {
             return (
-                <div className="flex items-center justify-center p-20">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <div className="flex items-center justify-center py-16">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
             );
         }
 
         if (error) {
             return (
-                <div className="p-8 text-center text-destructive font-medium">
+                <div className="py-8 text-center text-sm text-destructive">
                     {error}
                 </div>
             );
         }
 
         switch (activeTab) {
-            case 'Profil Peminjam':
-                return (
-                    <div className="flex flex-col gap-12">
-                        <BorrowerProfileTab applicant={applicant} />
-                    </div>
-                );
             case 'Pinjaman': return <LoanInfoTab application={application} applicant={applicant} productName={productName} />;
             case 'Riwayat Hutang': return <DebtHistoryTab />;
             case 'Kelengkapan Dokumen': return <DocumentCompletenessTab />;
@@ -123,91 +120,109 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
 
     if (loading && !application) {
         return (
-            <div className="flex flex-col gap-6 animate-pulse p-4">
-                <div className="h-40 w-full bg-muted rounded-2xl" />
-                <div className="grid grid-cols-4 gap-4">
-                    <div className="h-10 bg-muted rounded-lg" />
-                    <div className="h-10 bg-muted rounded-lg" />
-                    <div className="h-10 bg-muted rounded-lg" />
-                    <div className="h-10 bg-muted rounded-lg" />
-                </div>
-                <div className="h-[500px] w-full bg-muted rounded-2xl" />
+            <div className="space-y-4 animate-pulse">
+                <div className="h-32 w-full bg-muted rounded-xl" />
+                <div className="h-[400px] w-full bg-muted rounded-xl" />
             </div>
         );
     }
 
+    const statusKey = application?.status?.toUpperCase() || 'PENDING';
+    const statusColor = STATUS_VARIANT[statusKey] || STATUS_VARIANT.PENDING;
+
     return (
-        <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Header Actions */}
-            <div className="flex items-center justify-between px-2">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => router.back()}
-                    className="text-muted-foreground hover:text-foreground gap-2 font-bold uppercase text-[10px] tracking-widest group"
-                >
-                    <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                    Kembali Ke Daftar
+        <div className="space-y-5">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2">
+                    <Button variant="ghost" size="sm" className="h-7 px-2 text-muted-foreground -ml-2" asChild>
+                        <Link href="/loans">
+                            <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+                            Kembali
+                        </Link>
+                    </Button>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <h1 className="text-lg font-bold text-foreground">
+                            {applicant?.applicantName || application?.applicantName || 'Peminjaman'}
+                        </h1>
+                        <Badge variant="outline" className={cn("text-xs font-bold border", statusColor)}>
+                            {application?.status || 'Pending'}
+                        </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        {application?.createdAt
+                            ? `Diajukan ${new Date(application.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                            : ''}
+                    </p>
+                </div>
+                <Button asChild variant="outline" size="sm">
+                    <Link href={`/loans/${id}/edit`}>
+                        <Pencil className="h-3.5 w-3.5" />
+                        Edit
+                    </Link>
                 </Button>
             </div>
 
-            {/* Top Header Card */}
-            <Card className="border border-border/50 shadow-sm overflow-hidden bg-card rounded-2xl mb-4">
-                <CardContent className="p-0">
-                    <div className="p-4 border-b border-border/50">
-                        <h1 className="text-xl font-bold tracking-tight text-foreground">
-                            Nama Peminjam: <span className="text-foreground">{applicant?.applicantName || application?.applicantName || 'UMKM'}</span>
-                        </h1>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/50 ">
-                        <div className="flex items-center gap-3 px-5 py-3">
-                            <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
-                                <Plus className="h-5 w-5" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">Diajukan</span>
-                                <span className="text-[13px] font-semibold text-foreground whitespace-nowrap">
-                                    {application?.createdAt ? new Date(application.createdAt).toLocaleDateString('id-ID', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    }) + ` - ${new Date(application.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB` : '-'}
-                                </span>
-                            </div>
+            {/* Info Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                            Informasi Pengajuan
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <Field label="Tanggal Pengajuan" value={
+                            application?.createdAt
+                                ? new Date(application.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                                : '-'
+                        } />
+                        <Field label="Produk" value={productName || '-'} />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                            Status
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <Field label="Status Pengajuan" value={application?.status || 'Pending'} />
+                        <Field label="Diubah Oleh" value={application?.updatedBy || '-'} />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                                Peminjam
+                            </CardTitle>
+                            {applicant?.id && (
+                                <Button variant="ghost" size="sm" className="h-6 text-xs text-primary" asChild>
+                                    <Link href={`/borrowers/${applicant.id}`}>
+                                        Lihat Detail
+                                    </Link>
+                                </Button>
+                            )}
                         </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <Field label="Nama" value={applicant?.applicantName || applicant?.fullName || '-'} />
+                        <Field label="NIK" value={applicant?.identityNumber || '-'} />
+                    </CardContent>
+                </Card>
+            </div>
 
-                        <div className="flex items-center gap-3 px-5 py-3">
-                            <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 shrink-0">
-                                <RotateCw className="h-5 w-5" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">Status</span>
-                                <div className="mt-0.5">
-                                    <Badge className={cn(
-                                        "hover:bg-opacity-80 text-white border-0 text-[10px] font-bold px-2.5 py-0.5 rounded-md shadow-none cursor-default uppercase",
-                                        application?.status === 'APPROVED' ? 'bg-emerald-500' :
-                                            application?.status === 'DECLINED' ? 'bg-rose-500' : 'bg-orange-500'
-                                    )}>
-                                        {application?.status || 'Pending'}
-                                    </Badge>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Content Card */}
-            <Card className="border-border shadow-sm min-h-[600px] bg-card">
+            {/* Tabs Content */}
+            <Card>
                 <CardContent className="p-0">
-                    {/* Tabs */}
-                    <div className="flex items-center border-b border-border px-4 overflow-x-auto no-scrollbar bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+                    <div className="flex items-center border-b px-4 overflow-x-auto">
                         {TABS.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={cn(
-                                    "px-3 py-3 text-xs font-semibold whitespace-nowrap transition-all relative",
+                                    "px-3 py-3 text-xs font-semibold whitespace-nowrap transition-colors relative",
                                     activeTab === tab
                                         ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary"
                                         : "text-muted-foreground hover:text-foreground"
@@ -223,6 +238,15 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                     </div>
                 </CardContent>
             </Card>
+        </div>
+    );
+}
+
+function Field({ label, value }: { label: string; value: React.ReactNode }) {
+    return (
+        <div className="space-y-0.5">
+            <p className="text-xs text-muted-foreground">{label}</p>
+            <p className="text-sm font-medium text-foreground">{value}</p>
         </div>
     );
 }

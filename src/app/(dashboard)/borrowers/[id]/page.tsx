@@ -8,8 +8,6 @@ export default function ApplicantDetailPage() {
     const id = params.id as string;
 
     return (
-        <div className="min-h-full">
-            <ApplicantDetail id={id} />
-        </div>
+        <ApplicantDetail id={id} />
     );
 }

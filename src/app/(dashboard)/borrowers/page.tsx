@@ -7,9 +7,7 @@ export const metadata: Metadata = {
 
 export default function ApplicantsPage() {
     return (
-        <div className="h-full px-6 py-6">
-            <ApplicantList />
-        </div>
+        <ApplicantList />
     );
 }
 

@@ -37,7 +37,7 @@ export function CRRAssessmentView() {
                     <Button
                         variant="ghost"
                         size="icon-sm"
-                        className="text-orange-500 hover:text-orange-600 hover:bg-orange-50 rounded-md border border-orange-200"
+                        className="text-primary hover:text-primary hover:bg-primary/5 rounded-md border border-primary/20"
                     >
                         <Pencil className="h-3.5 w-3.5" />
                     </Button>

@@ -293,16 +293,16 @@ export function ApplicationKanban() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col gap-6 w-full h-full p-4 overflow-hidden">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-2">
-                    <Skeleton className="h-10 w-48" />
-                    <Skeleton className="h-10 w-96" />
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <Skeleton className="h-8 w-[200px]" />
+                    <Skeleton className="h-8 w-[300px]" />
                 </div>
-                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                <div className="flex gap-4 overflow-x-auto pb-4">
                     {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="flex flex-col gap-4 min-w-[300px]">
+                        <div key={i} className="flex flex-col gap-3 min-w-[280px]">
                             <Skeleton className="h-8 w-full" />
-                            <Skeleton className="h-[500px] w-full" />
+                            <Skeleton className="h-[400px] w-full rounded-xl" />
                         </div>
                     ))}
                 </div>
@@ -314,18 +314,17 @@ export function ApplicationKanban() {
 
     if (error) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 gap-6 text-center animate-in fade-in duration-500">
-                <div className="p-6 bg-rose-500/10 text-rose-600 rounded-full ring-8 ring-rose-500/5">
-                    <RotateCw className="h-12 w-12" />
+            <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
+                <div className="p-3 bg-destructive/10 text-destructive rounded-full">
+                    <RotateCw className="h-6 w-6" />
                 </div>
-                <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-foreground">Gagal memuat data pengajuan</h2>
-                </div>
+                <p className="text-sm font-medium">Gagal memuat data pengajuan</p>
                 <Button
                     onClick={() => fetchData()}
-                    className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl gap-2 font-semibold shadow-lg shadow-orange-600/20"
+                    variant="outline"
+                    size="sm"
                 >
-                    <RotateCw className="h-4 w-4" />
+                    <RotateCw className="h-3.5 w-3.5" />
                     Coba Lagi
                 </Button>
             </div>
@@ -333,104 +332,98 @@ export function ApplicationKanban() {
     }
 
     return (
-        <div className="flex flex-col gap-6 w-full h-full overflow-hidden animate-in fade-in duration-500">
+        <div className="flex flex-col gap-4 w-full h-full overflow-hidden">
             {/* Top Header */}
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between px-2">
-                <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground text-gradient">Pinjaman</h1>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-3">
+                    <h1 className="text-xl font-bold text-foreground">Pinjaman</h1>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex items-center gap-2 px-3 h-8 bg-muted/50 border-border/50 hover:bg-muted text-primary font-semibold transition-all hover:scale-105 active:scale-95">
+                            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
                                 {loanType === 'Personal' && <User className="h-3.5 w-3.5" />}
                                 {loanType === 'Company' && <Briefcase className="h-3.5 w-3.5" />}
-                                <span className="text-xs">{loanType}</span>
+                                {loanType}
                                 <ChevronDown className="h-3 w-3 opacity-50" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56 rounded-xl p-1.5 shadow-2xl border-border/50 backdrop-blur-2xl bg-popover/80">
-                            <DropdownMenuItem onClick={() => setLoanType('Personal')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
-                                <div className="p-1 rounded-md bg-primary/10">
-                                    <User className="h-3.5 w-3.5 text-primary" />
-                                </div>
-                                <span className="text-sm font-medium">Personal</span>
+                        <DropdownMenuContent align="start">
+                            <DropdownMenuItem onClick={() => setLoanType('Personal')} className="gap-2 cursor-pointer">
+                                <User className="h-3.5 w-3.5" />
+                                Personal
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setLoanType('Company')} className="rounded-lg gap-3 cursor-pointer py-2.5 hover:bg-primary/5 transition-colors">
-                                <div className="p-1 rounded-md bg-primary/10">
-                                    <Briefcase className="h-3.5 w-3.5 text-primary" />
-                                </div>
-                                <span className="text-sm font-medium">Company</span>
+                            <DropdownMenuItem onClick={() => setLoanType('Company')} className="gap-2 cursor-pointer">
+                                <Briefcase className="h-3.5 w-3.5" />
+                                Company
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="relative w-64 group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                         <Input
-                            placeholder="Search applications..."
-                            className="pl-9 h-10 bg-muted/30 border-border/50 text-sm focus:bg-background transition-all focus:ring-1 focus:ring-primary/20"
+                            placeholder="Cari pengajuan..."
+                            className="pl-8 h-8 w-64 text-xs rounded-md"
                         />
                     </div>
 
-                    <div className="flex items-center gap-2 border-l border-border/50 pl-4">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleRefresh}
+                        className={cn(
+                            "h-8 w-8 text-muted-foreground",
+                            isRefreshing && "animate-spin text-primary"
+                        )}
+                    >
+                        <RotateCw className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleSort}
+                        className="h-8 w-8 text-muted-foreground"
+                    >
+                        <ArrowUpDown className="h-3.5 w-3.5" />
+                    </Button>
+                    <div className="flex items-center gap-0.5 bg-muted p-0.5 rounded-md">
                         <Button
-                            variant="ghost"
                             size="icon"
-                            onClick={handleRefresh}
+                            variant="ghost"
+                            onClick={() => setViewMode('board')}
                             className={cn(
-                                "h-10 w-10 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all",
-                                isRefreshing && "animate-spin text-primary"
+                                "h-7 w-7",
+                                viewMode === 'board' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"
                             )}
                         >
-                            <RotateCw className="h-4 w-4" />
+                            <LayoutGrid className="h-3.5 w-3.5" />
                         </Button>
                         <Button
-                            variant="ghost"
                             size="icon"
-                            onClick={handleSort}
-                            className="h-10 w-10 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                            variant="ghost"
+                            onClick={() => setViewMode('list')}
+                            className={cn(
+                                "h-7 w-7",
+                                viewMode === 'list' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground"
+                            )}
                         >
-                            <ArrowUpDown className="h-4 w-4" />
-                        </Button>
-                        <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/50 shadow-inner">
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => setViewMode('board')}
-                                className={cn(
-                                    "h-8 w-8 transition-all",
-                                    viewMode === 'board' ? "bg-background shadow-md text-primary hover:bg-background" : "text-muted-foreground hover:bg-transparent hover:text-primary"
-                                )}
-                            >
-                                <LayoutGrid className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => setViewMode('list')}
-                                className={cn(
-                                    "h-8 w-8 transition-all",
-                                    viewMode === 'list' ? "bg-background shadow-md text-primary hover:bg-background" : "text-muted-foreground hover:bg-transparent hover:text-primary"
-                                )}
-                            >
-                                <List className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        <Button
-                            onClick={handleNewApplication}
-                            className="h-10 px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg shadow-lg shadow-orange-600/20 transition-all active:scale-95 hover:-translate-y-0.5"
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Pengajuan Baru
+                            <List className="h-3.5 w-3.5" />
                         </Button>
                     </div>
+                    <Button
+                        onClick={handleNewApplication}
+                        size="sm"
+                    >
+                        <Plus className="h-3.5 w-3.5" />
+                        Pengajuan Baru
+                    </Button>
                 </div>
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+            <div className="flex-1 overflow-auto pb-4">
                 {viewMode === 'board' ? (
                     <DndContext
                         sensors={sensors}
@@ -438,7 +431,7 @@ export function ApplicationKanban() {
                         onDragOver={onDragOver}
                         onDragEnd={onDragEnd}
                     >
-                        <div className="flex gap-6 min-w-max px-2">
+                        <div className="flex gap-4 min-w-max">
                             {filteredData?.map((column) => (
                                 <KanbanColumn
                                     key={column.id}
@@ -463,65 +456,62 @@ export function ApplicationKanban() {
                         </DragOverlay>
                     </DndContext>
                 ) : (
-                    <div className="px-2 mt-4 animate-in slide-in-from-bottom-4">
-                        <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl overflow-hidden shadow-2xl">
-                            <Table>
-                                <TableHeader className="bg-muted/50">
-                                    <TableRow className="hover:bg-transparent border-border/50">
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">NIK/NIB</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Nama Lengkap</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Branch</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Loan Amount</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Tenor</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Status</TableHead>
-                                        <TableHead className="font-bold text-xs uppercase tracking-wider py-4">Date</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {allApplications.map((app) => (
+                    <div className="rounded-xl border bg-card overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                                    <TableHead>NIK/NIB</TableHead>
+                                    <TableHead>Nama Lengkap</TableHead>
+                                    <TableHead>Branch</TableHead>
+                                    <TableHead>Loan Amount</TableHead>
+                                    <TableHead>Tenor</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Tanggal</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {allApplications.length > 0 ? (
+                                    allApplications.map((app) => (
                                         <TableRow
                                             key={app.id}
                                             onClick={() => router.push(`/loans/${app.id}`)}
-                                            className="hover:bg-muted/30 border-border/40 transition-colors group cursor-pointer"
+                                            className="cursor-pointer"
                                         >
-                                            <TableCell className="py-4">
+                                            <TableCell className="text-muted-foreground font-mono text-xs">
                                                 {app.identityNumber}
                                             </TableCell>
-                                            <TableCell className="py-4">
+                                            <TableCell className="font-medium">
                                                 {app.fullName}
                                             </TableCell>
-                                            <TableCell className="py-4 text-sm font-medium">
+                                            <TableCell className="text-muted-foreground">
                                                 {app.branchCode || '—'}
                                             </TableCell>
-                                            <TableCell className="py-4 font-bold text-sm">
-                                                {app.amount > 0 ? `Rp ${app.amount.toLocaleString('id-ID')}` : 'Rp -'}
+                                            <TableCell className="font-medium">
+                                                {app.amount > 0 ? `Rp ${app.amount.toLocaleString('id-ID')}` : '-'}
                                             </TableCell>
-                                            <TableCell className="py-4 text-sm">
+                                            <TableCell className="text-muted-foreground">
                                                 {app.tenorMonths} bln
                                             </TableCell>
-                                            <TableCell className="py-4">
-                                                <Badge className={cn(
-                                                    "text-[10px] font-bold px-2 py-0.5 rounded-full border-none",
-                                                    app.status === 'INTAKE' && "bg-slate-500/10 text-slate-600",
-                                                    app.status === 'ANALYSIS' && "bg-blue-500/10 text-blue-600",
-                                                    app.status === 'SURVEY' && "bg-purple-500/10 text-purple-600",
-                                                    app.status === 'COMMITTEE' && "bg-orange-500/10 text-orange-600",
-                                                    app.status === 'APPROVED' && "bg-emerald-500/10 text-emerald-600",
-                                                    app.status === 'REJECTED' && "bg-rose-500/10 text-rose-600",
-                                                    app.status === 'DISBURSED' && "bg-teal-500/10 text-teal-600",
-                                                    app.status === 'CANCELLED' && "bg-slate-500/10 text-slate-600",
-                                                )}>
-                                                    {app.status}
-                                                </Badge>
+                                            <TableCell>
+                                                <LoanStatusBadge status={app.status} />
                                             </TableCell>
-                                            <TableCell className="py-4 text-xs text-muted-foreground font-medium">
+                                            <TableCell className="text-muted-foreground text-xs">
                                                 {app.date}
                                             </TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="h-32 text-center">
+                                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                                <Search className="h-5 w-5 opacity-30" />
+                                                <p className="text-sm">Tidak ada data pengajuan.</p>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
                 )}
             </div>
@@ -531,5 +521,25 @@ export function ApplicationKanban() {
                 onOpenChange={setIsNewAppDialogOpen}
             />
         </div>
+    );
+}
+
+const STATUS_MAP: Record<string, { label: string; className: string }> = {
+    INTAKE: { label: 'Intake', className: 'bg-slate-100 text-slate-600' },
+    ANALYSIS: { label: 'Analisis', className: 'bg-blue-100 text-blue-700' },
+    SURVEY: { label: 'Survey', className: 'bg-purple-100 text-purple-700' },
+    COMMITTEE: { label: 'Committee', className: 'bg-amber-100 text-amber-700' },
+    APPROVED: { label: 'Disetujui', className: 'bg-emerald-100 text-emerald-700' },
+    REJECTED: { label: 'Ditolak', className: 'bg-red-100 text-red-700' },
+    DISBURSED: { label: 'Dicairkan', className: 'bg-teal-100 text-teal-700' },
+    CANCELLED: { label: 'Dibatalkan', className: 'bg-slate-100 text-slate-600' },
+};
+
+function LoanStatusBadge({ status }: { status?: string }) {
+    const s = STATUS_MAP[status?.toUpperCase() || ''] || { label: status || '-', className: 'bg-muted text-muted-foreground' };
+    return (
+        <Badge variant="outline" className={`text-xs font-semibold border ${s.className}`}>
+            {s.label}
+        </Badge>
     );
 }

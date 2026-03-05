@@ -7,8 +7,6 @@ export const metadata: Metadata = {
 
 export default function AddApplicantPage() {
     return (
-        <div className="h-full px-6 py-6 overflow-y-auto">
-            <ApplicantAddView />
-        </div>
+        <ApplicantAddView />
     );
 }

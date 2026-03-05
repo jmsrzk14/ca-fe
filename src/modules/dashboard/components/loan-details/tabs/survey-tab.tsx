@@ -26,7 +26,7 @@ interface SurveyTabProps {
 const statusConfig: Record<SurveyStatus, { label: string, color: string, icon: any }> = {
     'UNASSIGNED': { label: 'Belum Ditugaskan', color: 'bg-slate-500', icon: AlertCircle },
     'ASSIGNED': { label: 'Ditugaskan', color: 'bg-blue-500', icon: User },
-    'IN_PROGRESS': { label: 'Sedang Berjalan', color: 'bg-orange-500', icon: Clock },
+    'IN_PROGRESS': { label: 'Sedang Berjalan', color: 'bg-amber-500', icon: Clock },
     'SUBMITTED': { label: 'Selesai', color: 'bg-emerald-500', icon: CheckCircle2 },
     'VERIFIED': { label: 'Terverifikasi', color: 'bg-indigo-600', icon: CheckCircle2 },
 };

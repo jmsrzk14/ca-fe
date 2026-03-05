@@ -74,7 +74,7 @@ export function HistoryTab() {
                             <TableRow className="border-border hover:bg-muted/30 transition-colors">
                                 <TableCell className="text-sm font-medium py-4">1</TableCell>
                                 <TableCell className="py-4">
-                                    <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/20 uppercase text-[10px] font-bold px-3 py-0.5">
+                                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 uppercase text-[10px] font-bold px-3 py-0.5">
                                         Pending
                                     </Badge>
                                 </TableCell>

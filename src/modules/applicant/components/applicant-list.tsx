@@ -5,21 +5,12 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
     Search,
-    Filter,
     Plus,
-    MoreHorizontal,
-    ExternalLink,
-    Mail,
-    Phone,
     Calendar,
-    LayoutGrid,
-    List,
-    X,
     ArrowUpDown,
     ArrowUp,
     ArrowDown,
-    Eye,
-    PencilIcon
+    X,
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
 
@@ -37,14 +28,7 @@ import {
 
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { Avatar, AvatarFallback } from '@/shared/ui/avatar';
 import { Badge } from '@/shared/ui/badge';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/lib/utils';
 
@@ -73,7 +57,6 @@ export function ApplicantList() {
     const sortedApplicants = React.useMemo(() => {
         let items = [...applicants];
 
-        // Search Filter
         if (search) {
             items = items.filter((app) =>
                 app.fullName?.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,13 +64,11 @@ export function ApplicantList() {
             );
         }
 
-        // Sorting
         if (sortConfig.key && sortConfig.direction) {
             items.sort((a: any, b: any) => {
                 let aVal = a[sortConfig.key];
                 let bVal = b[sortConfig.key];
 
-                // Handle nested or special cases if needed
                 if (sortConfig.key === 'createdAt') {
                     aVal = aVal ? new Date(aVal).getTime() : 0;
                     bVal = bVal ? new Date(bVal).getTime() : 0;
@@ -113,8 +94,8 @@ export function ApplicantList() {
     };
 
     const SortIcon = ({ column }: { column: string }) => {
-        if (sortConfig.key !== column || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 opacity-50" />;
-        return sortConfig.direction === 'asc' ? <ArrowUp className="h-4 w-4 text-orange-600" /> : <ArrowDown className="h-4 w-4 text-orange-600" />;
+        if (sortConfig.key !== column || !sortConfig.direction) return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/50" />;
+        return sortConfig.direction === 'asc' ? <ArrowUp className="h-3.5 w-3.5 text-primary" /> : <ArrowDown className="h-3.5 w-3.5 text-primary" />;
     };
 
     const renderContent = () => {
@@ -123,40 +104,40 @@ export function ApplicantList() {
         }
 
         return (
-            <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-md overflow-hidden">
+            <div className="rounded-xl border bg-card overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-muted/50">
-                        <TableRow className="hover:bg-transparent border-border/50">
+                    <TableHeader>
+                        <TableRow className="bg-muted/30 hover:bg-muted/30">
                             <TableHead
-                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                className="cursor-pointer hover:bg-muted/50 transition-colors"
                                 onClick={() => handleSort('identityNumber')}
                             >
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5">
                                     {t`NIK / NIB`} <SortIcon column="identityNumber" />
                                 </div>
                             </TableHead>
                             <TableHead
-                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                className="cursor-pointer hover:bg-muted/50 transition-colors"
                                 onClick={() => handleSort('fullName')}
                             >
-                                <div className="flex items-center gap-2">
-                                    {t`NAMA`} <SortIcon column="fullName" />
+                                <div className="flex items-center gap-1.5">
+                                    {t`Nama`} <SortIcon column="fullName" />
                                 </div>
                             </TableHead>
                             <TableHead
-                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                className="cursor-pointer hover:bg-muted/50 transition-colors"
                                 onClick={() => handleSort('applicantType')}
                             >
-                                <div className="flex items-center gap-2">
-                                    {t`TIPE`} <SortIcon column="applicantType" />
+                                <div className="flex items-center gap-1.5">
+                                    {t`Tipe`} <SortIcon column="applicantType" />
                                 </div>
                             </TableHead>
                             <TableHead
-                                className="py-4 font-bold text-foreground cursor-pointer hover:bg-muted/80 transition-colors"
+                                className="cursor-pointer hover:bg-muted/50 transition-colors"
                                 onClick={() => handleSort('createdAt')}
                             >
-                                <div className="flex items-center gap-2">
-                                    {t`TANGGAL DIBUAT`} <SortIcon column="createdAt" />
+                                <div className="flex items-center gap-1.5">
+                                    {t`Tanggal Dibuat`} <SortIcon column="createdAt" />
                                 </div>
                             </TableHead>
                         </TableRow>
@@ -164,45 +145,34 @@ export function ApplicantList() {
                     <TableBody>
                         {sortedApplicants.length > 0 ? (
                             sortedApplicants.map((app: any) => (
-                                <TableRow key={app.id} className="group hover:bg-white/5 border-border/50 transition-colors">
-                                    <TableCell className="py-4">
-                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                            {app.identityNumber}
-                                        </div>
+                                <TableRow key={app.id}>
+                                    <TableCell className="text-muted-foreground font-mono text-xs">
+                                        {app.identityNumber}
                                     </TableCell>
-                                    <TableCell className="py-4">
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-10 w-10 ring-2 ring-primary/5 group-hover:ring-orange-500/20 transition-all">
-                                                <AvatarFallback className="bg-orange-100 text-orange-700 font-bold">
-                                                    {app.fullName?.charAt(0) ?? 'A'}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex flex-col">
-                                                <Link href={`/borrowers/${app.id}`} className="font-bold text-foreground group-hover:text-orange-500 transition-colors">
-                                                    {app.fullName}
-                                                </Link>
-                                            </div>
-                                        </div>
+                                    <TableCell>
+                                        <Link href={`/borrowers/${app.id}`} className="font-medium text-foreground hover:text-primary transition-colors">
+                                            {app.fullName}
+                                        </Link>
                                     </TableCell>
-                                    <TableCell className="py-4">
-                                        <Badge variant={app.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="rounded-lg px-2 py-0.5 capitalize">
+                                    <TableCell>
+                                        <Badge variant={app.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="capitalize">
                                             {app.applicantType}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="py-4">
-                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <TableCell className="text-muted-foreground">
+                                        <div className="flex items-center gap-1.5">
                                             <Calendar className="h-3 w-3" />
-                                            <span>{app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'Feb 19, 2026'}</span>
+                                            {app.createdAt ? new Date(app.createdAt).toLocaleDateString('id-ID') : '-'}
                                         </div>
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-64 text-center">
-                                    <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-                                        <Search className="h-8 w-8 opacity-20" />
-                                        <p>{t`Tidak ada data peminjam.`}</p>
+                                <TableCell colSpan={4} className="h-32 text-center">
+                                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                        <Search className="h-5 w-5 opacity-30" />
+                                        <p className="text-sm">{t`Tidak ada data peminjam.`}</p>
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -217,12 +187,12 @@ export function ApplicantList() {
         return (
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <Skeleton className="h-10 w-[300px]" />
-                    <Skeleton className="h-10 w-[120px]" />
+                    <Skeleton className="h-8 w-[200px]" />
+                    <Skeleton className="h-8 w-[100px]" />
                 </div>
-                <div className="border rounded-xl">
+                <div className="rounded-xl border">
                     {[1, 2, 3, 4, 5].map((i) => (
-                        <Skeleton key={i} className="h-16 w-full border-b" />
+                        <Skeleton key={i} className="h-14 w-full border-b" />
                     ))}
                 </div>
             </div>
@@ -231,38 +201,26 @@ export function ApplicantList() {
 
     if (error) {
         return (
-            <div className="space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t`Peminjam`}</h1>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon" className="rounded-xl">
-                            <Filter className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl gap-2 font-semibold shadow-lg shadow-orange-600/20"
-                            asChild
-                        >
-                            <Link href="/borrowers/add">
-                                <Plus className="h-5 w-5" />
-                                {t`Tambah peminjam`}
-                            </Link>
-                        </Button>
-                    </div>
+            <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-xl font-bold text-foreground">{t`Peminjam`}</h1>
+                    <Button size="sm" asChild>
+                        <Link href="/borrowers/add">
+                            <Plus className="h-3.5 w-3.5" />
+                            {t`Tambah`}
+                        </Link>
+                    </Button>
                 </div>
 
-                <div className="flex flex-col items-center justify-center py-20 gap-4 text-center bg-card/30 backdrop-blur-md rounded-2xl border border-destructive/20">
-                    <div className="p-4 bg-destructive/10 text-destructive rounded-full">
-                        <X className="h-10 w-10" />
+                <div className="flex flex-col items-center justify-center py-12 gap-3 text-center rounded-xl border">
+                    <div className="p-3 bg-destructive/10 text-destructive rounded-full">
+                        <X className="h-6 w-6" />
                     </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-foreground">{t`Gagal memuat data peminjam`}</h2>
-                    </div>
+                    <p className="text-sm font-medium">{t`Gagal memuat data peminjam`}</p>
                     <Button
                         variant="outline"
+                        size="sm"
                         onClick={() => window.location.reload()}
-                        className="mt-2 rounded-xl border-orange-200 hover:bg-orange-50 text-orange-700"
                     >
                         {t`Coba Lagi`}
                     </Button>
@@ -272,40 +230,34 @@ export function ApplicantList() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{t`Peminjam`}</h1>
+        <div className="space-y-4">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex gap-2 items-center">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                        <Input
+                            placeholder={t`Cari nama atau NIK...`}
+                            className="h-8 w-64 pl-8 text-xs rounded-md"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                    {sortedApplicants.length > 0 && (
+                        <span className="text-xs text-muted-foreground px-1">
+                            {sortedApplicants.length} peminjam
+                        </span>
+                    )}
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="rounded-xl">
-                        <Filter className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl gap-2 font-semibold shadow-lg shadow-orange-600/20"
-                        asChild
-                    >
-                        <Link href="/borrowers/add">
-                            <Plus className="h-5 w-5" />
-                            {t`Tambah peminjam`}
-                        </Link>
-                    </Button>
-                </div>
+                <Button size="sm" asChild>
+                    <Link href="/borrowers/add">
+                        <Plus className="h-3.5 w-3.5" />
+                        {t`Tambah Peminjam`}
+                    </Link>
+                </Button>
             </div>
 
             <ApplicantFormSheet open={isFormOpen} onOpenChange={setIsFormOpen} />
-
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-card/50 p-4 rounded-2xl border border-border/50 backdrop-blur-sm">
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder={t`Search by name or ID number...`}
-                        className="pl-10 bg-background/50 border-border/50 rounded-xl focus-visible:ring-orange-500/50"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                </div>
-            </div>
 
             {renderContent()}
         </div>

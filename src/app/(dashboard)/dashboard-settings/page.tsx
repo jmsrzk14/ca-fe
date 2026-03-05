@@ -8,8 +8,8 @@ export default function DashboardSettingsPage() {
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in">
             <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                    <LayoutDashboard className="h-6 w-6 text-orange-600" />
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <LayoutDashboard className="h-6 w-6 text-primary" />
                 </div>
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-foreground">{t`Atur Dashboard`}</h1>
