@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/shared/ui/button';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
 import { referenceService } from '@/core/api';
 import { DetailItem } from '@/shared/components/detail-item';
@@ -14,7 +13,7 @@ interface LoanInfoTabProps {
 }
 
 export function LoanInfoTab({ application, applicant, productName }: LoanInfoTabProps) {
-    const { registry, getLabel, isLoading } = useAttributeRegistry();
+    const { registry, isLoading } = useAttributeRegistry();
     const { data: citiesResponse } = useQuery({
         queryKey: ['cities'],
         queryFn: () => referenceService.listCities(),
@@ -38,7 +37,6 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
         );
     }
 
-    // Filter attributes for application scope
     const applicationAttributes = registry.filter((attr: any) =>
         attr.scope === 'APPLICATION'
     ).sort((a: any, b: any) => (a.displayOrder || 0) - (b.displayOrder || 0));
@@ -89,58 +87,60 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
         return val;
     };
 
+    const loanFields = [
+        { label: 'Peminjam', value: (applicant?.fullName || applicant?.attributes?.find((a: any) => a.key === 'full_name' || a.key === '0195383f-4281-7000-bb34-812010000002')?.value) || '—' },
+        { label: 'Produk', value: productName || application.productId || '—' },
+        { label: 'Tanggal Diajukan', value: formatDate(application.createdAt) },
+        { label: 'Tanggal Diubah', value: formatDate(application.updatedAt || application.createdAt) },
+        { label: 'Plafon Diajukan', value: formatCurrency(application.loanAmount) },
+        { label: 'Jangka Waktu', value: application.tenorMonths ? `${application.tenorMonths} Bulan` : '—' },
+        { label: 'Suku Bunga', value: application.interestRate ? `${application.interestRate}%` : '—' },
+        { label: 'Tipe Suku Bunga', value: application.interestType || '—' },
+        { label: 'Angsuran Per Bulan', value: '—' },
+        { label: 'Plafon Max', value: '—' },
+        { label: 'Tujuan Penggunaan', value: application.loanPurpose || '—' },
+    ];
+
+    const extraFields = applicationAttributes.map((attr: any) => ({
+        label: attr.uiLabel || attr.description,
+        value: getAttrValue(attr),
+    }));
+
+    const allFields = [...loanFields, ...extraFields];
+
     return (
         <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-            <div className="flex items-center justify-between mb-8">
-                <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <span className="w-1 h-5 bg-primary rounded-full"></span>
-                    Pinjaman
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                    <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
+                    Informasi Pinjaman
                 </h2>
-                <Button variant="outline" size="sm" className="text-primary border-primary/20 bg-primary/5 hover:bg-primary/10">
-                    Ubah Pinjaman
-                </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12 mb-12">
-                <DetailItem label="Peminjam" value={(applicant?.fullName || applicant?.attributes?.find((a: any) => a.key === 'full_name' || a.key === '0195383f-4281-7000-bb34-812010000002')?.value) || '—'} />
-                <DetailItem label="Produk" value={productName || application.productId || '—'} />
-                <DetailItem label="Tanggal Diajukan" value={formatDate(application.createdAt)} />
-                <DetailItem label="Tanggal Diubah" value={formatDate(application.updatedAt || application.createdAt)} />
-                <DetailItem label="Plafon Diajukan" value={formatCurrency(application.loanAmount)} />
-                <DetailItem label="Jangka Waktu" value={application.tenorMonths ? `${application.tenorMonths} Bulan` : '—'} />
-                <DetailItem label="Suku Bunga" value={application.interestRate ? `${application.interestRate}%` : '—'} />
-                <DetailItem label="Tipe Suku Bunga" value={application.interestType || '—'} />
-                <DetailItem label="Angsuran Per Bulan" value="—" />
-                <DetailItem label="Plafon Max" value="—" />
-                <DetailItem label="Tujuan Penggunaan" value={application.loanPurpose || '—'} />
             </div>
 
-            <div className="mb-12">
-                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center mb-6">Rincian Penggunaan</h3>
-                <div className="bg-muted rounded-xl p-4 flex justify-between items-center max-w-2xl mx-auto border border-border">
-                    <span className="text-sm font-medium text-foreground">{application.loanPurpose || '—'}</span>
-                    <span className="text-sm font-bold text-foreground">{formatCurrency(application.loanAmount).replace('Rp', '')}</span>
-                </div>
-            </div>
-
-            {applicationAttributes.length > 0 && (
-                <div className="mt-8 pt-8 border-t border-border">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                            <span className="w-1 h-5 bg-primary rounded-full"></span>
-                            Data Tambahan
-                        </h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                        {applicationAttributes.map((attr: any) => (
+            <div className="border border-border/50 rounded-xl overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 text-sm">
+                    <div className="flex flex-col divide-y divide-border/50 md:border-r border-border/50">
+                        {allFields.filter((_, i) => i % 2 === 0).map((field, idx) => (
                             <DetailItem
-                                key={attr.id}
-                                label={attr.uiLabel || attr.description}
-                                value={getAttrValue(attr)}
+                                key={idx}
+                                label={field.label}
+                                value={field.value}
+                                variant="inline"
+                            />
+                        ))}
+                    </div>
+                    <div className="flex flex-col divide-y divide-border/50">
+                        {allFields.filter((_, i) => i % 2 !== 0).map((field, idx) => (
+                            <DetailItem
+                                key={idx}
+                                label={field.label}
+                                value={field.value}
+                                variant="inline"
                             />
                         ))}
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

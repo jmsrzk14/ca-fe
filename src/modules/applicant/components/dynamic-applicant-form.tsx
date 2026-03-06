@@ -2,9 +2,11 @@
 
 import * as React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
     User,
-    Save,
     Loader2,
     CheckCircle2,
     ChevronRight,
@@ -18,7 +20,6 @@ import {
     DollarSign,
     Activity,
     Heart,
-    Calendar,
     GraduationCap,
     Home,
 } from 'lucide-react';
@@ -31,15 +32,15 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Card, CardContent } from '@/shared/ui/card';
 import { cn } from '@/shared/lib/utils';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/shared/ui/dialog';
+import { DynamicField } from '@/shared/components/dynamic-field';
+import { buildDynamicSchema, resolveChoiceId } from '@/shared/lib/dynamic-form';
 
 interface DynamicApplicantFormProps {
     applicantId?: string;
@@ -47,54 +48,49 @@ interface DynamicApplicantFormProps {
     onCancel?: () => void;
 }
 
-const getIconWithName = (name?: string) => {
-    if (!name) return Settings;
-    try {
-        const icons: Record<string, any> = {
-            User, Building2, Settings, CheckCircle2,
-            Phone, Mail, MapPin, Briefcase, DollarSign, Activity, Heart,
-            GraduationCap, Home
-        };
-        return icons[name] || Settings;
-    } catch {
-        return Settings;
-    }
+const ICON_MAP: Record<string, any> = {
+    User, Building2, Settings, CheckCircle2,
+    Phone, Mail, MapPin, Briefcase, DollarSign, Activity, Heart,
+    GraduationCap, Home,
 };
 
-const getCommonOptions = (): Record<string, { label: string; value: string; }[]> => ({
-    gender: [
-        { label: t`Laki-laki`, value: 'MALE' },
-        { label: t`Perempuan`, value: 'FEMALE' },
-    ],
-    maritalStatus: [
-        { label: t`Belum Menikah`, value: 'SINGLE' },
-        { label: t`Menikah`, value: 'MARRIED' },
-        { label: t`Cerai`, value: 'DIVORCED' },
-    ],
-    homeOwnership: [
-        { label: t`Milik Sendiri`, value: 'OWNED' },
-        { label: t`Sewa/Kontrak`, value: 'RENTED' },
-        { label: t`Milik Keluarga`, value: 'FAMILY' },
-    ],
-    jobStatus: [
-        { label: t`Karyawan Tetap`, value: 'PERMANENT' },
-        { label: t`Karyawan Kontrak`, value: 'CONTRACT' },
-        { label: t`Wiraswasta`, value: 'SELF_EMPLOYED' },
-    ],
-    lastEducation: [
-        { label: t`SMA/Sederajat`, value: 'SMA' },
-        { label: t`D3`, value: 'D3' },
-        { label: t`S1`, value: 'S1' },
-        { label: t`S2`, value: 'S2' },
-    ],
-    isKnownInArea: [
-        { label: t`Ya`, value: 'YES' },
-        { label: t`Tidak`, value: 'NO' },
-    ]
+const CATEGORY_ICON_FALLBACK: Record<string, any> = {
+    KONTAK: Phone,
+    PEKERJAAN: Briefcase,
+    FINANSIAL: DollarSign,
+    USAHA: DollarSign,
+    IDENTITAS: User,
+    BIO: User,
+    PERILAKU: Activity,
+    KARAKTER: Activity,
+    PASANGAN: Heart,
+    DOKUMEN: Building2,
+    PENDIDIKAN: GraduationCap,
+    RUMAH: Home,
+};
+
+function resolveIcon(iconName?: string, categoryTitle?: string) {
+    if (iconName && ICON_MAP[iconName]) return ICON_MAP[iconName];
+    if (categoryTitle) {
+        const upper = categoryTitle.toUpperCase();
+        for (const [keyword, icon] of Object.entries(CATEGORY_ICON_FALLBACK)) {
+            if (upper.includes(keyword)) return icon;
+        }
+    }
+    return Settings;
+}
+
+const PRIMARY_KEYS = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate', 'applicantType'];
+
+// Schema for the primary (step-0) fields
+const primarySchema = z.object({
+    fullName: z.string().min(1, 'Nama wajib diisi'),
+    identityNumber: z.string().min(1, 'NIK/NIB wajib diisi'),
+    taxId: z.string(),
+    birthDate: z.string(),
 });
 
 export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: DynamicApplicantFormProps) {
-    const COMMON_OPTIONS = React.useMemo(() => getCommonOptions(), []);
     const queryClient = useQueryClient();
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
@@ -109,12 +105,6 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         queryFn: () => referenceService.listAttributeCategories(),
     });
 
-    const { data: citiesResponse } = useQuery({
-        queryKey: ['cities'],
-        queryFn: () => referenceService.listCities(),
-        staleTime: 1000 * 60 * 60,
-    });
-
     const { data: applicantData, isLoading: isApplicantLoading } = useQuery({
         queryKey: ['applicant', applicantId],
         queryFn: () => applicantService.getById(applicantId!),
@@ -122,8 +112,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         initialData: () => {
             if (!applicantId) return undefined;
             const cached = queryClient.getQueryData<any>(['applicants']);
-            const found = cached?.applicants?.find((a: any) => a.id === applicantId);
-            return found ?? undefined;
+            return cached?.applicants?.find((a: any) => a.id === applicantId) ?? undefined;
         },
     });
 
@@ -143,59 +132,13 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
     const apiCategories = categoriesResponse?.categories || [];
 
-    const [formData, setFormData] = React.useState<Record<string, any>>({
-        fullName: '',
-        identityNumber: '',
-        taxId: '',
-        birthDate: '',
-        establishmentDate: '',
-    });
-
-    const parseToDateString = (val: any): string => {
-        if (!val) return '';
-        if (typeof val === 'string') return val.split('T')[0];
-        if (val.seconds !== undefined) {
-            try {
-                return new Date(Number(val.seconds) * 1000).toISOString().split('T')[0];
-            } catch { return ''; }
-        }
-        try {
-            const d = new Date(val);
-            return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
-        } catch { return ''; }
-    };
-
-    React.useEffect(() => {
-        if (applicantData) {
-            setCurrentStep(0);
-
-            const normalizedType = normalizeApplicantType(applicantData.applicantType);
-
-            const newFormData: Record<string, any> = {
-                fullName: applicantData.fullName || '',
-                identityNumber: applicantData.identityNumber || '',
-                taxId: applicantData.taxId || '',
-                birthDate: normalizedType === 'CORPORATE'
-                    ? parseToDateString(applicantData.establishmentDate)
-                    : parseToDateString(applicantData.birthDate),
-            };
-
-            applicantData.attributes?.forEach((attr: any) => {
-                const regItem = registry.find(r => r.id === attr.key || r.attributeCode === attr.key);
-                const formKey = regItem ? regItem.attributeCode : attr.key;
-                if (formKey) newFormData[formKey] = attr.value ?? '';
-            });
-
-            setFormData(newFormData);
-        }
-    }, [applicantData, registry]);
-
+    // Dynamic attributes grouped by category
     const categories = React.useMemo(() => {
         const groups: Record<string, AttributeRegistry[]> = {};
-        const primaryKeys = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate', 'applicantType'];
 
         registry.forEach(attr => {
-            if (primaryKeys.includes(attr.attributeCode)) return;
+            if (PRIMARY_KEYS.includes(attr.attributeCode)) return;
+            if (attr.scope !== 'APPLICANT') return;
             if (attr.appliesTo !== 'BOTH' && attr.appliesTo !== type) return;
             if (!applicantId && attr.hideOnCreate) return;
 
@@ -211,58 +154,148 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 .map(cat => ({
                     id: (cat.categoryCode || '').toLowerCase().replace(/[^a-z0-9]+/g, '_'),
                     title: cat.categoryName || 'Lainnya',
-                    fields: groups[cat.categoryCode] || [],
-                    iconName: cat.uiIcon
-                }));
+                    fields: (groups[cat.categoryCode] || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
+                    iconName: cat.uiIcon,
+                }))
+                .filter(cat => cat.fields.length > 0);
         }
 
         return Object.entries(groups)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([name, fields]) => ({
-                id: (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                title: t`${name || 'Lainnya'}`,
-                fields,
-                iconName: undefined
-            }));
-    }, [registry, apiCategories, t, type]);
+                id: name.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+                title: name || 'Lainnya',
+                fields: fields.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
+                iconName: undefined as string | undefined,
+            }))
+            .filter(cat => cat.fields.length > 0);
+    }, [registry, apiCategories, type, applicantId]);
 
     const steps = React.useMemo(() => {
-        return categories.map(cat => {
-            let Icon = Settings;
-            const name = cat.title.toUpperCase();
-
-            if (cat.iconName) {
-                Icon = getIconWithName(cat.iconName);
-            } else {
-                if (name.includes('KONTAK')) Icon = Phone;
-                if (name.includes('PEKERJAAN')) Icon = Briefcase;
-                if (name.includes('FINANSIAL') || name.includes('USAHA')) Icon = DollarSign;
-                if (name.includes('IDENTITAS') || name.includes('BIO')) Icon = User;
-                if (name.includes('PERILAKU') || name.includes('KARAKTER')) Icon = Activity;
-                if (name.includes('PASANGAN')) Icon = Heart;
-                if (name.includes('DOKUMEN')) Icon = Building2;
-                if (name.includes('PENDIDIKAN')) Icon = GraduationCap;
-                if (name.includes('RUMAH')) Icon = Home;
-            }
-
-            return { ...cat, icon: Icon };
-        });
+        return categories.map(cat => ({
+            ...cat,
+            icon: resolveIcon(cat.iconName, cat.title),
+        }));
     }, [categories]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+    // Build dynamic Zod schema for each step
+    const stepSchemas = React.useMemo(() => {
+        return steps.map(step => buildDynamicSchema(step.fields));
+    }, [steps]);
+
+    // Form state — use react-hook-form for primary fields
+    const primaryForm = useForm<z.infer<typeof primarySchema>>({
+        resolver: zodResolver(primarySchema),
+        defaultValues: { fullName: '', identityNumber: '', taxId: '', birthDate: '' },
+    });
+
+    // Dynamic fields stored separately (flat key-value)
+    const [dynamicData, setDynamicData] = React.useState<Record<string, string>>({});
+    const [dynamicErrors, setDynamicErrors] = React.useState<Record<string, string>>({});
+
+    const handleDynamicChange = (key: string, value: string) => {
+        setDynamicData(prev => ({ ...prev, [key]: value }));
+        // Clear error on change
+        if (dynamicErrors[key]) {
+            setDynamicErrors(prev => {
+                const next = { ...prev };
+                delete next[key];
+                return next;
+            });
+        }
     };
 
-    const handleSelectChange = (name: string, value: string) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
+    // Load existing applicant data
+    const parseToDateString = (val: any): string => {
+        if (!val) return '';
+        if (typeof val === 'string') return val.split('T')[0];
+        if (val.seconds !== undefined) {
+            try { return new Date(Number(val.seconds) * 1000).toISOString().split('T')[0]; }
+            catch { return ''; }
+        }
+        try {
+            const d = new Date(val);
+            return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+        } catch { return ''; }
+    };
+
+    React.useEffect(() => {
+        if (applicantData) {
+            setCurrentStep(0);
+            const normalizedType = normalizeApplicantType(applicantData.applicantType);
+
+            primaryForm.reset({
+                fullName: applicantData.fullName || '',
+                identityNumber: applicantData.identityNumber || '',
+                taxId: applicantData.taxId || '',
+                birthDate: normalizedType === 'CORPORATE'
+                    ? parseToDateString(applicantData.establishmentDate)
+                    : parseToDateString(applicantData.birthDate),
+            });
+
+            const newDynamic: Record<string, string> = {};
+            applicantData.attributes?.forEach((attr: any) => {
+                const regItem = registry.find(r => r.id === attr.key || r.attributeCode === attr.key);
+                const formKey = regItem ? regItem.attributeCode : attr.key;
+                if (formKey && !PRIMARY_KEYS.includes(formKey)) {
+                    newDynamic[formKey] = attr.value ?? '';
+                }
+            });
+            setDynamicData(newDynamic);
+        }
+    }, [applicantData, registry]);
+
+    // Validation
+    const validateCurrentStep = (): boolean => {
+        if (currentStep === 0) {
+            // Trigger primary form validation
+            // We'll check synchronously via getValues
+            const values = primaryForm.getValues();
+            if (!values.fullName?.trim() || !values.identityNumber?.trim()) {
+                primaryForm.trigger();
+                return false;
+            }
+            return true;
+        }
+
+        // Validate dynamic fields for current step
+        const step = steps[currentStep];
+        if (!step) return true;
+
+        const schema = stepSchemas[currentStep];
+        if (!schema) return true;
+
+        const stepData: Record<string, string> = {};
+        for (const field of step.fields) {
+            stepData[field.attributeCode] = dynamicData[field.attributeCode] || '';
+        }
+
+        const result = schema.safeParse(stepData);
+        if (!result.success) {
+            const errors: Record<string, string> = {};
+            for (const issue of result.error.issues) {
+                const key = issue.path[0] as string;
+                errors[key] = issue.message;
+            }
+            setDynamicErrors(prev => ({ ...prev, ...errors }));
+            const firstError = Object.values(errors)[0];
+            toast.error(firstError || 'Harap lengkapi field yang wajib');
+            return false;
+        }
+
+        return true;
+    };
+
+    const nextStep = () => {
+        if (!validateCurrentStep()) return;
+        if (currentStep < steps.length - 1) {
+            setCurrentStep(prev => prev + 1);
+        }
     };
 
     const mutation = useMutation({
         mutationFn: (data: any) => {
-            if (applicantId) {
-                return applicantService.update(applicantId, data);
-            }
+            if (applicantId) return applicantService.update(applicantId, data);
             return applicantService.create(data);
         },
         onSuccess: () => {
@@ -270,61 +303,45 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             if (applicantId) {
                 queryClient.invalidateQueries({ queryKey: ['applicant', applicantId] });
             }
-            toast.success(applicantId ? t`Applicant updated successfully` : t`Applicant created successfully`);
+            toast.success(applicantId ? t`Peminjam berhasil diperbarui` : t`Peminjam berhasil ditambahkan`);
             onSuccess?.();
         },
         onError: (error: any) => {
-            toast.error(error.message || (applicantId ? t`Failed to update applicant` : t`Failed to create applicant`));
+            toast.error(error.message || (applicantId ? t`Gagal memperbarui peminjam` : t`Gagal menambah peminjam`));
         },
     });
-
-    const nextStep = () => {
-        if (currentStep === 0) {
-            if (!formData.fullName || !formData.identityNumber) {
-                toast.error(t`Harap isi Nama dan NIK/NIB`);
-                return;
-            }
-        }
-
-        if (currentStep < steps.length - 1) {
-            setCurrentStep(prev => prev + 1);
-        }
-    };
 
     const performSubmit = () => {
         setIsConfirmOpen(false);
         const now = new Date().toISOString();
+        const primary = primaryForm.getValues();
 
-        const primaryKeys = [
-            'applicantType', 'identityNumber', 'taxId', 'fullName',
-            'birthDate', 'establishmentDate', 'attributes', 'createdAt'
-        ];
-
-        const attributes = Object.entries(formData)
-            .filter(([key, value]) => !primaryKeys.includes(key) && value !== undefined && value !== '')
+        const attributes = Object.entries(dynamicData)
+            .filter(([key, value]) => value !== undefined && value !== '')
             .map(([key, value]) => {
                 const regItem = registry.find(r => r.attributeCode === key);
                 return {
                     key: regItem?.id || key,
                     value: String(value),
                     dataType: regItem?.dataType || 'STRING',
-                    updatedAt: now
+                    choiceId: regItem ? resolveChoiceId(regItem, String(value)) : undefined,
+                    updatedAt: now,
                 };
             });
 
         const payload = {
             applicantType: type,
-            fullName: formData.fullName,
-            identityNumber: formData.identityNumber,
-            taxId: formData.taxId,
-            birthDate: type === 'PERSONAL' && formData.birthDate
-                ? new Date(formData.birthDate).toISOString()
+            fullName: primary.fullName,
+            identityNumber: primary.identityNumber,
+            taxId: primary.taxId,
+            birthDate: type === 'PERSONAL' && primary.birthDate
+                ? new Date(primary.birthDate).toISOString()
                 : '',
-            establishmentDate: type === 'CORPORATE' && formData.birthDate
-                ? new Date(formData.birthDate).toISOString()
+            establishmentDate: type === 'CORPORATE' && primary.birthDate
+                ? new Date(primary.birthDate).toISOString()
                 : '',
             attributes,
-            ...(applicantId ? {} : { createdAt: now })
+            ...(applicantId ? {} : { createdAt: now }),
         };
 
         mutation.mutate(payload);
@@ -339,114 +356,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         );
     }
 
-    const inputClass = "h-9 rounded-md";
-
-    const renderField = (field: AttributeRegistry) => {
-        const id = field.attributeCode;
-        const rawLabel = field.uiLabel || field.description || id;
-        const label = t`${rawLabel}`;
-        const isRequired = field.isRequired;
-
-        const labelContent = (
-            <Label className="text-xs font-medium text-muted-foreground">
-                {label} {isRequired && <span className="text-destructive">*</span>}
-            </Label>
-        );
-
-        const CITY_FIELDS = ['kota_ktp', 'kota_domisili'];
-        const isCityField = CITY_FIELDS.includes(id);
-        const resolvedChoices = isCityField
-            ? (citiesResponse?.cities || []).map((c: any) => ({ id: c.code, code: c.code, value: c.value, displayOrder: 0 }))
-            : field.choices;
-
-        if (field.dataType?.toUpperCase() === 'SELECT' && resolvedChoices && resolvedChoices.length > 0) {
-            return (
-                <div key={id} className="space-y-1.5">
-                    {labelContent}
-                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
-                        <SelectTrigger className={inputClass}>
-                            <SelectValue placeholder={t`Pilih ${label}...`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {resolvedChoices
-                                .slice()
-                                .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
-                                .map(opt => (
-                                    <SelectItem key={opt.id || opt.code} value={opt.code}>
-                                        {opt.value}
-                                    </SelectItem>
-                                ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            );
-        }
-
-        const commonOptions = COMMON_OPTIONS[id];
-        if (commonOptions) {
-            return (
-                <div key={id} className="space-y-1.5">
-                    {labelContent}
-                    <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
-                        <SelectTrigger className={inputClass}>
-                            <SelectValue placeholder={t`Pilih ${label}...`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {commonOptions.map(opt => (
-                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            );
-        }
-
-        switch (field.dataType?.toUpperCase()) {
-            case 'SELECT':
-                return (
-                    <div key={id} className="space-y-1.5">
-                        {labelContent}
-                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className={inputClass} placeholder={t`Masukkan ${label}`} />
-                    </div>
-                );
-            case 'BOOLEAN':
-                return (
-                    <div key={id} className="space-y-1.5">
-                        {labelContent}
-                        <Select onValueChange={(v) => handleSelectChange(id, v)} value={formData[id] || ''}>
-                            <SelectTrigger className={inputClass}>
-                                <SelectValue placeholder={t`Pilih...`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="true">{t`Ya`}</SelectItem>
-                                <SelectItem value="false">{t`Tidak`}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                );
-            case 'DATE':
-                return (
-                    <div key={id} className="space-y-1.5">
-                        {labelContent}
-                        <Input id={id} name={id} type="date" value={formData[id] || ''} onChange={handleInputChange} className={inputClass} />
-                    </div>
-                );
-            case 'NUMBER':
-                return (
-                    <div key={id} className="space-y-1.5">
-                        {labelContent}
-                        <Input id={id} name={id} type="number" value={formData[id] || ''} onChange={handleInputChange} className={inputClass} />
-                    </div>
-                );
-            default:
-                return (
-                    <div key={id} className="space-y-1.5">
-                        {labelContent}
-                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className={inputClass} placeholder={t`Masukkan ${label}`} />
-                    </div>
-                );
-        }
-    };
+    const inputClass = 'h-9 rounded-md';
 
     return (
         <Card>
@@ -527,21 +437,39 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                     <Label className="text-xs font-medium text-muted-foreground">
                                         {t`Nama Lengkap`} <span className="text-destructive">*</span>
                                     </Label>
-                                    <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} className={inputClass} placeholder={t`Masukkan Nama Sesuai Identitas`} />
+                                    <Input
+                                        {...primaryForm.register('fullName')}
+                                        className={inputClass}
+                                        placeholder={t`Masukkan Nama Sesuai Identitas`}
+                                    />
+                                    {primaryForm.formState.errors.fullName && (
+                                        <p className="text-[10px] text-destructive mt-0.5">{primaryForm.formState.errors.fullName.message}</p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-medium text-muted-foreground">
                                         {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NIB / No. Izin`} <span className="text-destructive">*</span>
                                     </Label>
-                                    <Input id="identityNumber" name="identityNumber" value={formData.identityNumber} onChange={handleInputChange} className={inputClass} placeholder="1234567890..." />
+                                    <Input
+                                        {...primaryForm.register('identityNumber')}
+                                        className={inputClass}
+                                        placeholder="1234567890..."
+                                    />
+                                    {primaryForm.formState.errors.identityNumber && (
+                                        <p className="text-[10px] text-destructive mt-0.5">{primaryForm.formState.errors.identityNumber.message}</p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-medium text-muted-foreground">
                                         {t`NPWP (Opsional)`}
                                     </Label>
-                                    <Input id="taxId" name="taxId" value={formData.taxId} onChange={handleInputChange} className={inputClass} placeholder="00.000.000.0-000.000" />
+                                    <Input
+                                        {...primaryForm.register('taxId')}
+                                        className={inputClass}
+                                        placeholder="00.000.000.0-000.000"
+                                    />
                                 </div>
 
                                 <div className="space-y-1.5">
@@ -549,18 +477,24 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                         {type === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`}
                                     </Label>
                                     <Input
-                                        id="birthDate"
-                                        name="birthDate"
+                                        {...primaryForm.register('birthDate')}
                                         type="date"
-                                        value={formData.birthDate}
-                                        onChange={handleInputChange}
                                         className={inputClass}
                                     />
                                 </div>
                             </>
                         )}
 
-                        {steps[currentStep]?.fields?.map((field: AttributeRegistry) => renderField(field))}
+                        {currentStep > 0 && steps[currentStep]?.fields?.map((field: AttributeRegistry) => (
+                            <DynamicField
+                                key={field.attributeCode}
+                                field={field}
+                                value={dynamicData[field.attributeCode] || ''}
+                                onChange={handleDynamicChange}
+                                error={dynamicErrors[field.attributeCode]}
+                                inputClass={inputClass}
+                            />
+                        ))}
                     </div>
                 </div>
 
@@ -573,10 +507,12 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
                     <Button
                         size="sm"
-                        onClick={currentStep === steps.length - 1 ? () => setIsConfirmOpen(true) : nextStep}
+                        onClick={currentStep === steps.length - 1 ? () => {
+                            if (validateCurrentStep()) setIsConfirmOpen(true);
+                        } : nextStep}
                         className={currentStep === steps.length - 1 ? "bg-emerald-600 hover:bg-emerald-700" : ""}
                     >
-                        {currentStep === steps.length - 1 ? t`Simpan Applicant` : t`Langkah Berikutnya`}
+                        {currentStep === steps.length - 1 ? t`Simpan Peminjam` : t`Langkah Berikutnya`}
                         {currentStep < steps.length - 1 && <ChevronRight className="h-3.5 w-3.5 ml-1" />}
                     </Button>
                 </div>

@@ -3,6 +3,7 @@ syntax = "proto3";
 package api.applicant.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "credit-analytics-backend/api/applicant/v1;v1";
@@ -43,6 +44,32 @@ service ApplicantService {
     option (google.api.http) = {
       post: "/v1/applicants/{applicant_id}/attributes",
       body: "*"
+    };
+  }
+
+  rpc AddApplicantParty (AddApplicantPartyRequest) returns (ApplicantPartyResponse) {
+    option (google.api.http) = {
+      post: "/v1/applicants/{applicant_id}/parties",
+      body: "*"
+    };
+  }
+
+  rpc UpdateApplicantParty (UpdateApplicantPartyRequest) returns (ApplicantPartyResponse) {
+    option (google.api.http) = {
+      put: "/v1/applicants/{applicant_id}/parties/{party_id}",
+      body: "*"
+    };
+  }
+
+  rpc RemoveApplicantParty (RemoveApplicantPartyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/applicants/{applicant_id}/parties/{party_id}"
+    };
+  }
+
+  rpc ListApplicantParties (ListApplicantPartiesRequest) returns (ListApplicantPartiesResponse) {
+    option (google.api.http) = {
+      get: "/v1/applicants/{applicant_id}/parties"
     };
   }
 }
@@ -118,4 +145,51 @@ message ListApplicantsResponse {
 message UpsertApplicantAttributesRequest {
   string applicant_id = 1;
   repeated ApplicantAttribute attributes = 2;
+}
+
+message ApplicantPartyResponse {
+  string party_id = 1;
+  string party_type = 2;
+  string name = 3;
+  string identifier = 4;
+  string date_of_birth = 5;
+  string role_code = 6;
+  double ownership_pct = 7;
+  string position = 8;
+  bool slik_required = 9;
+}
+
+message AddApplicantPartyRequest {
+  string applicant_id = 1;
+  string party_type = 2;
+  string name = 3;
+  string identifier = 4;
+  string date_of_birth = 5;
+  string role_code = 6;
+  double ownership_pct = 7;
+  string position = 8;
+  bool slik_required = 9;
+}
+
+message UpdateApplicantPartyRequest {
+  string applicant_id = 1;
+  string party_id = 2;
+  string role_code = 3;
+  double ownership_pct = 4;
+  string position = 5;
+  bool slik_required = 6;
+}
+
+message RemoveApplicantPartyRequest {
+  string applicant_id = 1;
+  string party_id = 2;
+  string role_code = 3;
+}
+
+message ListApplicantPartiesRequest {
+  string applicant_id = 1;
+}
+
+message ListApplicantPartiesResponse {
+  repeated ApplicantPartyResponse parties = 1;
 }

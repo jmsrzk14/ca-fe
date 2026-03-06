@@ -14,6 +14,8 @@ import {
     AlertCircle,
     Database,
     Pencil,
+    ChevronDown,
+    ChevronRight,
     User, UserCheck, UserX, Users, Baby, PersonStanding, Fingerprint, ScanFace, IdCard,
     Phone, Mail, MessageSquare, Send, AtSign, Bell, Rss, Radio,
     Building2, Briefcase, Factory, Store, Landmark, Newspaper, ClipboardList, Award, Star,
@@ -493,82 +495,182 @@ export function AttributeManagementView() {
                 </DialogContent>
             </Dialog>
 
-            {/* Table */}
-            <div className="rounded-xl border bg-card overflow-hidden">
-                {isLoading ? (
-                    <div className="p-12 flex flex-col items-center justify-center gap-3">
-                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                        <p className="text-sm text-muted-foreground">{t`Menghubungkan ke Registry...`}</p>
+            {/* Scope Filter + Grouped Tables */}
+            {isLoading ? (
+                <div className="p-12 flex flex-col items-center justify-center gap-3 rounded-xl border bg-card">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">{t`Menghubungkan ke Registry...`}</p>
+                </div>
+            ) : (
+                <ScopeFilteredRegistryView
+                    attributes={registry?.attributes || []}
+                    onEdit={openEdit}
+                />
+            )}
+        </div>
+    );
+}
+
+const SCOPE_TABS = [
+    { value: 'APPLICANT', label: 'Data Peminjam', icon: User, description: 'Field yang melekat pada profil peminjam' },
+    { value: 'APPLICATION', label: 'Data Pinjaman', icon: FileText, description: 'Field yang melekat pada pengajuan pinjaman' },
+] as const;
+
+function ScopeFilteredRegistryView({ attributes, onEdit }: { attributes: any[]; onEdit: (attr: any) => void }) {
+    const [activeScope, setActiveScope] = React.useState<string>('APPLICANT');
+    const [collapsedCategories, setCollapsedCategories] = React.useState<Set<string>>(new Set());
+
+    const toggleCategory = (key: string) => {
+        setCollapsedCategories(prev => {
+            const next = new Set(prev);
+            next.has(key) ? next.delete(key) : next.add(key);
+            return next;
+        });
+    };
+
+    const scopeCounts = React.useMemo(() => {
+        const counts: Record<string, number> = {};
+        for (const attr of attributes) {
+            const scope = attr.scope || 'APPLICANT';
+            counts[scope] = (counts[scope] || 0) + 1;
+        }
+        return counts;
+    }, [attributes]);
+
+    const categories = React.useMemo(() => {
+        const filtered = attributes.filter(a => (a.scope || 'APPLICANT') === activeScope);
+        const catMap: Record<string, any[]> = {};
+        for (const attr of filtered) {
+            const cat = attr.categoryName || 'Lainnya';
+            if (!catMap[cat]) catMap[cat] = [];
+            catMap[cat].push(attr);
+        }
+        return Object.entries(catMap)
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .map(([catName, attrs]) => ({ catName, attrs }));
+    }, [attributes, activeScope]);
+
+    return (
+        <div className="space-y-3">
+            {/* Scope tabs */}
+            <div className="flex gap-2">
+                {SCOPE_TABS.map(tab => {
+                    const isActive = activeScope === tab.value;
+                    const TabIcon = tab.icon;
+                    return (
+                        <button
+                            key={tab.value}
+                            onClick={() => setActiveScope(tab.value)}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all ${
+                                isActive
+                                    ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                                    : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'
+                            }`}
+                        >
+                            <TabIcon className="h-4 w-4" />
+                            <span>{tab.label}</span>
+                            <Badge variant={isActive ? 'secondary' : 'outline'} className={`text-[10px] px-1.5 py-0 ${isActive ? 'bg-primary-foreground/20 text-primary-foreground' : ''}`}>
+                                {scopeCounts[tab.value] || 0}
+                            </Badge>
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* Category groups */}
+            <div className="rounded-xl border bg-card overflow-hidden divide-y">
+                {categories.length === 0 ? (
+                    <div className="p-8 text-center text-sm text-muted-foreground">
+                        {t`Tidak ada field untuk scope ini.`}
                     </div>
                 ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="bg-muted/30 hover:bg-muted/30">
-                                <TableHead>{t`Label & Icon`}</TableHead>
-                                <TableHead>{t`Tipe`}</TableHead>
-                                <TableHead>{t`Kategori`}</TableHead>
-                                <TableHead>{t`Status`}</TableHead>
-                                <TableHead className="text-center">{t`Aksi`}</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {registry?.attributes?.map((attr: any) => {
-                                const IconComp = ICON_MAP[attr.categoryIcon] ?? Settings;
-                                return (
-                                    <TableRow key={attr.id} className="group">
-                                        <TableCell>
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center text-primary">
-                                                    <IconComp className="h-3.5 w-3.5" />
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-sm">{attr.uiLabel || attr.description}</p>
-                                                    <p className="text-[10px] text-muted-foreground">{attr.attributeCode}</p>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700 border-blue-200">
-                                                {attr.dataType}
-                                            </Badge>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 uppercase">{attr.scope}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline" className="text-xs bg-slate-100 text-slate-700 border-slate-200">
-                                                {attr.categoryName}
-                                            </Badge>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5">{attr.appliesTo}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            {attr.isRequired ? (
-                                                <span className="flex items-center gap-1 text-xs text-amber-600 font-medium">
-                                                    <AlertCircle className="h-3 w-3" /> {t`Wajib`}
-                                                </span>
-                                            ) : (
-                                                <span className="text-xs text-muted-foreground">{t`Opsional`}</span>
-                                            )}
-                                            {attr.riskRelevant && (
-                                                <span className="flex items-center gap-1 text-xs text-blue-600 font-medium mt-0.5">
-                                                    <Shield className="h-3 w-3" /> {t`Risk`}
-                                                </span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                                onClick={() => openEdit(attr)}
-                                            >
-                                                <Pencil className="h-3 w-3" />
-                                                {t`Edit`}
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
+                    categories.map(({ catName, attrs }) => {
+                        const catKey = `${activeScope}:${catName}`;
+                        const isCatCollapsed = collapsedCategories.has(catKey);
+                        const CatIcon = ICON_MAP[attrs[0]?.categoryIcon] ?? Settings;
+
+                        return (
+                            <div key={catKey}>
+                                {/* Category header */}
+                                <button
+                                    onClick={() => toggleCategory(catKey)}
+                                    className="w-full flex items-center justify-between px-4 py-2.5 bg-muted/30 hover:bg-muted/50 transition-colors text-left"
+                                >
+                                    <div className="flex items-center gap-2.5">
+                                        {isCatCollapsed
+                                            ? <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                                            : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
+                                        <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center">
+                                            <CatIcon className="h-3.5 w-3.5 text-primary" />
+                                        </div>
+                                        <span className="text-sm font-semibold text-foreground">{catName}</span>
+                                    </div>
+                                    <Badge variant="secondary" className="text-[10px]">
+                                        {attrs.length} {t`field`}
+                                    </Badge>
+                                </button>
+
+                                {/* Fields table */}
+                                {!isCatCollapsed && (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="hover:bg-transparent">
+                                                <TableHead className="text-[11px] h-8">{t`Field`}</TableHead>
+                                                <TableHead className="text-[11px] h-8">{t`Tipe`}</TableHead>
+                                                <TableHead className="text-[11px] h-8">{t`Berlaku`}</TableHead>
+                                                <TableHead className="text-[11px] h-8">{t`Status`}</TableHead>
+                                                <TableHead className="text-[11px] h-8 text-center w-16">{t`Aksi`}</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {attrs.map((attr: any) => (
+                                                <TableRow key={attr.id} className="group">
+                                                    <TableCell className="py-2">
+                                                        <p className="font-medium text-sm">{attr.uiLabel || attr.description}</p>
+                                                        <p className="text-[10px] text-muted-foreground font-mono">{attr.attributeCode}</p>
+                                                    </TableCell>
+                                                    <TableCell className="py-2">
+                                                        <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
+                                                            {attr.dataType}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="py-2">
+                                                        <span className="text-xs text-muted-foreground">{attr.appliesTo}</span>
+                                                    </TableCell>
+                                                    <TableCell className="py-2">
+                                                        <div className="flex items-center gap-2">
+                                                            {attr.isRequired ? (
+                                                                <span className="flex items-center gap-1 text-[11px] text-amber-600 font-medium">
+                                                                    <AlertCircle className="h-3 w-3" /> {t`Wajib`}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-[11px] text-muted-foreground">{t`Opsional`}</span>
+                                                            )}
+                                                            {attr.riskRelevant && (
+                                                                <span className="flex items-center gap-1 text-[11px] text-blue-600 font-medium">
+                                                                    <Shield className="h-3 w-3" /> {t`Risk`}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="py-2 text-center">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            onClick={() => onEdit(attr)}
+                                                        >
+                                                            <Pencil className="h-3 w-3" />
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                )}
+                            </div>
+                        );
+                    })
                 )}
             </div>
         </div>

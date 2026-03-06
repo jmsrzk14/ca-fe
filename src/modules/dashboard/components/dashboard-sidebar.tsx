@@ -7,6 +7,7 @@ import {
     Home,
     Users,
     ClipboardList,
+    Building2,
     Settings,
     ChevronRight,
     LogOut,
@@ -26,6 +27,7 @@ const NAV_ITEMS: NavItem[] = [
     { href: '/', label: 'Dashboards', icon: Home },
     { href: '/borrowers', label: 'Peminjam', icon: Users },
     { href: '/loans', label: 'Pinjaman', icon: ClipboardList },
+    { href: '/credit-bureau', label: 'Credit Bureau', icon: Building2 },
 ];
 
 const ADMIN_ITEMS: NavItem[] = [

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     ArrowLeft,
     Copy,
@@ -10,6 +10,8 @@ import {
     X,
     Plus,
     Pencil,
+    Trash2,
+    Users,
 } from 'lucide-react';
 import { applicantService, applicationService } from '@/core/api';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
@@ -24,6 +26,16 @@ import {
     TableHeader,
     TableRow,
 } from '@/shared/ui/table';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/shared/ui/dialog';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
+import { SearchableSelect } from '@/shared/ui/searchable-select';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { cn } from '@/shared/lib/utils';
 import Link from 'next/link';
@@ -34,7 +46,7 @@ interface ApplicantDetailProps {
     id: string;
 }
 
-const TABS = ['Data Peminjam', 'Daftar Pinjaman'] as const;
+const TABS = ['Data Peminjam', 'Pihak Terkait', 'Daftar Pinjaman'] as const;
 type Tab = (typeof TABS)[number];
 
 export function ApplicantDetail({ id }: ApplicantDetailProps) {
@@ -188,6 +200,12 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                         {activeTab === 'Data Peminjam' && (
                             <BorrowerDataView groupedAttributes={groupedAttributes} />
                         )}
+                        {activeTab === 'Pihak Terkait' && (
+                            <RelatedPartiesView
+                                applicantId={id}
+                                applicantType={data.applicantType}
+                            />
+                        )}
                         {activeTab === 'Daftar Pinjaman' && (
                             <LoansListView
                                 isLoading={isAppsLoading}
@@ -243,6 +261,280 @@ function BorrowerDataView({ groupedAttributes }: { groupedAttributes: [string, {
                     </div>
                 </div>
             ))}
+        </div>
+    );
+}
+
+/* ── Related Parties ── */
+const ROLE_OPTIONS_PERSONAL = [
+    { value: 'SPOUSE', label: 'Pasangan' },
+    { value: 'GUARANTOR', label: 'Penjamin' },
+];
+const ROLE_OPTIONS_CORPORATE = [
+    { value: 'DIRECTOR', label: 'Direktur' },
+    { value: 'COMMISSIONER', label: 'Komisaris' },
+    { value: 'SHAREHOLDER', label: 'Pemegang Saham' },
+    { value: 'GUARANTOR', label: 'Penjamin' },
+];
+
+interface PartyFormData {
+    name: string;
+    identifier: string;
+    dateOfBirth: string;
+    roleCode: string;
+    ownershipPct: number;
+    position: string;
+    slikRequired: boolean;
+}
+
+const emptyPartyForm: PartyFormData = {
+    name: '',
+    identifier: '',
+    dateOfBirth: '',
+    roleCode: '',
+    ownershipPct: 0,
+    position: '',
+    slikRequired: false,
+};
+
+function RelatedPartiesView({ applicantId, applicantType }: { applicantId: string; applicantType: string }) {
+    const queryClient = useQueryClient();
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [form, setForm] = React.useState<PartyFormData>(emptyPartyForm);
+
+    const isCorporate = applicantType?.toUpperCase() === 'COMPANY' || applicantType?.toUpperCase() === 'CORPORATE';
+    const roleOptions = isCorporate ? ROLE_OPTIONS_CORPORATE : ROLE_OPTIONS_PERSONAL;
+
+    const { data: parties, isLoading } = useQuery({
+        queryKey: ['applicant-parties', applicantId],
+        queryFn: () => applicantService.listParties(applicantId),
+        enabled: !!applicantId,
+    });
+
+    const addMutation = useMutation({
+        mutationFn: (data: PartyFormData) =>
+            applicantService.addParty(applicantId, {
+                partyType: 'PERSON',
+                name: data.name,
+                identifier: data.identifier,
+                dateOfBirth: data.dateOfBirth,
+                roleCode: data.roleCode,
+                ownershipPct: data.ownershipPct,
+                position: data.position,
+                slikRequired: data.slikRequired,
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['applicant-parties', applicantId] });
+            setDialogOpen(false);
+            setForm(emptyPartyForm);
+            toast.success(t`Pihak terkait berhasil ditambahkan`);
+        },
+        onError: (err: any) => {
+            toast.error(err?.message || t`Gagal menambahkan pihak terkait`);
+        },
+    });
+
+    const removeMutation = useMutation({
+        mutationFn: ({ partyId, roleCode }: { partyId: string; roleCode: string }) =>
+            applicantService.removeParty(applicantId, partyId, roleCode),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['applicant-parties', applicantId] });
+            toast.success(t`Pihak terkait berhasil dihapus`);
+        },
+        onError: (err: any) => {
+            toast.error(err?.message || t`Gagal menghapus pihak terkait`);
+        },
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!form.name || !form.roleCode) {
+            toast.error(t`Nama dan peran harus diisi`);
+            return;
+        }
+        addMutation.mutate(form);
+    };
+
+    const getRoleLabel = (code: string) => {
+        const all = [...ROLE_OPTIONS_PERSONAL, ...ROLE_OPTIONS_CORPORATE];
+        return all.find((r) => r.value === code)?.label || code;
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-32 gap-2 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm">{t`Memuat data pihak terkait...`}</span>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <h3 className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                    {isCorporate ? t`Pengurus & Pemegang Saham` : t`Pasangan & Penjamin`}
+                </h3>
+                <Button size="sm" variant="outline" onClick={() => setDialogOpen(true)}>
+                    <Plus className="h-3.5 w-3.5" />
+                    {t`Tambah`}
+                </Button>
+            </div>
+
+            {!parties?.length ? (
+                <div className="text-center py-8 space-y-2">
+                    <Users className="h-8 w-8 mx-auto text-muted-foreground/30" />
+                    <p className="text-sm text-muted-foreground">{t`Belum ada pihak terkait.`}</p>
+                </div>
+            ) : (
+                <div className="rounded-lg border overflow-hidden">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-muted/30 hover:bg-muted/30">
+                                <TableHead>{t`Nama`}</TableHead>
+                                <TableHead>{t`NIK`}</TableHead>
+                                <TableHead>{t`Tgl Lahir`}</TableHead>
+                                <TableHead>{t`Peran`}</TableHead>
+                                {isCorporate && <TableHead>{t`Kepemilikan`}</TableHead>}
+                                {isCorporate && <TableHead>{t`Jabatan`}</TableHead>}
+                                <TableHead>{t`SLIK`}</TableHead>
+                                <TableHead className="w-10"></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {parties.map((p: any) => (
+                                <TableRow key={`${p.partyId}-${p.roleCode}`}>
+                                    <TableCell className="font-medium">{p.name}</TableCell>
+                                    <TableCell className="text-muted-foreground font-mono text-xs">{p.identifier || '-'}</TableCell>
+                                    <TableCell className="text-muted-foreground">
+                                        {p.dateOfBirth && p.dateOfBirth !== '0001-01-01'
+                                            ? new Date(p.dateOfBirth).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+                                            : '-'}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="secondary" className="text-xs">
+                                            {getRoleLabel(p.roleCode)}
+                                        </Badge>
+                                    </TableCell>
+                                    {isCorporate && (
+                                        <TableCell className="text-muted-foreground">
+                                            {p.ownershipPct > 0 ? `${p.ownershipPct}%` : '-'}
+                                        </TableCell>
+                                    )}
+                                    {isCorporate && (
+                                        <TableCell className="text-muted-foreground">{p.position || '-'}</TableCell>
+                                    )}
+                                    <TableCell>
+                                        <Badge variant={p.slikRequired ? 'default' : 'outline'} className="text-xs">
+                                            {p.slikRequired ? 'Ya' : 'Tidak'}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                                            onClick={() => removeMutation.mutate({ partyId: p.partyId, roleCode: p.roleCode })}
+                                            disabled={removeMutation.isPending}
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            )}
+
+            {/* Add Party Dialog */}
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>{t`Tambah Pihak Terkait`}</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-1.5">
+                            <Label>{t`Peran`}</Label>
+                            <SearchableSelect
+                                options={roleOptions}
+                                value={form.roleCode}
+                                onValueChange={(v) => setForm((f) => ({ ...f, roleCode: v }))}
+                                placeholder={t`Pilih peran...`}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label>{t`Nama Lengkap`}</Label>
+                            <Input
+                                value={form.name}
+                                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                                placeholder={t`Nama lengkap`}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label>{t`NIK`}</Label>
+                            <Input
+                                value={form.identifier}
+                                onChange={(e) => setForm((f) => ({ ...f, identifier: e.target.value }))}
+                                placeholder={t`Nomor identitas`}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label>{t`Tanggal Lahir`}</Label>
+                            <Input
+                                type="date"
+                                value={form.dateOfBirth}
+                                onChange={(e) => setForm((f) => ({ ...f, dateOfBirth: e.target.value }))}
+                            />
+                        </div>
+                        {form.roleCode === 'SHAREHOLDER' && (
+                            <div className="space-y-1.5">
+                                <Label>{t`Persentase Kepemilikan`}</Label>
+                                <Input
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    step={0.01}
+                                    value={form.ownershipPct || ''}
+                                    onChange={(e) => setForm((f) => ({ ...f, ownershipPct: parseFloat(e.target.value) || 0 }))}
+                                    placeholder="0.00"
+                                />
+                            </div>
+                        )}
+                        {(form.roleCode === 'DIRECTOR' || form.roleCode === 'COMMISSIONER') && (
+                            <div className="space-y-1.5">
+                                <Label>{t`Jabatan`}</Label>
+                                <Input
+                                    value={form.position}
+                                    onChange={(e) => setForm((f) => ({ ...f, position: e.target.value }))}
+                                    placeholder={form.roleCode === 'DIRECTOR' ? t`Direktur Utama` : t`Komisaris Utama`}
+                                />
+                            </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="slik_required"
+                                checked={form.slikRequired}
+                                onChange={(e) => setForm((f) => ({ ...f, slikRequired: e.target.checked }))}
+                                className="h-4 w-4 rounded border-gray-300"
+                            />
+                            <Label htmlFor="slik_required" className="text-sm font-normal cursor-pointer">
+                                {t`Wajib SLIK (Pengecekan BI Checking)`}
+                            </Label>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                                {t`Batal`}
+                            </Button>
+                            <Button type="submit" disabled={addMutation.isPending}>
+                                {addMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}
+                                {t`Simpan`}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

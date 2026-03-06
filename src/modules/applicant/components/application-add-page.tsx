@@ -2,16 +2,16 @@
 
 import * as React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
     Loader2,
     CheckCircle2,
     ChevronRight,
     ChevronLeft,
     ArrowLeft,
-    Search,
-    Check,
     Building2,
-    Settings,
     DollarSign,
     LayoutGrid,
 } from 'lucide-react';
@@ -24,7 +24,6 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Card, CardContent } from '@/shared/ui/card';
 import { cn } from '@/shared/lib/utils';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import {
     Dialog,
     DialogContent,
@@ -32,13 +31,36 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/shared/ui/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { SearchableSelect } from '@/shared/ui/searchable-select';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { DynamicField } from '@/shared/components/dynamic-field';
+import { buildDynamicSchema, resolveChoiceId } from '@/shared/lib/dynamic-form';
 
 interface ApplicationAddPageProps {
     redirectTo?: string;
 }
+
+const coreStep0Schema = z.object({
+    applicantId: z.string().min(1, 'Peminjam wajib dipilih'),
+    branchCode: z.string().min(1, 'Cabang wajib dipilih'),
+    aoId: z.string().min(1, 'Petugas (AO) wajib dipilih'),
+    applicationChannel: z.string(),
+});
+
+const coreStep1Schema = z.object({
+    productId: z.string().min(1, 'Produk pinjaman wajib dipilih'),
+    loanAmount: z.string().min(1, 'Nilai pinjaman wajib diisi'),
+    tenorMonths: z.string(),
+    interestRate: z.string(),
+    interestType: z.string(),
+    loanPurpose: z.string(),
+});
+
+const CORE_APP_KEYS = [
+    'applicantId', 'branchCode', 'aoId', 'productId', 'loanAmount',
+    'tenorMonths', 'interestType', 'interestRate', 'loanPurpose', 'applicationChannel',
+];
 
 export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPageProps) {
     const router = useRouter();
@@ -49,20 +71,31 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
 
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
-    const [applicantSearch, setApplicantSearch] = React.useState('');
-    const [isApplicantPopoverOpen, setIsApplicantPopoverOpen] = React.useState(false);
 
-    const [formData, setFormData] = React.useState<Record<string, any>>({
-        applicantId: initialApplicantId,
-        branchCode: '',
-        aoId: '',
-        productId: '',
-        loanAmount: '',
-        tenorMonths: 0,
-        interestType: '',
-        interestRate: '',
-        loanPurpose: '',
-        applicationChannel: 'BRANCH',
+    // Dynamic attribute state
+    const [dynamicData, setDynamicData] = React.useState<Record<string, string>>({});
+    const [dynamicErrors, setDynamicErrors] = React.useState<Record<string, string>>({});
+
+    const step0Form = useForm<z.infer<typeof coreStep0Schema>>({
+        resolver: zodResolver(coreStep0Schema),
+        defaultValues: {
+            applicantId: initialApplicantId,
+            branchCode: '',
+            aoId: '',
+            applicationChannel: 'BRANCH',
+        },
+    });
+
+    const step1Form = useForm<z.infer<typeof coreStep1Schema>>({
+        resolver: zodResolver(coreStep1Schema),
+        defaultValues: {
+            productId: '',
+            loanAmount: '',
+            tenorMonths: '0',
+            interestRate: '',
+            interestType: '',
+            loanPurpose: '',
+        },
     });
 
     const { data: registryResponse, isLoading: isRegistryLoading } = useQuery({
@@ -80,10 +113,12 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
         queryFn: () => referenceService.getLoanProducts(),
     });
 
+    const branchCode = step0Form.watch('branchCode');
+
     const { data: officersResponse, isLoading: isOfficersLoading } = useQuery({
-        queryKey: ['officers', formData.branchCode],
-        queryFn: () => referenceService.listLoanOfficers(formData.branchCode),
-        enabled: !!formData.branchCode,
+        queryKey: ['officers', branchCode],
+        queryFn: () => referenceService.listLoanOfficers(branchCode),
+        enabled: !!branchCode,
     });
 
     const { data: applicantsResponse } = useQuery({
@@ -97,24 +132,13 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
     const officers = officersResponse?.officers || [];
     const applicants = (applicantsResponse as any)?.applicants || [];
 
-    const filteredApplicants = React.useMemo(() => {
-        if (!applicantSearch) return applicants;
-        const q = applicantSearch.toLowerCase();
-        return applicants.filter((a: any) =>
-            a.fullName?.toLowerCase().includes(q) ||
-            (a.identityNumber || a.taxId || '').toLowerCase().includes(q)
-        );
-    }, [applicants, applicantSearch]);
-
-    const selectedApplicant = React.useMemo(
-        () => applicants.find((a: any) => a.id === formData.applicantId),
-        [applicants, formData.applicantId]
+    const applicantOptions = React.useMemo(() =>
+        applicants.map((a: any) => ({
+            value: a.id,
+            label: `${a.fullName} — ${a.identityNumber || a.taxId || ''}`,
+        })),
+        [applicants]
     );
-
-    const CORE_APP_KEYS = [
-        'applicantId', 'branchCode', 'aoId', 'productId', 'loanAmount',
-        'tenorMonths', 'interestType', 'interestRate', 'loanPurpose', 'applicationChannel'
-    ];
 
     const dynamicAttributes = React.useMemo(() => {
         return registry
@@ -122,19 +146,20 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
             .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
     }, [registry]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    const dynamicSchema = React.useMemo(
+        () => buildDynamicSchema(dynamicAttributes),
+        [dynamicAttributes]
+    );
 
-    const handleSelectChange = (name: string, value: string) => {
-        setFormData(prev => {
-            const updated = { ...prev, [name]: value };
-            if (name === 'branchCode') {
-                updated.aoId = '';
-            }
-            return updated;
-        });
+    const handleDynamicChange = (key: string, value: string) => {
+        setDynamicData(prev => ({ ...prev, [key]: value }));
+        if (dynamicErrors[key]) {
+            setDynamicErrors(prev => {
+                const next = { ...prev };
+                delete next[key];
+                return next;
+            });
+        }
     };
 
     const mutation = useMutation({
@@ -152,32 +177,32 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
     const performSubmit = () => {
         setIsConfirmOpen(false);
 
-        const attributes = Object.entries(formData)
-            .filter(([key, value]) => !CORE_APP_KEYS.includes(key) && value !== undefined && value !== '')
+        const s0 = step0Form.getValues();
+        const s1 = step1Form.getValues();
+
+        const attributes = Object.entries(dynamicData)
+            .filter(([, value]) => value !== undefined && value !== '')
             .map(([key, value]) => {
                 const regItem = registry.find(r => r.attributeCode === key);
-                const attrId = regItem?.id || key;
-                const dataType = regItem?.dataType || 'STRING';
-
-                let choiceId = undefined;
-                if (dataType === 'SELECT' || dataType === 'BOOLEAN') {
-                    const choice = regItem?.choices?.find(opt => opt.code === String(value));
-                    if (choice) {
-                        choiceId = choice.id;
-                    }
-                }
-
                 return {
-                    attributeId: attrId,
+                    attributeId: regItem?.id || key,
                     value: String(value),
-                    dataType: dataType,
-                    choiceId,
+                    dataType: regItem?.dataType || 'STRING',
+                    choiceId: regItem ? resolveChoiceId(regItem, String(value)) : undefined,
                 };
             });
 
         const payload = {
-            ...formData,
-            tenorMonths: parseInt(String(formData.tenorMonths)) || 0,
+            applicantId: s0.applicantId,
+            branchCode: s0.branchCode,
+            aoId: s0.aoId,
+            applicationChannel: s0.applicationChannel,
+            productId: s1.productId,
+            loanAmount: s1.loanAmount,
+            tenorMonths: parseInt(s1.tenorMonths) || 0,
+            interestRate: s1.interestRate,
+            interestType: s1.interestType,
+            loanPurpose: s1.loanPurpose,
             attributes,
         };
 
@@ -190,22 +215,46 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
         { id: 'additional', title: t`Informasi Tambahan`, icon: LayoutGrid },
     ];
 
-    const nextStep = () => {
+    const validateAndNext = async () => {
         if (currentStep === 0) {
-            if (!formData.branchCode || !formData.aoId || !formData.applicantId) {
-                toast.error(t`Harap lengkapi Cabang, AO, dan Peminjam`);
+            const valid = await step0Form.trigger();
+            if (!valid) {
+                const firstError = Object.values(step0Form.formState.errors)[0];
+                toast.error(firstError?.message as string || 'Harap lengkapi data');
                 return;
             }
         }
         if (currentStep === 1) {
-            if (!formData.productId || !formData.loanAmount) {
-                toast.error(t`Harap lengkapi Produk dan Nilai Pinjaman`);
+            const valid = await step1Form.trigger();
+            if (!valid) {
+                const firstError = Object.values(step1Form.formState.errors)[0];
+                toast.error(firstError?.message as string || 'Harap lengkapi data');
                 return;
             }
         }
         if (currentStep < steps.length - 1) {
             setCurrentStep(prev => prev + 1);
         }
+    };
+
+    const validateAndConfirm = () => {
+        if (currentStep === 2 && dynamicAttributes.length > 0) {
+            const stepData: Record<string, string> = {};
+            for (const attr of dynamicAttributes) {
+                stepData[attr.attributeCode] = dynamicData[attr.attributeCode] || '';
+            }
+            const result = dynamicSchema.safeParse(stepData);
+            if (!result.success) {
+                const errors: Record<string, string> = {};
+                for (const issue of result.error.issues) {
+                    errors[issue.path[0] as string] = issue.message;
+                }
+                setDynamicErrors(prev => ({ ...prev, ...errors }));
+                toast.error(Object.values(errors)[0] || 'Harap lengkapi field yang wajib');
+                return;
+            }
+        }
+        setIsConfirmOpen(true);
     };
 
     if (isRegistryLoading) {
@@ -217,67 +266,7 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
         );
     }
 
-    const inputClass = "h-9 rounded-md";
-
-    const renderDynamicField = (attr: AttributeRegistry) => {
-        const id = attr.attributeCode;
-        const label = t`${attr.uiLabel || attr.description || id}`;
-
-        if (attr.dataType === 'SELECT') {
-            return (
-                <div key={id} className="space-y-1.5">
-                    <Label className="text-xs font-medium text-muted-foreground">
-                        {label} {attr.isRequired && <span className="text-destructive">*</span>}
-                    </Label>
-                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''}>
-                        <SelectTrigger className={inputClass}>
-                            <SelectValue placeholder={t`Pilih ${label}...`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {attr.choices?.map(opt => (
-                                <SelectItem key={opt.id} value={opt.code}>{opt.value}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            );
-        }
-
-        if (attr.dataType === 'BOOLEAN') {
-            return (
-                <div key={id} className="space-y-1.5">
-                    <Label className="text-xs font-medium text-muted-foreground">
-                        {label} {attr.isRequired && <span className="text-destructive">*</span>}
-                    </Label>
-                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''}>
-                        <SelectTrigger className={inputClass}>
-                            <SelectValue placeholder={t`Pilih...`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="true">{t`Ya`}</SelectItem>
-                            <SelectItem value="false">{t`Tidak`}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            );
-        }
-
-        return (
-            <div key={id} className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">
-                    {label} {attr.isRequired && <span className="text-destructive">*</span>}
-                </Label>
-                <Input
-                    name={id}
-                    type={attr.dataType === 'NUMBER' ? 'number' : attr.dataType === 'DATE' ? 'date' : 'text'}
-                    value={formData[id] || ''}
-                    onChange={handleInputChange}
-                    className={inputClass}
-                    placeholder={t`Masukkan ${label}`}
-                />
-            </div>
-        );
-    };
+    const inputClass = 'h-9 rounded-md';
 
     return (
         <div className="space-y-5">
@@ -328,71 +317,17 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             {t`Peminjam`} <span className="text-destructive">*</span>
                                         </Label>
-                                        <Popover open={isApplicantPopoverOpen} onOpenChange={setIsApplicantPopoverOpen}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    aria-expanded={isApplicantPopoverOpen}
-                                                    className={cn(inputClass, "w-full justify-between font-normal px-3")}
-                                                >
-                                                    {selectedApplicant ? (
-                                                        <div className="flex items-center gap-2 overflow-hidden">
-                                                            <span className="font-medium text-sm truncate">{selectedApplicant.fullName}</span>
-                                                            <span className="text-[10px] text-muted-foreground truncate">
-                                                                {selectedApplicant.identityNumber || selectedApplicant.taxId}
-                                                            </span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-muted-foreground text-sm">{t`Pilih Peminjam...`}</span>
-                                                    )}
-                                                    <Search className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-lg border-border/50 shadow-lg overflow-hidden" align="start">
-                                                <div className="flex flex-col max-h-[300px]">
-                                                    <div className="flex items-center border-b px-3 h-9 sticky top-0 bg-background z-10">
-                                                        <Search className="mr-2 h-3.5 w-3.5 shrink-0 opacity-50" />
-                                                        <input
-                                                            className="flex h-8 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                                                            placeholder={t`Cari NIK atau Nama...`}
-                                                            value={applicantSearch}
-                                                            onChange={(e) => setApplicantSearch(e.target.value)}
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1 overflow-y-auto py-1">
-                                                        {filteredApplicants.length === 0 ? (
-                                                            <div className="py-6 text-center text-xs text-muted-foreground">
-                                                                {t`Peminjam tidak ditemukan.`}
-                                                            </div>
-                                                        ) : (
-                                                            filteredApplicants.map((a: any) => (
-                                                                <div
-                                                                    key={a.id}
-                                                                    className={cn(
-                                                                        "flex cursor-pointer items-center px-3 py-2 text-sm transition-colors hover:bg-accent mx-1 rounded-sm",
-                                                                        formData.applicantId === a.id && "bg-accent text-primary"
-                                                                    )}
-                                                                    onClick={() => {
-                                                                        handleSelectChange('applicantId', a.id);
-                                                                        setIsApplicantPopoverOpen(false);
-                                                                        setApplicantSearch('');
-                                                                    }}
-                                                                >
-                                                                    <div className="flex flex-col flex-1 min-w-0">
-                                                                        <span className="font-medium text-sm truncate">{a.fullName}</span>
-                                                                        <span className="text-[10px] text-muted-foreground truncate">{a.identityNumber || a.taxId}</span>
-                                                                    </div>
-                                                                    {formData.applicantId === a.id && (
-                                                                        <Check className="h-3.5 w-3.5 ml-2 shrink-0 text-primary" />
-                                                                    )}
-                                                                </div>
-                                                            ))
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
+                                        <SearchableSelect
+                                            options={applicantOptions}
+                                            value={step0Form.watch('applicantId')}
+                                            onValueChange={v => step0Form.setValue('applicantId', v, { shouldValidate: true })}
+                                            placeholder={t`Pilih Peminjam...`}
+                                            searchPlaceholder={t`Cari NIK atau Nama...`}
+                                            className={inputClass}
+                                        />
+                                        {step0Form.formState.errors.applicantId && (
+                                            <p className="text-[10px] text-destructive mt-0.5">{step0Form.formState.errors.applicantId.message}</p>
+                                        )}
                                     </div>
 
                                     {/* Branch */}
@@ -400,16 +335,20 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             {t`Cabang`} <span className="text-destructive">*</span>
                                         </Label>
-                                        <Select onValueChange={v => handleSelectChange('branchCode', v)} value={formData.branchCode}>
-                                            <SelectTrigger className={inputClass}>
-                                                <SelectValue placeholder={t`Pilih Cabang...`} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {branches.map(b => (
-                                                    <SelectItem key={b.branchCode} value={b.branchCode}>{b.branchName}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <SearchableSelect
+                                            options={branches.map(b => ({ value: b.branchCode, label: b.branchName }))}
+                                            value={step0Form.watch('branchCode')}
+                                            onValueChange={v => {
+                                                step0Form.setValue('branchCode', v, { shouldValidate: true });
+                                                step0Form.setValue('aoId', '');
+                                            }}
+                                            placeholder={t`Pilih Cabang...`}
+                                            searchPlaceholder={t`Cari Cabang...`}
+                                            className={inputClass}
+                                        />
+                                        {step0Form.formState.errors.branchCode && (
+                                            <p className="text-[10px] text-destructive mt-0.5">{step0Form.formState.errors.branchCode.message}</p>
+                                        )}
                                     </div>
 
                                     {/* AO */}
@@ -417,35 +356,34 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             {t`Petugas (AO)`} <span className="text-destructive">*</span>
                                         </Label>
-                                        <Select
-                                            onValueChange={v => handleSelectChange('aoId', v)}
-                                            value={formData.aoId}
-                                            disabled={!formData.branchCode || isOfficersLoading}
-                                        >
-                                            <SelectTrigger className={inputClass}>
-                                                <SelectValue placeholder={isOfficersLoading ? t`Memuat...` : t`Pilih AO...`} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {officers.map(o => (
-                                                    <SelectItem key={o.id} value={o.id}>{o.officerCode}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <SearchableSelect
+                                            options={officers.map(o => ({ value: o.id, label: o.officerCode }))}
+                                            value={step0Form.watch('aoId')}
+                                            onValueChange={v => step0Form.setValue('aoId', v, { shouldValidate: true })}
+                                            placeholder={isOfficersLoading ? t`Memuat...` : t`Pilih AO...`}
+                                            searchPlaceholder={t`Cari AO...`}
+                                            disabled={!branchCode || isOfficersLoading}
+                                            className={inputClass}
+                                        />
+                                        {step0Form.formState.errors.aoId && (
+                                            <p className="text-[10px] text-destructive mt-0.5">{step0Form.formState.errors.aoId.message}</p>
+                                        )}
                                     </div>
 
                                     {/* Channel */}
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-medium text-muted-foreground">{t`Saluran Pengajuan`}</Label>
-                                        <Select onValueChange={v => handleSelectChange('applicationChannel', v)} value={formData.applicationChannel}>
-                                            <SelectTrigger className={inputClass}>
-                                                <SelectValue placeholder={t`Pilih Saluran...`} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="BRANCH">{t`Cabang`}</SelectItem>
-                                                <SelectItem value="ONLINE">{t`Online`}</SelectItem>
-                                                <SelectItem value="MOBILE">{t`Mobile`}</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                        <SearchableSelect
+                                            options={[
+                                                { value: 'BRANCH', label: t`Cabang` },
+                                                { value: 'ONLINE', label: t`Online` },
+                                                { value: 'MOBILE', label: t`Mobile` },
+                                            ]}
+                                            value={step0Form.watch('applicationChannel')}
+                                            onValueChange={v => step0Form.setValue('applicationChannel', v)}
+                                            placeholder={t`Pilih Saluran...`}
+                                            className={inputClass}
+                                        />
                                     </div>
                                 </>
                             )}
@@ -457,16 +395,17 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             {t`Produk Pinjaman`} <span className="text-destructive">*</span>
                                         </Label>
-                                        <Select onValueChange={v => handleSelectChange('productId', v)} value={formData.productId}>
-                                            <SelectTrigger className={inputClass}>
-                                                <SelectValue placeholder={t`Pilih Produk...`} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {products.map(p => (
-                                                    <SelectItem key={p.id} value={p.id}>{p.productName}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <SearchableSelect
+                                            options={products.map(p => ({ value: p.id, label: p.productName }))}
+                                            value={step1Form.watch('productId')}
+                                            onValueChange={v => step1Form.setValue('productId', v, { shouldValidate: true })}
+                                            placeholder={t`Pilih Produk...`}
+                                            searchPlaceholder={t`Cari Produk...`}
+                                            className={inputClass}
+                                        />
+                                        {step1Form.formState.errors.productId && (
+                                            <p className="text-[10px] text-destructive mt-0.5">{step1Form.formState.errors.productId.message}</p>
+                                        )}
                                     </div>
 
                                     {/* Loan Amount */}
@@ -474,40 +413,49 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             {t`Nilai Pinjaman`} <span className="text-destructive">*</span>
                                         </Label>
-                                        <Input name="loanAmount" type="number" value={formData.loanAmount} onChange={handleInputChange} className={inputClass} placeholder="e.g. 50000000" />
+                                        <Input
+                                            {...step1Form.register('loanAmount')}
+                                            type="number"
+                                            className={inputClass}
+                                            placeholder="e.g. 50000000"
+                                        />
+                                        {step1Form.formState.errors.loanAmount && (
+                                            <p className="text-[10px] text-destructive mt-0.5">{step1Form.formState.errors.loanAmount.message}</p>
+                                        )}
                                     </div>
 
                                     {/* Tenor */}
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-medium text-muted-foreground">{t`Tenor (Bulan)`}</Label>
-                                        <Input name="tenorMonths" type="number" value={formData.tenorMonths} onChange={handleInputChange} className={inputClass} />
+                                        <Input {...step1Form.register('tenorMonths')} type="number" className={inputClass} />
                                     </div>
 
                                     {/* Interest Rate */}
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-medium text-muted-foreground">{t`Suku Bunga (%)`}</Label>
-                                        <Input name="interestRate" type="number" step="0.01" value={formData.interestRate} onChange={handleInputChange} className={inputClass} />
+                                        <Input {...step1Form.register('interestRate')} type="number" step="0.01" className={inputClass} />
                                     </div>
 
                                     {/* Interest Type */}
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-medium text-muted-foreground">{t`Tipe Bunga`}</Label>
-                                        <Select onValueChange={v => handleSelectChange('interestType', v)} value={formData.interestType}>
-                                            <SelectTrigger className={inputClass}>
-                                                <SelectValue placeholder={t`Pilih Tipe Bunga...`} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="FLAT">{t`Flat`}</SelectItem>
-                                                <SelectItem value="EFFECTIVE">{t`Efektif`}</SelectItem>
-                                                <SelectItem value="ANNUITY">{t`Anuitas`}</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                        <SearchableSelect
+                                            options={[
+                                                { value: 'FLAT', label: t`Flat` },
+                                                { value: 'EFFECTIVE', label: t`Efektif` },
+                                                { value: 'ANNUITY', label: t`Anuitas` },
+                                            ]}
+                                            value={step1Form.watch('interestType')}
+                                            onValueChange={v => step1Form.setValue('interestType', v)}
+                                            placeholder={t`Pilih Tipe Bunga...`}
+                                            className={inputClass}
+                                        />
                                     </div>
 
                                     {/* Loan Purpose */}
                                     <div className="space-y-1.5 col-span-full">
                                         <Label className="text-xs font-medium text-muted-foreground">{t`Tujuan Pinjaman`}</Label>
-                                        <Input name="loanPurpose" value={formData.loanPurpose} onChange={handleInputChange} className={inputClass} placeholder={t`Contoh: Modal Kerja, Investasi, dll`} />
+                                        <Input {...step1Form.register('loanPurpose')} className={inputClass} placeholder={t`Contoh: Modal Kerja, Investasi, dll`} />
                                     </div>
                                 </>
                             )}
@@ -515,7 +463,16 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                             {currentStep === 2 && (
                                 <>
                                     {dynamicAttributes.length > 0 ? (
-                                        dynamicAttributes.map(attr => renderDynamicField(attr))
+                                        dynamicAttributes.map(attr => (
+                                            <DynamicField
+                                                key={attr.attributeCode}
+                                                field={attr}
+                                                value={dynamicData[attr.attributeCode] || ''}
+                                                onChange={handleDynamicChange}
+                                                error={dynamicErrors[attr.attributeCode]}
+                                                inputClass={inputClass}
+                                            />
+                                        ))
                                     ) : (
                                         <p className="col-span-full py-12 text-center text-sm text-muted-foreground">{t`Tidak ada atribut tambahan`}</p>
                                     )}
@@ -533,7 +490,7 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
 
                         <Button
                             size="sm"
-                            onClick={currentStep === steps.length - 1 ? () => setIsConfirmOpen(true) : nextStep}
+                            onClick={currentStep === steps.length - 1 ? validateAndConfirm : validateAndNext}
                             className={currentStep === steps.length - 1 ? "bg-emerald-600 hover:bg-emerald-700" : ""}
                         >
                             {currentStep === steps.length - 1 ? t`Submit Pengajuan` : t`Lanjut`}

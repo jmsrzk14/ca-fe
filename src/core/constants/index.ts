@@ -8,6 +8,7 @@ export const ROUTES = {
   DASHBOARD: '/',
   APPLICATIONS: '/applications',
   BORROWERS: '/borrowers',
+  CREDIT_BUREAU: '/credit-bureau',
   SETTINGS: '/settings',
   ATTRIBUTES: '/settings/attributes',
 } as const;

@@ -558,3 +558,363 @@ export class UpsertApplicantAttributesRequest extends Message<UpsertApplicantAtt
   }
 }
 
+/**
+ * @generated from message api.applicant.v1.ApplicantPartyResponse
+ */
+export class ApplicantPartyResponse extends Message<ApplicantPartyResponse> {
+  /**
+   * @generated from field: string party_id = 1;
+   */
+  partyId = "";
+
+  /**
+   * @generated from field: string party_type = 2;
+   */
+  partyType = "";
+
+  /**
+   * @generated from field: string name = 3;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string identifier = 4;
+   */
+  identifier = "";
+
+  /**
+   * @generated from field: string date_of_birth = 5;
+   */
+  dateOfBirth = "";
+
+  /**
+   * @generated from field: string role_code = 6;
+   */
+  roleCode = "";
+
+  /**
+   * @generated from field: double ownership_pct = 7;
+   */
+  ownershipPct = 0;
+
+  /**
+   * @generated from field: string position = 8;
+   */
+  position = "";
+
+  /**
+   * @generated from field: bool slik_required = 9;
+   */
+  slikRequired = false;
+
+  constructor(data?: PartialMessage<ApplicantPartyResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.applicant.v1.ApplicantPartyResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "party_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "party_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "identifier", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "date_of_birth", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "role_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "ownership_pct", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 8, name: "position", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "slik_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ApplicantPartyResponse {
+    return new ApplicantPartyResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ApplicantPartyResponse {
+    return new ApplicantPartyResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ApplicantPartyResponse {
+    return new ApplicantPartyResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ApplicantPartyResponse | PlainMessage<ApplicantPartyResponse> | undefined, b: ApplicantPartyResponse | PlainMessage<ApplicantPartyResponse> | undefined): boolean {
+    return proto3.util.equals(ApplicantPartyResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message api.applicant.v1.AddApplicantPartyRequest
+ */
+export class AddApplicantPartyRequest extends Message<AddApplicantPartyRequest> {
+  /**
+   * @generated from field: string applicant_id = 1;
+   */
+  applicantId = "";
+
+  /**
+   * @generated from field: string party_type = 2;
+   */
+  partyType = "";
+
+  /**
+   * @generated from field: string name = 3;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string identifier = 4;
+   */
+  identifier = "";
+
+  /**
+   * @generated from field: string date_of_birth = 5;
+   */
+  dateOfBirth = "";
+
+  /**
+   * @generated from field: string role_code = 6;
+   */
+  roleCode = "";
+
+  /**
+   * @generated from field: double ownership_pct = 7;
+   */
+  ownershipPct = 0;
+
+  /**
+   * @generated from field: string position = 8;
+   */
+  position = "";
+
+  /**
+   * @generated from field: bool slik_required = 9;
+   */
+  slikRequired = false;
+
+  constructor(data?: PartialMessage<AddApplicantPartyRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.applicant.v1.AddApplicantPartyRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "applicant_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "party_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "identifier", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "date_of_birth", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "role_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "ownership_pct", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 8, name: "position", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 9, name: "slik_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AddApplicantPartyRequest {
+    return new AddApplicantPartyRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AddApplicantPartyRequest {
+    return new AddApplicantPartyRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AddApplicantPartyRequest {
+    return new AddApplicantPartyRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AddApplicantPartyRequest | PlainMessage<AddApplicantPartyRequest> | undefined, b: AddApplicantPartyRequest | PlainMessage<AddApplicantPartyRequest> | undefined): boolean {
+    return proto3.util.equals(AddApplicantPartyRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.applicant.v1.UpdateApplicantPartyRequest
+ */
+export class UpdateApplicantPartyRequest extends Message<UpdateApplicantPartyRequest> {
+  /**
+   * @generated from field: string applicant_id = 1;
+   */
+  applicantId = "";
+
+  /**
+   * @generated from field: string party_id = 2;
+   */
+  partyId = "";
+
+  /**
+   * @generated from field: string role_code = 3;
+   */
+  roleCode = "";
+
+  /**
+   * @generated from field: double ownership_pct = 4;
+   */
+  ownershipPct = 0;
+
+  /**
+   * @generated from field: string position = 5;
+   */
+  position = "";
+
+  /**
+   * @generated from field: bool slik_required = 6;
+   */
+  slikRequired = false;
+
+  constructor(data?: PartialMessage<UpdateApplicantPartyRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.applicant.v1.UpdateApplicantPartyRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "applicant_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "party_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "role_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "ownership_pct", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 5, name: "position", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "slik_required", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateApplicantPartyRequest {
+    return new UpdateApplicantPartyRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateApplicantPartyRequest {
+    return new UpdateApplicantPartyRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateApplicantPartyRequest {
+    return new UpdateApplicantPartyRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateApplicantPartyRequest | PlainMessage<UpdateApplicantPartyRequest> | undefined, b: UpdateApplicantPartyRequest | PlainMessage<UpdateApplicantPartyRequest> | undefined): boolean {
+    return proto3.util.equals(UpdateApplicantPartyRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.applicant.v1.RemoveApplicantPartyRequest
+ */
+export class RemoveApplicantPartyRequest extends Message<RemoveApplicantPartyRequest> {
+  /**
+   * @generated from field: string applicant_id = 1;
+   */
+  applicantId = "";
+
+  /**
+   * @generated from field: string party_id = 2;
+   */
+  partyId = "";
+
+  /**
+   * @generated from field: string role_code = 3;
+   */
+  roleCode = "";
+
+  constructor(data?: PartialMessage<RemoveApplicantPartyRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.applicant.v1.RemoveApplicantPartyRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "applicant_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "party_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "role_code", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RemoveApplicantPartyRequest {
+    return new RemoveApplicantPartyRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RemoveApplicantPartyRequest {
+    return new RemoveApplicantPartyRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RemoveApplicantPartyRequest {
+    return new RemoveApplicantPartyRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RemoveApplicantPartyRequest | PlainMessage<RemoveApplicantPartyRequest> | undefined, b: RemoveApplicantPartyRequest | PlainMessage<RemoveApplicantPartyRequest> | undefined): boolean {
+    return proto3.util.equals(RemoveApplicantPartyRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.applicant.v1.ListApplicantPartiesRequest
+ */
+export class ListApplicantPartiesRequest extends Message<ListApplicantPartiesRequest> {
+  /**
+   * @generated from field: string applicant_id = 1;
+   */
+  applicantId = "";
+
+  constructor(data?: PartialMessage<ListApplicantPartiesRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.applicant.v1.ListApplicantPartiesRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "applicant_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListApplicantPartiesRequest {
+    return new ListApplicantPartiesRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListApplicantPartiesRequest {
+    return new ListApplicantPartiesRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListApplicantPartiesRequest {
+    return new ListApplicantPartiesRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListApplicantPartiesRequest | PlainMessage<ListApplicantPartiesRequest> | undefined, b: ListApplicantPartiesRequest | PlainMessage<ListApplicantPartiesRequest> | undefined): boolean {
+    return proto3.util.equals(ListApplicantPartiesRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message api.applicant.v1.ListApplicantPartiesResponse
+ */
+export class ListApplicantPartiesResponse extends Message<ListApplicantPartiesResponse> {
+  /**
+   * @generated from field: repeated api.applicant.v1.ApplicantPartyResponse parties = 1;
+   */
+  parties: ApplicantPartyResponse[] = [];
+
+  constructor(data?: PartialMessage<ListApplicantPartiesResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "api.applicant.v1.ListApplicantPartiesResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "parties", kind: "message", T: ApplicantPartyResponse, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ListApplicantPartiesResponse {
+    return new ListApplicantPartiesResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ListApplicantPartiesResponse {
+    return new ListApplicantPartiesResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ListApplicantPartiesResponse {
+    return new ListApplicantPartiesResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ListApplicantPartiesResponse | PlainMessage<ListApplicantPartiesResponse> | undefined, b: ListApplicantPartiesResponse | PlainMessage<ListApplicantPartiesResponse> | undefined): boolean {
+    return proto3.util.equals(ListApplicantPartiesResponse, a, b);
+  }
+}
+

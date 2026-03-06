@@ -2,106 +2,112 @@
 
 import * as React from 'react';
 import { Badge } from '@/shared/ui/badge';
-import { Input } from '@/shared/ui/input';
-import { Button } from '@/shared/ui/button';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/shared/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/shared/ui/select';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle2, Clock, FileText, UserCheck, AlertTriangle, Send } from 'lucide-react';
+
+interface HistoryEntry {
+    id: number;
+    status: string;
+    statusColor: string;
+    comment: string;
+    date: string;
+    user: string;
+    icon: React.ElementType;
+}
+
+const MOCK_HISTORY: HistoryEntry[] = [
+    {
+        id: 1,
+        status: 'Diajukan',
+        statusColor: 'bg-blue-500/10 text-blue-600',
+        comment: 'Pengajuan kredit baru',
+        date: '13 Feb 2026, 09:50 WIB',
+        user: 'Sistem',
+        icon: Send,
+    },
+    {
+        id: 2,
+        status: 'Verifikasi Dokumen',
+        statusColor: 'bg-amber-500/10 text-amber-600',
+        comment: 'Dokumen KTP dan KK sudah lengkap',
+        date: '14 Feb 2026, 10:15 WIB',
+        user: 'Rina Marlina',
+        icon: FileText,
+    },
+    {
+        id: 3,
+        status: 'Survey Ditugaskan',
+        statusColor: 'bg-purple-500/10 text-purple-600',
+        comment: 'Ditugaskan ke surveyor lapangan',
+        date: '15 Feb 2026, 08:30 WIB',
+        user: 'Rina Marlina',
+        icon: UserCheck,
+    },
+    {
+        id: 4,
+        status: 'Survey Selesai',
+        statusColor: 'bg-indigo-500/10 text-indigo-600',
+        comment: 'Hasil survey positif, usaha aktif dan produktif',
+        date: '18 Feb 2026, 16:45 WIB',
+        user: 'Budi Santoso',
+        icon: CheckCircle2,
+    },
+    {
+        id: 5,
+        status: 'Analisis CRR',
+        statusColor: 'bg-cyan-500/10 text-cyan-600',
+        comment: 'Skor CRR: B+ (Good Risk Profile)',
+        date: '19 Feb 2026, 11:20 WIB',
+        user: 'Sistem',
+        icon: AlertTriangle,
+    },
+    {
+        id: 6,
+        status: 'Pending Approval',
+        statusColor: 'bg-amber-500/10 text-amber-600',
+        comment: 'Menunggu persetujuan komite kredit',
+        date: '20 Feb 2026, 09:00 WIB',
+        user: 'Rina Marlina',
+        icon: Clock,
+    },
+];
 
 export function HistoryTab() {
     return (
-        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-left-4 duration-500">
-            <div className="flex items-center justify-between mb-2">
-                <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <span className="w-1 h-5 bg-primary rounded-full"></span>
-                    Status Log
-                </h2>
-            </div>
+        <div className="animate-in fade-in slide-in-from-left-4 duration-500 space-y-5">
+            <h2 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-wider">
+                <span className="w-1 h-5 bg-primary rounded-full"></span>
+                Histori Pengajuan
+            </h2>
 
-            <div className="border border-border rounded-xl bg-card/30 overflow-hidden shadow-sm">
-                {/* Table Controls */}
-                <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-muted/20">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
-                        Show
-                        <Select defaultValue="10">
-                            <SelectTrigger className="h-8 w-[70px] bg-background">
-                                <SelectValue placeholder="10" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
-                                <SelectItem value="25">25</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        entries
-                    </div>
+            <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
 
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">Search:</span>
-                        <Input
-                            className="h-8 w-64 bg-background"
-                            placeholder="..."
-                        />
-                    </div>
-                </div>
+                <div className="space-y-0">
+                    {MOCK_HISTORY.map((entry, i) => {
+                        const Icon = entry.icon;
+                        const isLast = i === MOCK_HISTORY.length - 1;
+                        return (
+                            <div key={entry.id} className="relative flex gap-4 pb-5">
+                                {/* Icon dot */}
+                                <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-background border-2 border-border shrink-0">
+                                    <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                                </div>
 
-                {/* Table Content */}
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader className="bg-muted/50">
-                            <TableRow className="hover:bg-transparent border-border">
-                                <TableHead className="w-16 font-bold text-xs uppercase text-foreground py-4">No.</TableHead>
-                                <TableHead className="font-bold text-xs uppercase text-foreground py-4">Status</TableHead>
-                                <TableHead className="font-bold text-xs uppercase text-foreground py-4">Komentar</TableHead>
-                                <TableHead className="font-bold text-xs uppercase text-foreground py-4">Tanggal Diubah</TableHead>
-                                <TableHead className="font-bold text-xs uppercase text-foreground py-4">Diubah Oleh</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableRow className="border-border hover:bg-muted/30 transition-colors">
-                                <TableCell className="text-sm font-medium py-4">1</TableCell>
-                                <TableCell className="py-4">
-                                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 uppercase text-[10px] font-bold px-3 py-0.5">
-                                        Pending
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-sm text-foreground py-4">-</TableCell>
-                                <TableCell className="text-sm font-medium text-foreground py-4">February 13, 2026 - 9:50 WIB</TableCell>
-                                <TableCell className="text-sm font-bold text-foreground py-4">Sistem</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </div>
-
-                {/* Pagination */}
-                <div className="p-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-muted/10">
-                    <div className="text-xs text-muted-foreground font-medium">
-                        Showing 1 to 1 of 1 entries
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <Button variant="outline" size="sm" className="h-8 text-xs font-semibold px-3 opacity-50 cursor-not-allowed">
-                            Previous
-                        </Button>
-                        <Button variant="default" size="sm" className="h-8 w-8 text-xs font-bold bg-primary text-primary-foreground">
-                            1
-                        </Button>
-                        <Button variant="outline" size="sm" className="h-8 text-xs font-semibold px-3 opacity-50 cursor-not-allowed">
-                            Next
-                        </Button>
-                    </div>
+                                {/* Content */}
+                                <div className="flex-1 min-w-0 pt-0.5">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <Badge variant="secondary" className={`${entry.statusColor} border-none font-bold text-[10px]`}>
+                                            {entry.status}
+                                        </Badge>
+                                        <span className="text-[10px] text-muted-foreground">{entry.date}</span>
+                                    </div>
+                                    <p className="text-xs text-foreground mt-1">{entry.comment}</p>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">oleh {entry.user}</p>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

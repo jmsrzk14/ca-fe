@@ -40,7 +40,7 @@ export function AnalyticsCards() {
         },
         {
             title: 'Total Kredit di bulan ini',
-            value: `$${(data.totalFunded / 1000000).toFixed(1)}M`,
+            value: `${(data.totalFunded / 1000000).toFixed(1)}M`,
             icon: Banknote,
         },
         {

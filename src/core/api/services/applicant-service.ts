@@ -199,5 +199,67 @@ export const applicantService = {
                 dataType: attribute.dataType,
             }],
         });
-    }
+    },
+
+    listParties: async (applicantId: string) => {
+        const response = await client.listApplicantParties({ applicantId });
+        return (response.parties || []).map((p: any) => ({
+            partyId: p.partyId,
+            partyType: p.partyType || 'PERSON',
+            name: p.name || '',
+            identifier: p.identifier || '',
+            dateOfBirth: p.dateOfBirth || '',
+            roleCode: p.roleCode || '',
+            ownershipPct: p.ownershipPct || 0,
+            position: p.position || '',
+            slikRequired: p.slikRequired || false,
+        }));
+    },
+
+    addParty: async (applicantId: string, data: {
+        partyType: string;
+        name: string;
+        identifier: string;
+        dateOfBirth: string;
+        roleCode: string;
+        ownershipPct?: number;
+        position?: string;
+        slikRequired?: boolean;
+    }) => {
+        return client.addApplicantParty({
+            applicantId,
+            partyType: data.partyType,
+            name: data.name,
+            identifier: data.identifier,
+            dateOfBirth: data.dateOfBirth,
+            roleCode: data.roleCode,
+            ownershipPct: data.ownershipPct || 0,
+            position: data.position || '',
+            slikRequired: data.slikRequired || false,
+        });
+    },
+
+    updateParty: async (applicantId: string, partyId: string, data: {
+        roleCode: string;
+        ownershipPct?: number;
+        position?: string;
+        slikRequired?: boolean;
+    }) => {
+        return client.updateApplicantParty({
+            applicantId,
+            partyId,
+            roleCode: data.roleCode,
+            ownershipPct: data.ownershipPct || 0,
+            position: data.position || '',
+            slikRequired: data.slikRequired || false,
+        });
+    },
+
+    removeParty: async (applicantId: string, partyId: string, roleCode: string) => {
+        return client.removeApplicantParty({
+            applicantId,
+            partyId,
+            roleCode,
+        });
+    },
 };

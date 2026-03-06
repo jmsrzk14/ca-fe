@@ -3,8 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { Applicant, ApplicantAttributes, CreateApplicantRequest, GetApplicantAttributesRequest, GetApplicantRequest, ListApplicantsRequest, ListApplicantsResponse, UpdateApplicantRequest, UpsertApplicantAttributesRequest } from "./applicant_pb";
-import { MethodKind } from "@bufbuild/protobuf";
+import { AddApplicantPartyRequest, Applicant, ApplicantAttributes, ApplicantPartyResponse, CreateApplicantRequest, GetApplicantAttributesRequest, GetApplicantRequest, ListApplicantPartiesRequest, ListApplicantPartiesResponse, ListApplicantsRequest, ListApplicantsResponse, RemoveApplicantPartyRequest, UpdateApplicantPartyRequest, UpdateApplicantRequest, UpsertApplicantAttributesRequest } from "./applicant_pb";
+import { Empty, MethodKind } from "@bufbuild/protobuf";
 
 /**
  * @generated from service api.applicant.v1.ApplicantService
@@ -64,6 +64,42 @@ export const ApplicantService = {
       name: "UpsertApplicantAttributes",
       I: UpsertApplicantAttributesRequest,
       O: ApplicantAttributes,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.applicant.v1.ApplicantService.AddApplicantParty
+     */
+    addApplicantParty: {
+      name: "AddApplicantParty",
+      I: AddApplicantPartyRequest,
+      O: ApplicantPartyResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.applicant.v1.ApplicantService.UpdateApplicantParty
+     */
+    updateApplicantParty: {
+      name: "UpdateApplicantParty",
+      I: UpdateApplicantPartyRequest,
+      O: ApplicantPartyResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.applicant.v1.ApplicantService.RemoveApplicantParty
+     */
+    removeApplicantParty: {
+      name: "RemoveApplicantParty",
+      I: RemoveApplicantPartyRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.applicant.v1.ApplicantService.ListApplicantParties
+     */
+    listApplicantParties: {
+      name: "ListApplicantParties",
+      I: ListApplicantPartiesRequest,
+      O: ListApplicantPartiesResponse,
       kind: MethodKind.Unary,
     },
   }
