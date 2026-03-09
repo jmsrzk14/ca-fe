@@ -85,11 +85,10 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
             },
             {
                 label: data.applicantType?.toUpperCase() === 'COMPANY'
-                    ? getLabel('nib_number', t`NIB`)
+                    ? getLabel('tax_id', t`NPWP`)
                     : getLabel('identity_number', t`NIK`),
                 value: data.identityNumber,
             },
-            { label: getLabel('tax_id', t`NPWP`), value: data.taxId || '-' },
             {
                 label: data.applicantType?.toUpperCase() === 'COMPANY'
                     ? getLabel('tanggal_pendirian', t`Tanggal Pendirian`)

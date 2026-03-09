@@ -113,7 +113,7 @@ export function ApplicantList() {
                                 onClick={() => handleSort('identityNumber')}
                             >
                                 <div className="flex items-center gap-1.5">
-                                    {t`NIK / NIB`} <SortIcon column="identityNumber" />
+                                    {t`NIK / NPWP`} <SortIcon column="identityNumber" />
                                 </div>
                             </TableHead>
                             <TableHead

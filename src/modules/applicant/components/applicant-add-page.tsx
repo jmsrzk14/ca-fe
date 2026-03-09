@@ -201,7 +201,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
     const nextStep = () => {
         if (currentStep === 0) {
             if (!formData.fullName || !formData.identityNumber) {
-                toast.error(t`Harap isi Nama Lengkap dan NIK/NIB`);
+                toast.error(t`Harap isi Nama Lengkap dan NIK/NPWP`);
                 return;
             }
         }
@@ -490,33 +490,44 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     <div className="space-y-1">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
                                             <CheckCircle2 className="h-4 w-4 text-primary/70" />
-                                            {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NIB / No. Izin`} <span className="text-red-500">*</span>
+                                            {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NPWP`} <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             id="identityNumber"
                                             name="identityNumber"
                                             value={formData.identityNumber}
-                                            onChange={handleInputChange}
+                                            onChange={(e) => {
+                                                handleInputChange(e);
+                                                if (type === 'PERSONAL') {
+                                                    setFormData(prev => ({ ...prev, taxId: e.target.value }));
+                                                }
+                                            }}
                                             className="rounded-xl h-11 bg-slate-50 border-slate-200"
-                                            placeholder="1234567890..."
+                                            placeholder={type === 'PERSONAL' ? '3271234567890001' : '00.000.000.0-000.000'}
+                                            maxLength={type === 'PERSONAL' ? 16 : undefined}
                                         />
+                                        {type === 'PERSONAL' && (
+                                            <p className="text-[10px] text-muted-foreground">{t`NPWP otomatis sama dengan NIK`}</p>
+                                        )}
                                     </div>
 
-                                    {/* Tax ID */}
-                                    <div className="space-y-1">
-                                        <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
-                                            <Activity className="h-4 w-4 text-primary/70" />
-                                            {t`NPWP (Opsional)`}
-                                        </Label>
-                                        <Input
-                                            id="taxId"
-                                            name="taxId"
-                                            value={formData.taxId}
-                                            onChange={handleInputChange}
-                                            className="rounded-xl h-11 bg-slate-50 border-slate-200"
-                                            placeholder="00.000.000.0-000.000"
-                                        />
-                                    </div>
+                                    {/* Tax ID - only show for corporate */}
+                                    {type === 'CORPORATE' && (
+                                        <div className="space-y-1">
+                                            <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
+                                                <Activity className="h-4 w-4 text-primary/70" />
+                                                {t`NPWP Lama (Opsional)`}
+                                            </Label>
+                                            <Input
+                                                id="taxId"
+                                                name="taxId"
+                                                value={formData.taxId}
+                                                onChange={handleInputChange}
+                                                className="rounded-xl h-11 bg-slate-50 border-slate-200"
+                                                placeholder="00.000.000.0-000.000"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* Birth / Establishment Date */}
                                     <div className="space-y-1">

@@ -85,7 +85,7 @@ const PRIMARY_KEYS = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'estab
 // Schema for the primary (step-0) fields
 const primarySchema = z.object({
     fullName: z.string().min(1, 'Nama wajib diisi'),
-    identityNumber: z.string().min(1, 'NIK/NIB wajib diisi'),
+    identityNumber: z.string().min(1, 'NIK/NPWP wajib diisi'),
     taxId: z.string(),
     birthDate: z.string(),
 });
@@ -449,28 +449,40 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-medium text-muted-foreground">
-                                        {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NIB / No. Izin`} <span className="text-destructive">*</span>
+                                        {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NPWP`} <span className="text-destructive">*</span>
                                     </Label>
                                     <Input
-                                        {...primaryForm.register('identityNumber')}
+                                        {...primaryForm.register('identityNumber', {
+                                            onChange: (e) => {
+                                                if (type === 'PERSONAL') {
+                                                    primaryForm.setValue('taxId', e.target.value);
+                                                }
+                                            },
+                                        })}
                                         className={inputClass}
-                                        placeholder="1234567890..."
+                                        placeholder={type === 'PERSONAL' ? '3271234567890001' : '00.000.000.0-000.000'}
+                                        maxLength={type === 'PERSONAL' ? 16 : undefined}
                                     />
                                     {primaryForm.formState.errors.identityNumber && (
                                         <p className="text-[10px] text-destructive mt-0.5">{primaryForm.formState.errors.identityNumber.message}</p>
                                     )}
+                                    {type === 'PERSONAL' && (
+                                        <p className="text-[10px] text-muted-foreground">{t`NPWP otomatis sama dengan NIK`}</p>
+                                    )}
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <Label className="text-xs font-medium text-muted-foreground">
-                                        {t`NPWP (Opsional)`}
-                                    </Label>
-                                    <Input
-                                        {...primaryForm.register('taxId')}
-                                        className={inputClass}
-                                        placeholder="00.000.000.0-000.000"
-                                    />
-                                </div>
+                                {type === 'CORPORATE' && (
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-medium text-muted-foreground">
+                                            {t`NPWP Lama (Opsional)`}
+                                        </Label>
+                                        <Input
+                                            {...primaryForm.register('taxId')}
+                                            className={inputClass}
+                                            placeholder="00.000.000.0-000.000"
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-medium text-muted-foreground">
