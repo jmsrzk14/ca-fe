@@ -151,16 +151,18 @@ export const applicantService = {
         });
     },
 
-    list: async (params?: Record<string, string>) => {
+    list: async (params?: { cursor?: string; pageSize?: number }) => {
         if (USE_DUMMY_DATA) {
             return {
                 applicants: DUMMY_APPLICANTS,
                 nextCursor: "",
+                hasNext: false,
             };
         }
 
         const response = await client.listApplicants({
             cursor: params?.cursor || "",
+            pageSize: params?.pageSize || 0,
         });
         if (typeof window !== 'undefined') {
             (window as any).lastApplicants = response;
@@ -183,6 +185,7 @@ export const applicantService = {
                 createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
             })),
             nextCursor: response.nextCursor || "",
+            hasNext: response.hasNext || false,
         };
     },
 

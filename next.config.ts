@@ -18,7 +18,8 @@ const nextConfig: NextConfig = {
   skipMiddlewareUrlNormalize: true,
 
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://creditanalyticsbackend-production.up.railway.app/";
+    // "http://localhost:8001";
     return [
       // gRPC-Web proxy: /api.<package>.<Service>/<Method>
       { source: "/api.applicant.v1.:service/:method", destination: `${backendUrl}/api.applicant.v1.:service/:method` },

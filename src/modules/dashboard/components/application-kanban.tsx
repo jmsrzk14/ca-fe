@@ -16,7 +16,7 @@ import {
     User,
     MoreHorizontal
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -58,6 +58,7 @@ import { ApplicationFormSheet } from './application-form-sheet';
 
 export function ApplicationKanban() {
     const router = useRouter();
+    const pathname = usePathname();
     const [loanType, setLoanType] = React.useState('Personal');
     const [viewMode, setViewMode] = React.useState<'board' | 'list'>('board');
     const [data, setData] = React.useState<KanbanColumnData[] | null>(null);
@@ -336,7 +337,9 @@ export function ApplicationKanban() {
             {/* Top Header */}
             <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-bold text-foreground">Pinjaman</h1>
+                    <h1 className="text-xl font-bold text-foreground">
+                        {pathname.includes('/applications') ? 'Pengajuan' : 'Pinjaman'}
+                    </h1>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
