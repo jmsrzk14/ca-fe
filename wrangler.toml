@@ -1,12 +1,8 @@
 name = "dots-ca-fe"
-main = ".vercel/output/static/_worker.js/index.js"
+pages_build_output_dir = ".vercel/output/static"
 compatibility_date = "2024-01-01"
 compatibility_flags = [ "nodejs_compat" ]
 
 [vars]
 ENVIRONMENT = "production"
 NEXT_PUBLIC_API_URL = "http://localhost:8001"
-
-[assets]
-directory = "./.vercel/output/static"
-binding = "ASSETS"
