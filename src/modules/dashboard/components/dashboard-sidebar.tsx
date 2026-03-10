@@ -38,6 +38,7 @@ const ADMIN_ITEMS: NavItem[] = [
         icon: Settings,
         children: [
             { href: ROUTES.ATTRIBUTES, label: 'Registri Field' },
+            { href: ROUTES.CATEGORIES, label: 'Registri Category' },
         ],
     },
 ];

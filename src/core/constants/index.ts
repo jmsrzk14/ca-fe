@@ -11,6 +11,7 @@ export const ROUTES = {
   CREDIT_BUREAU: '/credit-bureau',
   SETTINGS: '/settings',
   ATTRIBUTES: '/settings/attributes',
+  CATEGORIES: '/settings/categories',
 } as const;
 
 export const THEME_CONFIG = {

@@ -268,7 +268,6 @@ function AttributeForm({
                     <Label htmlFor="categoryCode">{t`Kode Kategori`}</Label>
                     <Input
                         id="categoryCode"
-                        placeholder="identitas"
                         value={value.categoryCode}
                         onChange={e => onChange({ categoryCode: e.target.value })}
                         required
@@ -281,7 +280,6 @@ function AttributeForm({
                     <Label htmlFor="categoryName">{t`Nama Kategori`}</Label>
                     <Input
                         id="categoryName"
-                        placeholder="1. Identitas"
                         value={value.categoryName}
                         onChange={e => onChange({ categoryName: e.target.value })}
                         required
