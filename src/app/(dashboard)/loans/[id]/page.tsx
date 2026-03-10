@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+export const runtime = 'edge';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { ErrorBoundary } from '@/shared/components/error-boundary';
 import { LoanDetailsView } from '@/modules/dashboard';
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function LoanDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    
+
     return (
         <ErrorBoundary>
             <Suspense fallback={<LoanDetailLoadingSkeleton />}>
