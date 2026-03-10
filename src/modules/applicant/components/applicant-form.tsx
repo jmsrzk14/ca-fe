@@ -78,6 +78,8 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
     const [currentStep, setCurrentStep] = React.useState(0);
     const [type, setType] = React.useState<ApplicantType>('PERSONAL');
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+    const [isCancelConfirmOpen, setIsCancelConfirmOpen] = React.useState(false);
+    const [pendingCancelAction, setPendingCancelAction] = React.useState<(() => void) | null>(null);
 
     const { data: registry, isLoading: isRegistryLoading } = useQuery({
         queryKey: ['attribute-registry'],
@@ -459,7 +461,10 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                                 type="button"
                                 variant="outline"
                                 className="rounded-xl px-8 h-12 font-bold"
-                                onClick={onCancel}
+                                onClick={() => {
+                                    setPendingCancelAction(() => onCancel);
+                                    setIsCancelConfirmOpen(true);
+                                }}
                             >
                                 {t`Batal`}
                             </Button>
@@ -469,7 +474,10 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                             type="button"
                             variant="outline"
                             className="rounded-xl px-8 h-12 font-bold gap-2"
-                            onClick={prevStep}
+                            onClick={() => {
+                                setPendingCancelAction(() => prevStep);
+                                setIsCancelConfirmOpen(true);
+                            }}
                         >
                             <ChevronLeft className="h-4 w-4" />
                             {t`Sebelumnya`}
@@ -520,6 +528,31 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                         <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => performSubmit()} disabled={mutation.isPending}>
                             {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                             {t`Ya, Ajukan Sekarang`}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isCancelConfirmOpen} onOpenChange={setIsCancelConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t`Batalkan Pengisian?`}</DialogTitle>
+                        <DialogDescription>
+                            {t`Data yang sudah diisi akan hilang. Apakah Anda yakin ingin keluar?`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => setIsCancelConfirmOpen(false)}>
+                            {t`Lanjut Mengisi`}
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={() => {
+                                setIsCancelConfirmOpen(false);
+                                pendingCancelAction?.();
+                            }}
+                        >
+                            {t`Ya, Keluar`}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

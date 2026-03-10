@@ -1,35 +1,31 @@
 'use client';
 
 import * as React from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Menu } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { usePathname } from 'next/navigation';
 import { Button } from '@/shared/ui/button';
 import { LanguageSwitcher } from '@/shared/components/language-switcher';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { useSidebar } from './sidebar-context';
 
 export function DashboardHeader() {
     const { setTheme, theme } = useTheme();
-    const pathname = usePathname();
     const { user } = useAuth();
-
-    const getPageTitle = () => {
-        if (pathname === '/') return 'Dashboard';
-        if (pathname.includes('/applications')) return 'Pengajuan';
-        if (pathname.includes('/loans')) {
-            const pathParts = pathname.split('/').filter(Boolean);
-            if (pathParts.length > 1) return 'Detail Pengajuan';
-            return 'Pinjaman';
-        }
-        if (pathname.includes('/survey')) return 'Survey';
-        if (pathname.includes('/settings')) return 'Pengaturan';
-        if (pathname.includes('/borrowers')) return 'Peminjam';
-        return 'DOTS CA';
-    };
+    const { toggleSidebar } = useSidebar();
 
     return (
         <header className="h-14 bg-card border-b border-border flex items-center justify-between px-6 shrink-0">
-            <h1 className="text-sm font-semibold text-foreground">{getPageTitle()}</h1>
+            <div className="flex items-center gap-4">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 text-muted-foreground hover:bg-accent transition-colors"
+                    onClick={toggleSidebar}
+                >
+                    <Menu className="h-8 w-8" />
+                    <span className="sr-only">Toggle Sidebar</span>
+                </Button>
+            </div>
 
             <div className="flex items-center gap-2">
                 <LanguageSwitcher />

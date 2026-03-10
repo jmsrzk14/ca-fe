@@ -27,6 +27,7 @@ import { cn } from '@/shared/lib/utils';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -71,6 +72,8 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
 
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+    const [isCancelConfirmOpen, setIsCancelConfirmOpen] = React.useState(false);
+    const [pendingCancelAction, setPendingCancelAction] = React.useState<(() => void) | null>(null);
 
     // Dynamic attribute state
     const [dynamicData, setDynamicData] = React.useState<Record<string, string>>({});
@@ -483,7 +486,17 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
 
                     {/* Footer */}
                     <div className="px-6 py-4 border-t flex items-center justify-between">
-                        <Button variant="outline" size="sm" onClick={currentStep === 0 ? () => router.push('/loans') : () => setCurrentStep(prev => prev - 1)}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                const action = currentStep === 0
+                                    ? () => router.push('/loans')
+                                    : () => setCurrentStep(prev => prev - 1);
+                                setPendingCancelAction(() => action);
+                                setIsCancelConfirmOpen(true);
+                            }}
+                        >
                             <ChevronLeft className="h-3.5 w-3.5 mr-1" />
                             {currentStep === 0 ? t`Batal` : t`Kembali`}
                         </Button>
@@ -511,6 +524,32 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                         <Button size="sm" onClick={performSubmit} disabled={mutation.isPending}>
                             {mutation.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
                             {t`Ya, Buat Pengajuan`}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isCancelConfirmOpen} onOpenChange={setIsCancelConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t`Batalkan Pengisian?`}</DialogTitle>
+                        <DialogDescription>
+                            {t`Data yang sudah diisi akan hilang. Apakah Anda yakin ingin keluar?`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" size="sm" onClick={() => setIsCancelConfirmOpen(false)}>
+                            {t`Lanjut Mengisi`}
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                                setIsCancelConfirmOpen(false);
+                                pendingCancelAction?.();
+                            }}
+                        >
+                            {t`Ya, Keluar`}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

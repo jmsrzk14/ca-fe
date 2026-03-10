@@ -168,6 +168,7 @@ export const applicationService = {
 
         const response = await client.listApplications({
             cursor: params?.cursor || "",
+            pageSize: Number(params?.pageSize) || 0,
             status: params?.status || "",
             applicantId: params?.applicantId || ""
         });

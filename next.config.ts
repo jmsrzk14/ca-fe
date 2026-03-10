@@ -17,6 +17,8 @@ const nextConfig: NextConfig = {
     return config;
   },
   async rewrites() {
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://creditanalyticsbackend-production.up.railway.app/";
+    // "http://localhost:8001";
     return [
       {
         source: "/api.:path*",

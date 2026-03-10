@@ -39,8 +39,8 @@ function LoginForm() {
     <div className="w-full max-w-sm space-y-8">
       {/* Mobile brand */}
       <div className="lg:hidden flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-          <span className="text-white text-xs font-bold">CA</span>
+        <div className="w-9 h-9 rounded-lg flex items-center justify-center">
+          <img src="dots.png" alt="" />
         </div>
         <div>
           <p className="font-bold text-foreground leading-none">DOTS</p>
@@ -84,8 +84,8 @@ export default function LoginPage() {
       {/* Left panel — brand */}
       <div className="hidden lg:flex w-1/2 bg-[hsl(222,47%,11%)] flex-col justify-between p-12">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-white text-sm font-bold">CA</span>
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+            <img src="dots.png" alt="" />
           </div>
           <div>
             <p className="text-white font-bold text-lg leading-none">DOTS</p>

@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
 import { referenceService } from '@/core/api';
 import { DetailItem } from '@/shared/components/detail-item';
+import { formatThousands } from '@/shared/lib/utils';
 
 interface LoanInfoTabProps {
     application?: any;
@@ -44,11 +45,8 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
     const formatCurrency = (amount?: string | number) => {
         if (amount === undefined || amount === null || amount === '') return '—';
         const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-        }).format(num);
+        // Use custom formatting for commas as thousand separators as requested
+        return 'Rp ' + formatThousands(num);
     };
 
     const formatDate = (dateStr?: string) => {
@@ -82,7 +80,7 @@ export function LoanInfoTab({ application, applicant, productName }: LoanInfoTab
                 return choice?.value || val;
             }
         }
-        if (attr.dataType === 'NUMBER') return val;
+        if (attr.dataType === 'NUMBER') return formatThousands(val);
 
         return val;
     };

@@ -6,6 +6,7 @@ import { Label } from '@/shared/ui/label';
 import { SearchableSelect } from '@/shared/ui/searchable-select';
 import { AttributeRegistry } from '@/shared/types/api';
 import { t } from '@/shared/lib/t';
+import { formatThousands, parseThousands } from '@/shared/lib/utils';
 
 interface DynamicFieldProps {
     field: AttributeRegistry;
@@ -13,9 +14,10 @@ interface DynamicFieldProps {
     onChange: (key: string, value: string) => void;
     error?: string;
     inputClass?: string;
+    disabled?: boolean;
 }
 
-export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 rounded-md' }: DynamicFieldProps) {
+export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 rounded-md', disabled = false }: DynamicFieldProps) {
     const id = field.attributeCode;
     const rawLabel = field.uiLabel || field.description || id;
     const label = t`${rawLabel}`;
@@ -52,6 +54,7 @@ export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 
                     placeholder={t`Pilih ${label}...`}
                     searchPlaceholder={t`Cari ${label}...`}
                     className={inputClass}
+                    disabled={disabled}
                 />
                 {errorContent}
             </div>
@@ -66,7 +69,7 @@ export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 
                 <SearchableSelect
                     options={[]}
                     value=""
-                    onValueChange={() => {}}
+                    onValueChange={() => { }}
                     placeholder={t`Tidak ada pilihan`}
                     disabled
                     className={inputClass}
@@ -91,6 +94,7 @@ export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 
                     onValueChange={(v) => onChange(id, v)}
                     placeholder={t`Pilih...`}
                     className={inputClass}
+                    disabled={disabled}
                 />
                 {errorContent}
             </div>
@@ -109,6 +113,7 @@ export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 
                     value={value || ''}
                     onChange={(e) => onChange(id, e.target.value)}
                     className={inputClass}
+                    disabled={disabled}
                 />
                 {errorContent}
             </div>
@@ -117,16 +122,25 @@ export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 
 
     // NUMBER
     if (dataType === 'NUMBER') {
+        const displayValue = formatThousands(value);
         return (
             <div key={id} className="space-y-1.5">
                 {labelContent}
                 <Input
                     id={id}
                     name={id}
-                    type="number"
-                    value={value || ''}
-                    onChange={(e) => onChange(id, e.target.value)}
+                    type="text"
+                    inputMode="numeric"
+                    value={displayValue}
+                    onChange={(e) => {
+                        const raw = parseThousands(e.target.value);
+                        if (raw === '' || /^\d+$/.test(raw)) {
+                            onChange(id, raw);
+                        }
+                    }}
                     className={inputClass}
+                    disabled={disabled}
+                    placeholder="0"
                 />
                 {errorContent}
             </div>
@@ -144,6 +158,7 @@ export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 
                 onChange={(e) => onChange(id, e.target.value)}
                 className={inputClass}
                 placeholder={t`Masukkan ${label}`}
+                disabled={disabled}
             />
             {errorContent}
         </div>
