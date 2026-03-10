@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAttributeRegistry } from '@/shared/hooks/use-attribute-registry';
 import { referenceService } from '@/core/api';
 import { DetailItem } from '@/shared/components/detail-item';
+import { formatThousands } from '@/shared/lib/utils';
 
 interface BorrowerProfileTabProps {
     applicant?: any;
@@ -96,6 +97,7 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
                 return choice?.value || val;
             }
         }
+        if (attr.dataType === 'NUMBER') return formatThousands(val);
 
         return val;
     };

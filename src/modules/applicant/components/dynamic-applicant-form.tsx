@@ -35,10 +35,13 @@ import { cn } from '@/shared/lib/utils';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/shared/ui/dialog';
+import { useRouter } from 'next/navigation';
+import { Checkbox } from '@/shared/ui/checkbox';
 import { DynamicField } from '@/shared/components/dynamic-field';
 import { buildDynamicSchema, resolveChoiceId } from '@/shared/lib/dynamic-form';
 
@@ -94,6 +97,8 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     const queryClient = useQueryClient();
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+    const [isCancelConfirmOpen, setIsCancelConfirmOpen] = React.useState(false);
+    const [pendingCancelAction, setPendingCancelAction] = React.useState<(() => void) | null>(null);
 
     const { data: registryResponse, isLoading: isRegistryLoading } = useQuery({
         queryKey: ['attribute-registry'],
@@ -189,12 +194,53 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         defaultValues: { fullName: '', identityNumber: '', taxId: '', birthDate: '' },
     });
 
-    // Dynamic fields stored separately (flat key-value)
     const [dynamicData, setDynamicData] = React.useState<Record<string, string>>({});
     const [dynamicErrors, setDynamicErrors] = React.useState<Record<string, string>>({});
+    const [isDomicileSameAsIdentity, setIsDomicileSameAsIdentity] = React.useState(false);
+
+    // Sync KTP fields -> Domisili fields
+    const syncAddress = React.useCallback((currentData: Record<string, string>) => {
+        const newData = { ...currentData };
+        Object.keys(currentData).forEach(key => {
+            if (key.endsWith('_ktp')) {
+                const domKey = key === 'alamat_ktp' ? 'domicile_address' : key.replace('_ktp', '_domisili');
+                newData[domKey] = currentData[key];
+            }
+        });
+        return newData;
+    }, []);
+
+    React.useEffect(() => {
+        if (isDomicileSameAsIdentity) {
+            setDynamicData(prev => syncAddress(prev));
+        }
+    }, [isDomicileSameAsIdentity, syncAddress]);
+
+    // Deteksi apakah step saat ini adalah Alamat Domisili
+    const isCurrentStepDomicile = React.useMemo(() => {
+        const step = steps[currentStep];
+        if (!step) return false;
+        if ((step as any).categoryCode === 'domicile_address') return true;
+        return step.fields.some(
+            (f: AttributeRegistry) =>
+                f.categoryCode === 'domicile_address' ||
+                f.attributeCode === 'domicile_address' ||
+                f.attributeCode?.includes('domisili') ||
+                f.categoryCode?.includes('domicile') ||
+                f.categoryCode?.includes('domisili')
+        );
+    }, [steps, currentStep]);
 
     const handleDynamicChange = (key: string, value: string) => {
-        setDynamicData(prev => ({ ...prev, [key]: value }));
+        setDynamicData(prev => {
+            const next = { ...prev, [key]: value };
+            // Jika checkbox aktif dan field _ktp diubah, sync ke _domisili
+            if (isDomicileSameAsIdentity && key.endsWith('_ktp')) {
+                const domKey = key === 'alamat_ktp' ? 'domicile_address' : key.replace('_ktp', '_domisili');
+                next[domKey] = value;
+            }
+            return next;
+        });
         // Clear error on change
         if (dynamicErrors[key]) {
             setDynamicErrors(prev => {
@@ -497,6 +543,37 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                             </>
                         )}
 
+                        {/* Checkbox sinkronisasi alamat — tampil di step Alamat Domisili */}
+                        {currentStep > 0 && isCurrentStepDomicile && (
+                            <div className="col-span-full mb-2">
+                                <div
+                                    className={cn(
+                                        'flex items-start gap-3 p-4 rounded-xl border transition-all cursor-pointer',
+                                        isDomicileSameAsIdentity
+                                            ? 'bg-primary/10 border-primary/30 shadow-sm'
+                                            : 'bg-primary/5 border-primary/10 hover:bg-primary/10'
+                                    )}
+                                    onClick={() => setIsDomicileSameAsIdentity(prev => !prev)}
+                                >
+                                    <Checkbox
+                                        id="sync-address-dynamic"
+                                        checked={isDomicileSameAsIdentity}
+                                        onCheckedChange={(checked: boolean) => setIsDomicileSameAsIdentity(!!checked)}
+                                        className="border-primary data-[state=checked]:bg-primary mt-0.5 shrink-0"
+                                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                    />
+                                    <div className="flex flex-col gap-0.5">
+                                        <Label htmlFor="sync-address-dynamic" className="text-xs font-bold cursor-pointer text-primary select-none">
+                                            {t`Alamat Domisili sama dengan Alamat KTP`}
+                                        </Label>
+                                        <span className="text-[10px] text-muted-foreground select-none">
+                                            {t`Centang jika alamat domisili sama dengan alamat KTP. `}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {currentStep > 0 && steps[currentStep]?.fields?.map((field: AttributeRegistry) => (
                             <DynamicField
                                 key={field.attributeCode}
@@ -505,6 +582,10 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                 onChange={handleDynamicChange}
                                 error={dynamicErrors[field.attributeCode]}
                                 inputClass={inputClass}
+                                disabled={isDomicileSameAsIdentity && (
+                                    field.attributeCode?.endsWith('_domisili') ||
+                                    field.attributeCode === 'domicile_address'
+                                )}
                             />
                         ))}
                     </div>
@@ -512,7 +593,17 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
                 {/* Footer */}
                 <div className="px-6 py-4 border-t flex items-center justify-between">
-                    <Button variant="outline" size="sm" onClick={currentStep === 0 ? onCancel : () => setCurrentStep(prev => prev - 1)}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            const action = currentStep === 0
+                                ? () => onCancel?.()
+                                : () => setCurrentStep(prev => prev - 1);
+                            setPendingCancelAction(() => action);
+                            setIsCancelConfirmOpen(true);
+                        }}
+                    >
                         <ChevronLeft className="h-3.5 w-3.5 mr-1" />
                         {currentStep === 0 ? t`Batal` : t`Kembali`}
                     </Button>
@@ -538,6 +629,32 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                     <DialogFooter>
                         <Button variant="outline" size="sm" onClick={() => setIsConfirmOpen(false)}>{t`Batal`}</Button>
                         <Button size="sm" onClick={performSubmit} disabled={mutation.isPending}>{t`Ya, Simpan`}</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isCancelConfirmOpen} onOpenChange={setIsCancelConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t`Batalkan Pengisian?`}</DialogTitle>
+                        <DialogDescription>
+                            {t`Data yang sudah diisi akan hilang. Apakah Anda yakin ingin keluar?`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" size="sm" onClick={() => setIsCancelConfirmOpen(false)}>
+                            {t`Lanjut Mengisi`}
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                                setIsCancelConfirmOpen(false);
+                                pendingCancelAction?.();
+                            }}
+                        >
+                            {t`Ya, Keluar`}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

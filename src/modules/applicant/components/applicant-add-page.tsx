@@ -30,16 +30,18 @@ import { AttributeRegistry, ApplicantType } from '@/shared/types/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { cn } from '@/shared/lib/utils';
+import { cn, formatThousands, parseThousands } from '@/shared/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/shared/ui/dialog';
 import { useRouter } from 'next/navigation';
+import { Checkbox } from '@/shared/ui/checkbox';
 
 interface ApplicantAddPageProps {
     /** After successful submit, redirect to this path (default: /borrowers) */
@@ -107,6 +109,9 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
     const [type, setType] = React.useState<ApplicantType>('PERSONAL');
     const [currentStep, setCurrentStep] = React.useState(0);
     const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
+    const [isCancelConfirmOpen, setIsCancelConfirmOpen] = React.useState(false);
+    const [pendingCancelAction, setPendingCancelAction] = React.useState<(() => void) | null>(null);
+    const [isDomicileSameAsIdentity, setIsDomicileSameAsIdentity] = React.useState(false);
 
     const [formData, setFormData] = React.useState<Record<string, any>>({
         fullName: '',
@@ -115,6 +120,24 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
         birthDate: '',
         establishmentDate: '',
     });
+
+    // Sync semua field _ktp -> _domisili (khusus alamat_ktp -> domicile_address)
+    const syncAddress = React.useCallback((currentData: Record<string, any>) => {
+        const newData = { ...currentData };
+        Object.keys(currentData).forEach(key => {
+            if (key.endsWith('_ktp')) {
+                const domKey = key === 'alamat_ktp' ? 'domicile_address' : key.replace('_ktp', '_domisili');
+                newData[domKey] = currentData[key];
+            }
+        });
+        return newData;
+    }, []);
+
+    React.useEffect(() => {
+        if (isDomicileSameAsIdentity) {
+            setFormData(prev => syncAddress(prev));
+        }
+    }, [isDomicileSameAsIdentity, syncAddress]);
 
     // ── Queries ────────────────────────────────────────────────────────────────
     const { data: registryResponse, isLoading: isRegistryLoading } = useQuery({
@@ -154,6 +177,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                     title: cat.categoryName || 'Lainnya',
                     fields: groups[cat.categoryCode] || [],
                     iconName: cat.uiIcon,
+                    categoryCode: cat.categoryCode,
                 }))
                 .filter(cat => cat.fields.length > 0); // skip empty categories
         }
@@ -165,6 +189,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                 title: name,
                 fields,
                 iconName: undefined,
+                categoryCode: name,
             }));
     }, [registry, apiCategories, type]);
 
@@ -188,14 +213,45 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
             return { ...cat, icon: Icon };
         }), [categories]);
 
+    // Deteksi: apakah step saat ini adalah "Alamat Domisili"
+    const isCurrentStepDomicile = React.useMemo(() => {
+        const step = steps[currentStep];
+        if (!step) return false;
+        // Cek berdasarkan categoryCode (paling reliable)
+        if (step.categoryCode === 'domicile_address') return true;
+        // Fallback: cek field-field di step ini
+        return step.fields.some(
+            (f: AttributeRegistry) =>
+                f.categoryCode === 'domicile_address' ||
+                f.attributeCode === 'domicile_address' ||
+                f.attributeCode?.includes('domisili') ||
+                f.categoryCode?.includes('domicile') ||
+                f.categoryCode?.includes('domisili')
+        );
+    }, [steps, currentStep]);
+
     // ── Handlers ───────────────────────────────────────────────────────────────
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => {
+            const next = { ...prev, [name]: value };
+            if (isDomicileSameAsIdentity && name.endsWith('_ktp')) {
+                const domKey = name === 'alamat_ktp' ? 'domicile_address' : name.replace('_ktp', '_domisili');
+                next[domKey] = value;
+            }
+            return next;
+        });
     };
 
     const handleSelectChange = (name: string, value: string) => {
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => {
+            const next = { ...prev, [name]: value };
+            if (isDomicileSameAsIdentity && name.endsWith('_ktp')) {
+                const domKey = name === 'alamat_ktp' ? 'domicile_address' : name.replace('_ktp', '_domisili');
+                next[domKey] = value;
+            }
+            return next;
+        });
     };
 
     const nextStep = () => {
@@ -260,6 +316,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
         const label = t`${rawLabel}`;
         const isRequired = field.isRequired;
         const FieldIcon = getIconWithName(field.categoryIcon);
+        const isDisabled = isDomicileSameAsIdentity && (id.endsWith('_domisili') || id === 'domicile_address');
 
         const labelContent = (
             <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
@@ -273,7 +330,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
             return (
                 <div key={id} className="space-y-1">
                     {labelContent}
-                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''}>
+                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''} disabled={isDisabled}>
                         <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
@@ -298,7 +355,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
             return (
                 <div key={id} className="space-y-1">
                     {labelContent}
-                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''}>
+                    <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''} disabled={isDisabled}>
                         <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
                             <SelectValue placeholder={t`Pilih ${label}...`} />
                         </SelectTrigger>
@@ -317,7 +374,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                 return (
                     <div key={id} className="space-y-1">
                         {labelContent}
-                        <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''}>
+                        <Select onValueChange={v => handleSelectChange(id, v)} value={formData[id] || ''} disabled={isDisabled}>
                             <SelectTrigger className="rounded-xl h-11 bg-slate-50 border-slate-200">
                                 <SelectValue placeholder={t`Pilih...`} />
                             </SelectTrigger>
@@ -332,21 +389,38 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                 return (
                     <div key={id} className="space-y-1">
                         {labelContent}
-                        <Input id={id} name={id} type="date" value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" />
+                        <Input id={id} name={id} type="date" value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" disabled={isDisabled} />
                     </div>
                 );
-            case 'NUMBER':
+            case 'NUMBER': {
+                const displayValue = formatThousands(formData[id]);
                 return (
                     <div key={id} className="space-y-1">
                         {labelContent}
-                        <Input id={id} name={id} type="number" value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" />
+                        <Input
+                            id={id}
+                            name={id}
+                            type="text"
+                            inputMode="numeric"
+                            value={displayValue}
+                            onChange={(e) => {
+                                const raw = parseThousands(e.target.value);
+                                if (raw === '' || /^\d+$/.test(raw)) {
+                                    handleSelectChange(id, raw);
+                                }
+                            }}
+                            className="rounded-xl h-11 bg-slate-50 border-slate-200"
+                            disabled={isDisabled}
+                            placeholder="0"
+                        />
                     </div>
                 );
+            }
             default:
                 return (
                     <div key={id} className="space-y-1">
                         {labelContent}
-                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan ${label}`} />
+                        <Input id={id} name={id} value={formData[id] || ''} onChange={handleInputChange} className="rounded-xl h-11 bg-slate-50 border-slate-200" placeholder={t`Masukkan ${label}`} disabled={isDisabled} />
                     </div>
                 );
         }
@@ -547,8 +621,44 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                 </>
                             )}
 
-                            {/* Registry fields for current step */}
-                            {steps[currentStep]?.fields?.map((field: AttributeRegistry) => renderField(field))}
+                            {/* ─── Checkbox sinkronisasi alamat ─────────────────────────────────── */}
+                            {/* Ditampilkan di atas semua field saat berada di step Alamat Domisili */}
+                            {isCurrentStepDomicile && (
+                                <div className="col-span-full mb-2">
+                                    <div
+                                        className={cn(
+                                            'flex items-start gap-4 p-5 rounded-2xl border transition-all cursor-pointer',
+                                            isDomicileSameAsIdentity
+                                                ? 'bg-primary/10 border-primary/30 shadow-md'
+                                                : 'bg-primary/5 border-primary/10 shadow-sm hover:bg-primary/10'
+                                        )}
+                                        onClick={() => setIsDomicileSameAsIdentity(prev => !prev)}
+                                    >
+                                        <Checkbox
+                                            id="sync-address"
+                                            checked={isDomicileSameAsIdentity}
+                                            onCheckedChange={(checked: boolean) => setIsDomicileSameAsIdentity(!!checked)}
+                                            className="border-primary data-[state=checked]:bg-primary mt-0.5 shrink-0"
+                                            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                        />
+                                        <div className="flex flex-col gap-0.5">
+                                            <Label htmlFor="sync-address" className="text-sm font-bold cursor-pointer text-primary select-none">
+                                                {t`Alamat Domisili sama dengan Alamat KTP`}
+                                            </Label>
+                                            <span className="text-xs text-muted-foreground select-none">
+                                                {t`Centang jika alamat domisili Anda sama dengan alamat yang tertera di KTP. Data akan disalin otomatis.`}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Registry fields for this step */}
+                            {steps[currentStep]?.fields?.map((field: AttributeRegistry) => (
+                                <React.Fragment key={field.attributeCode}>
+                                    {renderField(field)}
+                                </React.Fragment>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -557,7 +667,13 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                 <div className="p-8 border-t bg-muted/10 flex items-center justify-between">
                     <Button
                         variant="outline"
-                        onClick={currentStep === 0 ? () => router.back() : () => setCurrentStep(prev => prev - 1)}
+                        onClick={() => {
+                            const action = currentStep === 0
+                                ? () => router.back()
+                                : () => setCurrentStep(prev => prev - 1);
+                            setPendingCancelAction(() => action);
+                            setIsCancelConfirmOpen(true);
+                        }}
                         className="rounded-xl px-8 h-12"
                     >
                         {currentStep === 0 ? t`Batal` : t`Kembali`}
@@ -605,6 +721,31 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                         >
                             {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                             {t`Ya, Simpan`}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isCancelConfirmOpen} onOpenChange={setIsCancelConfirmOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t`Batalkan Pengisian?`}</DialogTitle>
+                        <DialogDescription>
+                            {t`Data yang sudah diisi akan hilang. Apakah Anda yakin ingin keluar?`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCancelConfirmOpen(false)}>
+                            {t`Lanjut Mengisi`}
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={() => {
+                                setIsCancelConfirmOpen(false);
+                                pendingCancelAction?.();
+                            }}
+                        >
+                            {t`Ya, Keluar`}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

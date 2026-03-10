@@ -59,7 +59,7 @@ import { ApplicationFormSheet } from './application-form-sheet';
 export function ApplicationKanban() {
     const router = useRouter();
     const pathname = usePathname();
-    const [loanType, setLoanType] = React.useState('Personal');
+    const [loanType, setLoanType] = React.useState('All');
     const [viewMode, setViewMode] = React.useState<'board' | 'list'>('board');
     const [data, setData] = React.useState<KanbanColumnData[] | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -344,6 +344,7 @@ export function ApplicationKanban() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                                {loanType === 'All' && <User className="h-3.5 w-3.5" />}
                                 {loanType === 'Personal' && <User className="h-3.5 w-3.5" />}
                                 {loanType === 'Company' && <Briefcase className="h-3.5 w-3.5" />}
                                 {loanType}
@@ -351,6 +352,9 @@ export function ApplicationKanban() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start">
+                            <DropdownMenuItem onClick={() => setLoanType('')} className="gap-2 cursor-pointer">
+                                All
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setLoanType('Personal')} className="gap-2 cursor-pointer">
                                 <User className="h-3.5 w-3.5" />
                                 Personal
