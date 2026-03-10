@@ -9,9 +9,9 @@
     "lint": "eslint",
     "gen-proto": "npx @bufbuild/buf generate buf.build/dots-credit-analytics/credit-analytics",
     "gen-proto-local": "npx @bufbuild/buf generate src/proto",
-    "pages:build": "npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
-    "build:cloudflare": "npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
-    "pages:deploy": "npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\""
+    "pages:build": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
+    "build:cloudflare": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
+    "pages:deploy": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\""
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.1",
