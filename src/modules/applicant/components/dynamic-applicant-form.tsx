@@ -292,15 +292,40 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     }, [applicantData, registry]);
 
     // Validation
-    const validateCurrentStep = (): boolean => {
+    const [isValidating, setIsValidating] = React.useState(false);
+
+    const validateCurrentStep = async (): Promise<boolean> => {
         if (currentStep === 0) {
-            // Trigger primary form validation
-            // We'll check synchronously via getValues
             const values = primaryForm.getValues();
             if (!values.fullName?.trim() || !values.identityNumber?.trim()) {
                 primaryForm.trigger();
                 return false;
             }
+
+            // Check for duplicate identity number (skip when editing)
+            if (!applicantId) {
+                try {
+                    setIsValidating(true);
+                    const existing = await applicantService.list();
+                    const duplicate = existing.applicants?.find(
+                        (a: any) => a.identityNumber === values.identityNumber.trim()
+                    );
+                    if (duplicate) {
+                        toast.error(
+                            t`${type === 'PERSONAL' ? 'NIK' : 'NPWP'} sudah terdaftar atas nama ${duplicate.fullName}`
+                        );
+                        primaryForm.setError('identityNumber', {
+                            message: t`${type === 'PERSONAL' ? 'NIK' : 'NPWP'} sudah terdaftar`,
+                        });
+                        return false;
+                    }
+                } catch {
+                    // If check fails, allow through — backend will reject if truly duplicate
+                } finally {
+                    setIsValidating(false);
+                }
+            }
+
             return true;
         }
 
@@ -332,8 +357,9 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         return true;
     };
 
-    const nextStep = () => {
-        if (!validateCurrentStep()) return;
+    const nextStep = async () => {
+        const valid = await validateCurrentStep();
+        if (!valid) return;
         if (currentStep < steps.length - 1) {
             setCurrentStep(prev => prev + 1);
         }
@@ -610,13 +636,15 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
                     <Button
                         size="sm"
-                        onClick={currentStep === steps.length - 1 ? () => {
-                            if (validateCurrentStep()) setIsConfirmOpen(true);
+                        disabled={isValidating}
+                        onClick={currentStep === steps.length - 1 ? async () => {
+                            if (await validateCurrentStep()) setIsConfirmOpen(true);
                         } : nextStep}
                         className={currentStep === steps.length - 1 ? "bg-emerald-600 hover:bg-emerald-700" : ""}
                     >
+                        {isValidating && <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />}
                         {currentStep === steps.length - 1 ? t`Simpan Peminjam` : t`Langkah Berikutnya`}
-                        {currentStep < steps.length - 1 && <ChevronRight className="h-3.5 w-3.5 ml-1" />}
+                        {currentStep < steps.length - 1 && !isValidating && <ChevronRight className="h-3.5 w-3.5 ml-1" />}
                     </Button>
                 </div>
             </CardContent>

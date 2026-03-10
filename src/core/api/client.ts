@@ -30,7 +30,7 @@ class ApiClient {
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({ message: 'An unknown error occurred' }));
-            throw new Error(error.message || `HTTP error! status: ${response.status}`);
+            throw new Error((error as any)?.message || `HTTP error! status: ${response.status}`);
         }
 
         // Return empty object for 204 No Content or empty responses

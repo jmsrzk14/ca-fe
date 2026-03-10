@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "gen-proto": "npx @bufbuild/buf generate buf.build/dots-credit-analytics/credit-analytics",
-    "gen-proto-local": "npx @bufbuild/buf generate src/proto"
+    "gen-proto-local": "npx @bufbuild/buf generate src/proto",
+    "pages:build": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
+    "build:cloudflare": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
+    "pages:deploy": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\""
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.1",
@@ -30,7 +33,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.564.0",
-    "next": "^15.5.12",
+    "next": "15.5.2",
     "next-themes": "^0.4.4",
     "radix-ui": "^1.1.2",
     "react": "19.0.0",
@@ -44,6 +47,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@lingui/cli": "^5.9.1",
     "@lingui/loader": "^5.9.1",
     "@lingui/macro": "^5.9.1",
