@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
   images: {
     unoptimized: true,
   },
@@ -16,6 +15,14 @@ const nextConfig: NextConfig = {
       },
     });
     return config;
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api.:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001"}/api.:path*`,
+      },
+    ];
   },
   skipTrailingSlashRedirect: true,
   skipMiddlewareUrlNormalize: true,
