@@ -38,14 +38,24 @@ function mapToCardData(app: any): ApplicationCardData {
     };
 }
 
+async function fetchAllApplications(params?: Record<string, string>): Promise<any[]> {
+    const all: any[] = [];
+    let cursor = '';
+    do {
+        const response = await applicationService.list({ ...params, cursor });
+        all.push(...(response.applications || []));
+        cursor = response.nextCursor || '';
+    } while (cursor);
+    return all;
+}
+
 export const kanbanService = {
     getBoardData: async (): Promise<KanbanColumnData[]> => {
-        const [appResponse, statusResponse] = await Promise.all([
-            applicationService.list(),
+        const [applications, statusResponse] = await Promise.all([
+            fetchAllApplications(),
             referenceService.listApplicationStatuses()
         ]);
 
-        const applications = appResponse.applications || [];
         const statuses = statusResponse.statuses || [];
 
         // Map status colors for fallback
