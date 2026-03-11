@@ -489,8 +489,9 @@ export function CategoryManagementView() {
                         <Button
                             variant="destructive"
                             onClick={confirmDelete}
-                            loading={deleteMutation.isPending}
+                            disabled={deleteMutation.isPending}
                         >
+                            {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {t`Ya, Hapus Kategori`}
                         </Button>
                     </DialogFooter>

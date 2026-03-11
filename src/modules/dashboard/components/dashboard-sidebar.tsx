@@ -39,6 +39,7 @@ const ADMIN_ITEMS: NavItem[] = [
         children: [
             { href: ROUTES.ATTRIBUTES, label: 'Registri Field' },
             { href: ROUTES.CATEGORIES, label: 'Registri Category' },
+            { href: ROUTES.SURVEYS, label: 'Survey' },
         ],
     },
 ];

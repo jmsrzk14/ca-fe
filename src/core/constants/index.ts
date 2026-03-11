@@ -12,6 +12,7 @@ export const ROUTES = {
   SETTINGS: '/settings',
   ATTRIBUTES: '/settings/attributes',
   CATEGORIES: '/settings/categories',
+  SURVEYS: '/settings/surveys',
 } as const;
 
 export const THEME_CONFIG = {

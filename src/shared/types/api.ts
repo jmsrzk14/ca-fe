@@ -106,8 +106,11 @@ export interface FinancialRatio {
 
 export interface SurveyTemplate {
     id: string;
-    name: string;
+    templateName: string;
+    templateCode: string;
     description: string;
+    applicantType?: string;
+    productId?: string;
 }
 
 export type SurveyStatus = 'UNASSIGNED' | 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'VERIFIED';
