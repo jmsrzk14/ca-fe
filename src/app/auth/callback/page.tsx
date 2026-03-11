@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   exchangeCodeForTokens,
@@ -16,8 +16,11 @@ function CallbackHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const isProcessing = useRef(false);
 
   useEffect(() => {
+    if (isProcessing.current) return;
+    
     const code = searchParams.get("code");
     const state = searchParams.get("state");
     const errorParam = searchParams.get("error");
@@ -31,6 +34,8 @@ function CallbackHandler() {
       router.replace("/login?error=missing_params");
       return;
     }
+
+    isProcessing.current = true;
 
     exchangeCodeForTokens(code, state)
       .then((tokens) => {

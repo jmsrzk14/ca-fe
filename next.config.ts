@@ -17,12 +17,11 @@ const nextConfig: NextConfig = {
     return config;
   },
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://creditanalyticsbackend-production.up.railway.app/";
-    // "http://localhost:8001";
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://dots-ca-be-production.up.railway.app";
     return [
       {
-        source: "/api.:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001"}/api.:path*`,
+        source: "/:service(api\\.[a-zA-Z0-9_.-]+)/:method",
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "https://dots-ca-be-production.up.railway.app"}/:service/:method`,
       },
     ];
   },

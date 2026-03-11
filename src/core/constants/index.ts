@@ -1,7 +1,7 @@
 export const APP_CONFIG = {
   NAME: 'Credit Analytics',
   DESCRIPTION: 'Credit Analytics Dots',
-  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://creditanalyticsbackend-production.up.railway.app',
+  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'https://dots-ca-be-production.up.railway.app',
 } as const;
 
 export const ROUTES = {
