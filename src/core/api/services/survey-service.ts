@@ -5,13 +5,8 @@ export const surveyService = {
     getTemplates: () =>
         apiClient.get<{ templates: SurveyTemplate[] }>('/v1/survey-templates'),
 
-    assignSurvey: (applicationId: string, templateId: string, surveyPurpose: string = '') =>
-        apiClient.post<Survey>(`/v1/applications/${applicationId}/surveys`, {
-            templateId,
-            surveyPurpose,
-            surveyType: 'GENERAL', // Default type
-            assignedTo: '' // Optional for now
-        }),
+    assignSurvey: (applicationId: string, payload: { templateId: string, surveyType: string, assignedTo: string, surveyPurpose: string }) =>
+        apiClient.post<Survey>(`/v1/applications/${applicationId}/surveys`, payload),
 
     listByApplication: (applicationId: string) =>
         apiClient.get<{ surveys: Survey[] }>(`/v1/applications/${applicationId}/surveys`),

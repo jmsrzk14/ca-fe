@@ -5,11 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { surveyService } from '@/core/api/services/survey-service';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
-import Link from 'next/link';
 import {
     ClipboardList,
     User,
-    Calendar,
+    GoalIcon,
     CheckCircle2,
     Clock,
     AlertCircle,
@@ -17,26 +16,44 @@ import {
     Plus
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import { t } from '@/shared/lib/t';
 import { Survey, SurveyStatus } from '@/shared/types/api';
+import { SurveyAssignModal } from './survey-assign-modal';
 
 interface SurveyTabProps {
     applicationId: string;
 }
 
 const statusConfig: Record<SurveyStatus, { label: string, color: string, icon: any }> = {
-    'UNASSIGNED': { label: 'Belum Ditugaskan', color: 'bg-slate-500', icon: AlertCircle },
-    'ASSIGNED': { label: 'Ditugaskan', color: 'bg-blue-500', icon: User },
-    'IN_PROGRESS': { label: 'Sedang Berjalan', color: 'bg-amber-500', icon: Clock },
-    'SUBMITTED': { label: 'Selesai', color: 'bg-emerald-500', icon: CheckCircle2 },
-    'VERIFIED': { label: 'Terverifikasi', color: 'bg-indigo-600', icon: CheckCircle2 },
+    'UNASSIGNED': { label: 'UNASSIGNED', color: 'bg-slate-500', icon: AlertCircle },
+    'ASSIGNED': { label: 'ASSIGNED', color: 'bg-blue-500', icon: User },
+    'IN_PROGRESS': { label: 'IN_PROGRESS', color: 'bg-amber-500', icon: Clock },
+    'SUBMITTED': { label: 'SUBMITTED', color: 'bg-emerald-500', icon: CheckCircle2 },
+    'VERIFIED': { label: 'VERIFIED', color: 'bg-indigo-600', icon: CheckCircle2 },
 };
 
 export function SurveyTab({ applicationId }: SurveyTabProps) {
+    const [isAssignModalOpen, setIsAssignModalOpen] = React.useState(false);
+
     const { data, isLoading, error } = useQuery({
         queryKey: ['surveys', applicationId],
         queryFn: () => surveyService.listByApplication(applicationId),
         enabled: !!applicationId,
     });
+
+    // Fetch survey templates to map name and code
+    const { data: templatesData } = useQuery({
+        queryKey: ['survey-templates'],
+        queryFn: () => surveyService.getTemplates(),
+    });
+
+    const templateMap = React.useMemo(() => {
+        const map: Record<string, any> = {};
+        (templatesData as any)?.templates?.forEach((t: any) => {
+            map[t.id] = t;
+        });
+        return map;
+    }, [templatesData]);
 
     if (isLoading) {
         return (
@@ -63,6 +80,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
 
     if (surveys.length === 0) {
         return (
+            <>
             <div className="flex flex-col items-center justify-center p-20 gap-4 bg-muted/50 rounded-2xl border border-dashed border-border border-2">
                 <div className="h-16 w-16 rounded-full bg-background flex items-center justify-center shadow-sm">
                     <ClipboardList className="h-8 w-8 text-muted-foreground/40" />
@@ -72,16 +90,26 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                     <p className="text-xs text-muted-foreground mt-1 mb-6">
                         Belum ada tugas survey yang dibuat untuk pengajuan ini.
                     </p>
-                    <Link href={`/loans/${applicationId}/survey/assign`}>
-                        <Button variant="outline" size="sm" className="h-9 gap-2 rounded-full px-6 text-[11px] font-bold uppercase tracking-wider border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors translate-z-0 shadow-sm">
-                            <Plus className="h-3.5 w-3.5" />
-                            Assign Survey Baru
-                        </Button>
-                    </Link>
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setIsAssignModalOpen(true)}
+                        className="h-9 gap-2 rounded-full px-6 text-[11px] font-bold uppercase tracking-wider border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors translate-z-0 shadow-sm"
+                    >
+                        <Plus className="h-3.5 w-3.5" />
+                        Assign Survey Baru
+                    </Button>
                 </div>
             </div>
-        );
-    }
+            
+            <SurveyAssignModal 
+                applicationId={applicationId} 
+                isOpen={isAssignModalOpen} 
+                onClose={() => setIsAssignModalOpen(false)} 
+            />
+        </>
+    );
+}
 
     const formatDate = (dateStr?: string) => {
         if (!dateStr) return '—';
@@ -97,6 +125,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
     };
 
     return (
+        <>
         <div className="animate-in fade-in slide-in-from-left-4 duration-500 space-y-6">
             <div className="flex items-center justify-between mb-2">
                 <h2 className="text-base font-bold text-foreground flex items-center gap-2">
@@ -107,12 +136,14 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                     <Badge variant="outline" className="rounded-full px-4 h-7 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-2">
                         {surveys.length} Survey
                     </Badge>
-                    <Link href={`/loans/${applicationId}/survey/assign`}>
-                        <Button size="sm" className="h-8 gap-1 rounded-full px-4 text-[11px] font-bold uppercase tracking-wider">
-                            <Plus className="h-3 w-3" />
-                            Assign Survey
-                        </Button>
-                    </Link>
+                    <Button 
+                        size="sm" 
+                        onClick={() => setIsAssignModalOpen(true)}
+                        className="h-8 gap-1 rounded-full px-4 text-[11px] font-bold uppercase tracking-wider"
+                    >
+                        <Plus className="h-3 w-3" />
+                        Assign Survey
+                    </Button>
                 </div>
             </div>
 
@@ -138,10 +169,10 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-bold text-foreground leading-tight">
-                                            {survey.surveyType || 'Survey Umum'}
+                                            {templateMap[survey.templateId]?.templateName || survey.surveyType || 'Survey Umum'}
                                         </span>
-                                        <span className="text-[11px] text-muted-foreground mt-0.5">
-                                            ID: {survey.id.slice(0, 8)}...
+                                        <span className="text-[11px] text-muted-foreground mt-0.5 font-mono">
+                                            CODE: {templateMap[survey.templateId]?.templateCode || '-'}
                                         </span>
                                     </div>
                                 </div>
@@ -156,20 +187,20 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
 
                             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/50">
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Surveyor</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t`Tipe`}</span>
                                     <div className="flex items-center gap-2">
                                         <User className="h-3 w-3 text-primary" />
                                         <span className="text-xs font-semibold text-foreground truncate">
-                                            {survey.assignedTo || 'Belum ditunjuk'}
+                                            {survey.surveyType || '-'}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Terakhir Update</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t`Tujuan`}</span>
                                     <div className="flex items-center gap-2">
-                                        <Calendar className="h-3 w-3 text-primary" />
+                                        <GoalIcon className="h-3 w-3 text-primary" />
                                         <span className="text-xs font-semibold text-foreground">
-                                            {formatDate(survey.submittedAt || survey.startedAt)}
+                                            {survey.surveyPurpose || '-'}
                                         </span>
                                     </div>
                                 </div>
@@ -188,5 +219,12 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                 })}
             </div>
         </div>
+        
+        <SurveyAssignModal 
+            applicationId={applicationId} 
+            isOpen={isAssignModalOpen} 
+            onClose={() => setIsAssignModalOpen(false)} 
+        />
+        </>
     );
 }

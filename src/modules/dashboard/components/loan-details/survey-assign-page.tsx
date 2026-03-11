@@ -73,7 +73,12 @@ export function SurveyAssignPage() {
         mutationFn: async (templateIds: string[]) => {
             // Assign each template sequentially
             for (const templateId of templateIds) {
-                await surveyService.assignSurvey(applicationId, templateId, 'Survey assignment from dashboard');
+                await surveyService.assignSurvey(applicationId, {
+                    templateId,
+                    surveyType: 'GENERAL',
+                    assignedTo: '',
+                    surveyPurpose: 'GENERAL'
+                });
             }
         },
         onSuccess: () => {
