@@ -135,7 +135,7 @@ export function SurveyTemplateManagementView() {
 
     const { data: templatesData, isLoading } = useQuery({
         queryKey: ['survey-templates'],
-        queryFn: () => surveyService.getTemplates(),
+        queryFn: () => surveyService.listAdminTemplates(),
     });
 
     const { data: productsData } = useQuery({
@@ -186,7 +186,9 @@ export function SurveyTemplateManagementView() {
                 ...data, 
                 productId: data.productId === 'ALL' ? '' : data.productId,
                 applicantType: data.applicantType === 'ALL' ? '' : data.applicantType,
-                active: data.active ?? true
+                active: data.active ?? true,
+                templateCode: data.templateCode || '',
+                templateName: data.templateName || ''
             };
             return surveyService.updateTemplate(data.id, payload as any);
         },
@@ -201,14 +203,14 @@ export function SurveyTemplateManagementView() {
         },
     });
 
-    const deleteMutation = useMutation({
-        mutationFn: (id: string) => surveyService.deleteTemplate(id),
+    const statusMutation = useMutation({
+        mutationFn: ({ id, active }: { id: string, active: boolean }) => surveyService.updateTemplateStatus(id, active),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['survey-templates'] });
-            toast.success(t`Template berhasil dihapus!`);
+            toast.success(t`Status template berhasil diperbarui!`);
             setDeletingTemplate(null);
         },
-        onError: (err: any) => toast.error(err.message || t`Gagal menghapus template`),
+        onError: (err: any) => toast.error(err.message || t`Gagal memperbarui status template`),
     });
 
     const handleCreate = (e: React.FormEvent) => {
@@ -224,7 +226,7 @@ export function SurveyTemplateManagementView() {
 
     const confirmDelete = () => {
         if (deletingTemplate) {
-            deleteMutation.mutate(deletingTemplate.id);
+            statusMutation.mutate({ id: deletingTemplate.id, active: false });
         }
     };
 
@@ -375,30 +377,30 @@ export function SurveyTemplateManagementView() {
                             <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
                                 <AlertTriangle className="h-5 w-5" />
                             </div>
-                            <DialogTitle>{t`Konfirmasi Hapus`}</DialogTitle>
+                            <DialogTitle>{t`Konfirmasi Nonaktifkan`}</DialogTitle>
                         </div>
                         <DialogDescription className="text-base text-foreground/80">
-                            {t`Apakah Anda yakin ingin menghapus template`} <span className="font-bold text-foreground">"{deletingTemplate?.templateName}"</span>?
+                            {t`Apakah Anda yakin ingin menonaktifkan template`} <span className="font-bold text-foreground">"{deletingTemplate?.templateName}"</span>?
                         </DialogDescription>
                         <p className="text-xs text-muted-foreground mt-2 italic">
-                            {t`Tindakan ini tidak dapat dibatalkan.`}
+                            {t`Template ini tidak akan dapat diubah lagi, namun data survey lama tetap tersimpan.`}
                         </p>
                     </DialogHeader>
                     <DialogFooter className="mt-4 gap-2">
                         <Button
                             variant="outline"
                             onClick={() => setDeletingTemplate(null)}
-                            disabled={deleteMutation.isPending}
+                            disabled={statusMutation.isPending}
                         >
                             {t`Batal`}
                         </Button>
                         <Button
                             variant="destructive"
                             onClick={confirmDelete}
-                            disabled={deleteMutation.isPending}
+                            disabled={statusMutation.isPending}
                         >
-                            {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {t`Ya, Hapus Template`}
+                            {statusMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t`Ya, Nonaktifkan`}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

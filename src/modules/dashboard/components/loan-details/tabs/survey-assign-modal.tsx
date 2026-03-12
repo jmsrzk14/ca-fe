@@ -159,7 +159,7 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
     }, [templates, applicantData?.applicantType]);
 
     const filteredTemplates = filteredByApplicantType.filter((t: any) =>
-        t.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.templateName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.templateCode?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -237,14 +237,14 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                                                 <ClipboardList className="h-5 w-5" />
                                                             </div>
                                                             <Badge variant="secondary" className="mr-8 rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600">
-                                                                {template.applicantType || 'GENERAL'}
+                                                                {template.applicantType || 'ALL'}
                                                             </Badge>
                                                         </div>
                                                         <CardTitle className={cn(
                                                             "text-base font-bold mt-4 leading-snug transition-colors",
                                                             isSelected ? "text-primary" : "text-foreground group-hover:text-primary"
                                                         )}>
-                                                            {template.name || 'Template Survey'}
+                                                            {template.templateName || 'Template Survey'}
                                                         </CardTitle>
                                                         <CardDescription className="font-mono text-[10px] uppercase tracking-widest mt-1">
                                                             CODE: {template.templateCode}

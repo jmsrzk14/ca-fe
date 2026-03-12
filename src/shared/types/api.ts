@@ -112,6 +112,32 @@ export interface SurveyTemplate {
     applicantType?: string;
     productId?: string;
     active?: boolean;
+    sections?: SurveySection[];
+}
+
+export interface SurveySection {
+    id: string;
+    templateId: string;
+    sectionName: string;
+    sequence: number;
+    questions?: SurveyQuestion[];
+}
+
+export interface SurveyQuestion {
+    id: string;
+    sectionId: string;
+    questionText: string;
+    answerType: 'TEXT' | 'NUMBER' | 'BOOLEAN' | 'DATE' | 'OPTION';
+    sequence: number;
+    isRequired: boolean;
+    options?: SurveyQuestionOption[];
+}
+
+export interface SurveyQuestionOption {
+    id: string;
+    questionId: string;
+    optionText: string;
+    optionValue: string;
 }
 
 export type SurveyStatus = 'UNASSIGNED' | 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'VERIFIED';
@@ -131,19 +157,25 @@ export interface Survey {
     applicationStatus?: string;
     totalQuestions?: number;
     answeredQuestions?: number;
+    answers?: SurveyAnswer[];
 }
 
 export interface SurveyAnswer {
     surveyId: string;
     questionId: string;
-    answerValue: string;
+    answerText?: string;
+    answerNumber?: string;
+    answerBoolean?: boolean;
+    answeredAt?: string;
 }
 
 export interface SurveyEvidence {
+    id?: string;
     surveyId: string;
     evidenceType: string;
-    url: string;
+    fileUrl: string;
     description: string;
+    capturedAt?: string;
 }
 
 export interface AttributeChoice {

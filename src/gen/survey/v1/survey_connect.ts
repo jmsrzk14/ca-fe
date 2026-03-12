@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ApplicationSurvey, AssignSurveyRequest, GetSurveyRequest, ListSurveysByApplicationRequest, ListSurveysResponse, StartSurveyRequest, SubmitSurveyAnswerRequest, SubmitSurveyRequest, SurveyAnswer, SurveyEvidence, UploadSurveyEvidenceRequest, VerifySurveyRequest } from "./survey_pb";
+import { ApplicationSurvey, AssignSurveyRequest, CreateSurveyQuestionOptionRequest, CreateSurveyQuestionRequest, CreateSurveySectionRequest, CreateSurveyTemplateRequest, GetSurveyRequest, GetSurveyTemplateRequest, ListAdminSurveyTemplatesRequest, ListSurveyAnswersRequest, ListSurveyAnswersResponse, ListSurveyQuestionsRequest, ListSurveyQuestionsResponse, ListSurveysByApplicationRequest, ListSurveysByApplicationResponse, ListSurveySectionsRequest, ListSurveySectionsResponse, ListSurveysRequest, ListSurveysResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, StartSurveyRequest, SubmitSurveyAnswerRequest, SubmitSurveyRequest, SurveyAnswer, SurveyEvidence, SurveyQuestion, SurveyQuestionOption, SurveySection, SurveyTemplate, UpdateSurveyTemplateRequest, UpdateSurveyTemplateStatusRequest, UploadSurveyEvidenceRequest, VerifySurveyRequest } from "./survey_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -13,6 +13,8 @@ export const SurveyService = {
   typeName: "api.survey.v1.SurveyService",
   methods: {
     /**
+     * ===== ASSIGN & GET =====
+     *
      * @generated from rpc api.survey.v1.SurveyService.AssignSurvey
      */
     assignSurvey: {
@@ -31,15 +33,30 @@ export const SurveyService = {
       kind: MethodKind.Unary,
     },
     /**
+     * ===== LIST BY APPLICATION =====
+     *
      * @generated from rpc api.survey.v1.SurveyService.ListSurveysByApplication
      */
     listSurveysByApplication: {
       name: "ListSurveysByApplication",
       I: ListSurveysByApplicationRequest,
+      O: ListSurveysByApplicationResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ===== GLOBAL LIST (Mobile App / Backend Filter) =====
+     *
+     * @generated from rpc api.survey.v1.SurveyService.ListSurveys
+     */
+    listSurveys: {
+      name: "ListSurveys",
+      I: ListSurveysRequest,
       O: ListSurveysResponse,
       kind: MethodKind.Unary,
     },
     /**
+     * ===== WORKFLOW =====
+     *
      * @generated from rpc api.survey.v1.SurveyService.StartSurvey
      */
     startSurvey: {
@@ -67,6 +84,17 @@ export const SurveyService = {
       kind: MethodKind.Unary,
     },
     /**
+     * ===== ANSWERS & EVIDENCE =====
+     *
+     * @generated from rpc api.survey.v1.SurveyService.ListSurveyAnswers
+     */
+    listSurveyAnswers: {
+      name: "ListSurveyAnswers",
+      I: ListSurveyAnswersRequest,
+      O: ListSurveyAnswersResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc api.survey.v1.SurveyService.SubmitSurveyAnswer
      */
     submitSurveyAnswer: {
@@ -82,6 +110,111 @@ export const SurveyService = {
       name: "UploadSurveyEvidence",
       I: UploadSurveyEvidenceRequest,
       O: SurveyEvidence,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ===== TEMPLATES (USER) =====
+     *
+     * @generated from rpc api.survey.v1.SurveyService.GetSurveyTemplate
+     */
+    getSurveyTemplate: {
+      name: "GetSurveyTemplate",
+      I: GetSurveyTemplateRequest,
+      O: SurveyTemplate,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.ListSurveyTemplates
+     */
+    listSurveyTemplates: {
+      name: "ListSurveyTemplates",
+      I: ListSurveyTemplatesRequest,
+      O: ListSurveyTemplatesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ===== TEMPLATES (ADMIN) =====
+     *
+     * @generated from rpc api.survey.v1.SurveyService.ListAdminSurveyTemplates
+     */
+    listAdminSurveyTemplates: {
+      name: "ListAdminSurveyTemplates",
+      I: ListAdminSurveyTemplatesRequest,
+      O: ListSurveyTemplatesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.CreateSurveyTemplate
+     */
+    createSurveyTemplate: {
+      name: "CreateSurveyTemplate",
+      I: CreateSurveyTemplateRequest,
+      O: SurveyTemplate,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.UpdateSurveyTemplate
+     */
+    updateSurveyTemplate: {
+      name: "UpdateSurveyTemplate",
+      I: UpdateSurveyTemplateRequest,
+      O: SurveyTemplate,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.UpdateSurveyTemplateStatus
+     */
+    updateSurveyTemplateStatus: {
+      name: "UpdateSurveyTemplateStatus",
+      I: UpdateSurveyTemplateStatusRequest,
+      O: SurveyTemplate,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.CreateSurveySection
+     */
+    createSurveySection: {
+      name: "CreateSurveySection",
+      I: CreateSurveySectionRequest,
+      O: SurveySection,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.CreateSurveyQuestion
+     */
+    createSurveyQuestion: {
+      name: "CreateSurveyQuestion",
+      I: CreateSurveyQuestionRequest,
+      O: SurveyQuestion,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.CreateSurveyQuestionOption
+     */
+    createSurveyQuestionOption: {
+      name: "CreateSurveyQuestionOption",
+      I: CreateSurveyQuestionOptionRequest,
+      O: SurveyQuestionOption,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ===== SECTIONS & QUESTIONS =====
+     *
+     * @generated from rpc api.survey.v1.SurveyService.ListSurveySections
+     */
+    listSurveySections: {
+      name: "ListSurveySections",
+      I: ListSurveySectionsRequest,
+      O: ListSurveySectionsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.ListSurveyQuestions
+     */
+    listSurveyQuestions: {
+      name: "ListSurveyQuestions",
+      I: ListSurveyQuestionsRequest,
+      O: ListSurveyQuestionsResponse,
       kind: MethodKind.Unary,
     },
   }
