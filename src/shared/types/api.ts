@@ -111,6 +111,7 @@ export interface SurveyTemplate {
     description: string;
     applicantType?: string;
     productId?: string;
+    active?: boolean;
 }
 
 export type SurveyStatus = 'UNASSIGNED' | 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'VERIFIED';

@@ -31,11 +31,11 @@ import { SurveyTemplate } from '@/shared/types/api';
 import { Badge } from '@/shared/ui/badge';
 
 const EMPTY_TEMPLATE = {
-    name: '',
+    templateName: '',
     templateCode: '',
-    description: '',
-    applicantType: 'GENERAL',
+    applicantType: 'ALL',
     productId: '',
+    active: true,
 };
 
 function TemplateForm({
@@ -60,13 +60,12 @@ function TemplateForm({
         <form onSubmit={onSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                    <Label htmlFor="name">{t`Nama Template`}</Label>
+                    <Label htmlFor="templateName">{t`Nama Template`}</Label>
                     <Input
-                        id="name"
-                        value={value.name}
-                        onChange={e => onChange({ name: e.target.value })}
+                        id="templateName"
+                        value={value.templateName}
+                        onChange={e => onChange({ templateName: e.target.value })}
                         required
-                        placeholder="Misal: Survey Rumah Tinggal"
                     />
                 </div>
                 <div className="space-y-1.5">
@@ -76,7 +75,6 @@ function TemplateForm({
                         value={value.templateCode}
                         onChange={e => onChange({ templateCode: e.target.value })}
                         required
-                        placeholder="Misal: SRH-01"
                     />
                 </div>
             </div>
@@ -92,9 +90,8 @@ function TemplateForm({
                             <SelectValue placeholder="Pilih Tipe" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="GENERAL">GENERAL</SelectItem>
+                            <SelectItem value="ALL">ALL</SelectItem>
                             <SelectItem value="PERSONAL">PERSONAL</SelectItem>
-                            <SelectItem value="CORPORATE">CORPORATE</SelectItem>
                             <SelectItem value="COMPANY">COMPANY</SelectItem>
                         </SelectContent>
                     </Select>
@@ -106,10 +103,9 @@ function TemplateForm({
                         onValueChange={v => onChange({ productId: v })}
                     >
                         <SelectTrigger id="productId">
-                            <SelectValue placeholder="Semua Produk" />
+                            <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">{t`Semua Produk`}</SelectItem>
                             {(productsData as any)?.products?.map((p: any) => (
                                 <SelectItem key={p.id} value={p.id}>
                                     {p.productName}
@@ -118,16 +114,6 @@ function TemplateForm({
                         </SelectContent>
                     </Select>
                 </div>
-            </div>
-
-            <div className="space-y-1.5">
-                <Label htmlFor="description">{t`Deskripsi`}</Label>
-                <Input
-                    id="description"
-                    value={value.description}
-                    onChange={e => onChange({ description: e.target.value })}
-                    required
-                />
             </div>
 
             <DialogFooter className="pt-4">
@@ -172,24 +158,44 @@ export function SurveyTemplateManagementView() {
         setEditingTemplate(prev => prev ? { ...prev, ...patch } as SurveyTemplate : prev);
 
     const createMutation = useMutation({
-        mutationFn: (data: typeof EMPTY_TEMPLATE) => surveyService.createTemplate(data),
-        onSuccess: () => {
+        mutationFn: (data: typeof EMPTY_TEMPLATE) => {
+            const payload = { 
+                ...data, 
+                productId: data.productId === 'ALL' ? '' : data.productId,
+                applicantType: data.applicantType === 'ALL' ? '' : data.applicantType
+            };
+            return surveyService.createTemplate(payload);
+        },
+        onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['survey-templates'] });
             toast.success(t`Template baru berhasil ditambahkan!`);
             setIsAddOpen(false);
             setNewTemplate({ ...EMPTY_TEMPLATE });
         },
-        onError: (err: any) => toast.error(err.message || t`Gagal menambahkan template`),
+        onError: (err: any) => {
+            console.error('Create Error:', err);
+            toast.error(err.message || t`Gagal menambahkan template`);
+        },
     });
 
     const updateMutation = useMutation({
-        mutationFn: (data: SurveyTemplate) => surveyService.updateTemplate(data.id, data),
-        onSuccess: () => {
+        mutationFn: (data: SurveyTemplate) => {
+            const payload = { 
+                ...data, 
+                productId: data.productId === 'ALL' ? '' : data.productId,
+                applicantType: data.applicantType === 'ALL' ? '' : data.applicantType
+            };
+            return surveyService.updateTemplate(data.id, payload as any);
+        },
+        onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['survey-templates'] });
             toast.success(t`Template berhasil diperbarui!`);
             setEditingTemplate(null);
         },
-        onError: (err: any) => toast.error(err.message || t`Gagal memperbarui template`),
+        onError: (err: any) => {
+            console.error('Update Error:', err);
+            toast.error(err.message || t`Gagal memperbarui template`);
+        },
     });
 
     const deleteMutation = useMutation({
@@ -267,8 +273,8 @@ export function SurveyTemplateManagementView() {
                             value={{
                                 ...EMPTY_TEMPLATE,
                                 ...editingTemplate,
-                                applicantType: editingTemplate.applicantType || 'GENERAL',
-                                productId: editingTemplate.productId || '',
+                                applicantType: editingTemplate.applicantType || 'ALL',
+                                productId: editingTemplate.productId || 'ALL',
                             }}
                             onChange={patchEdit}
                             onSubmit={handleUpdate}
@@ -320,7 +326,7 @@ export function SurveyTemplateManagementView() {
                                                 <div className="flex items-center gap-1.5">
                                                     <User className="h-3 w-3 text-muted-foreground" />
                                                     <span className="text-[10px] font-bold uppercase tracking-wider">
-                                                        {template.applicantType || 'GENERAL'}
+                                                        {template.applicantType || 'ALL'}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
