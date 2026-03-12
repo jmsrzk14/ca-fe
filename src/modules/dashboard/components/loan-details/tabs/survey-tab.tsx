@@ -169,7 +169,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-bold text-foreground leading-tight">
-                                            {templateMap[survey.templateId]?.templateName }
+                                            {templateMap[survey.templateId]?.templateName || survey.surveyType || 'Survey Umum'}
                                         </span>
                                         <span className="text-[11px] text-muted-foreground mt-0.5 font-mono">
                                             CODE: {templateMap[survey.templateId]?.templateCode || '-'}

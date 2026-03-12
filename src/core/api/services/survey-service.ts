@@ -5,10 +5,10 @@ export const surveyService = {
     getTemplates: () =>
         apiClient.get<{ templates: SurveyTemplate[] }>('/v1/survey-templates'),
 
-    createTemplate: (payload: { templateName: string; templateCode: string; applicantType?: string; productId?: string }) =>
+    createTemplate: (payload: { templateName: string; templateCode: string; description?: string; applicantType?: string; productId?: string; active?: boolean }) =>
         apiClient.post<SurveyTemplate>('/v1/survey-templates', payload),
 
-    updateTemplate: (id: string, payload: { templateName: string; templateCode: string; applicantType?: string; productId?: string }) =>
+    updateTemplate: (id: string, payload: { templateName: string; templateCode: string; description?: string; applicantType?: string; productId?: string; active?: boolean }) =>
         apiClient.put<SurveyTemplate>(`/v1/survey-templates/${id}`, payload),
 
     deleteTemplate: (id: string) =>

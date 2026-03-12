@@ -103,9 +103,10 @@ function TemplateForm({
                         onValueChange={v => onChange({ productId: v })}
                     >
                         <SelectTrigger id="productId">
-                            <SelectValue />
+                            <SelectValue placeholder="Semua Produk" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="ALL">{t`Semua Produk`}</SelectItem>
                             {(productsData as any)?.products?.map((p: any) => (
                                 <SelectItem key={p.id} value={p.id}>
                                     {p.productName}
@@ -162,7 +163,8 @@ export function SurveyTemplateManagementView() {
             const payload = { 
                 ...data, 
                 productId: data.productId === 'ALL' ? '' : data.productId,
-                applicantType: data.applicantType === 'ALL' ? '' : data.applicantType
+                applicantType: data.applicantType === 'ALL' ? '' : data.applicantType,
+                active: data.active ?? true
             };
             return surveyService.createTemplate(payload);
         },
@@ -183,7 +185,8 @@ export function SurveyTemplateManagementView() {
             const payload = { 
                 ...data, 
                 productId: data.productId === 'ALL' ? '' : data.productId,
-                applicantType: data.applicantType === 'ALL' ? '' : data.applicantType
+                applicantType: data.applicantType === 'ALL' ? '' : data.applicantType,
+                active: data.active ?? true
             };
             return surveyService.updateTemplate(data.id, payload as any);
         },
