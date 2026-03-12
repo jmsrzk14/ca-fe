@@ -231,11 +231,14 @@ export function SurveyAssignPage() {
 
             {/* Action Bar */}
             {selectedTemplateIds.length > 0 && (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 animate-in slide-in-from-bottom-10 duration-500">
-                    <div className="bg-slate-900 text-white rounded-3xl p-4 shadow-2xl flex items-center justify-between border border-white/10 backdrop-blur-md bg-opacity-90">
-                        <div className="flex flex-col pl-2">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Terpilih</span>
-                            <span className="text-lg font-black text-white">{selectedTemplateIds.length} Template</span>
+                <div className="sticky bottom-8 left-0 right-0 w-full z-20 animate-in slide-in-from-bottom-10 duration-500 max-w-2xl mx-auto">
+                    <div className="bg-indigo-950/95 text-white rounded-[2rem] p-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] flex items-center justify-between border border-white/10 backdrop-blur-xl">
+                        <div className="flex flex-col pl-4">
+                            <span className="text-[10px] font-bold text-indigo-300/60 uppercase tracking-widest">Item Terpilih</span>
+                            <span className="text-lg font-black text-indigo-50 flex items-center gap-2">
+                                <div className="h-2 w-2 rounded-full bg-indigo-400 animate-pulse" />
+                                {selectedTemplateIds.length} Template
+                            </span>
                         </div>
                         <Button
                             onClick={(e) => {

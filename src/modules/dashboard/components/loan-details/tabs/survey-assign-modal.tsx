@@ -317,7 +317,7 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                         )}
                         
                         {selectedTemplateIds.length > 0 && (
-                            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-3xl bg-slate-900 flex-col sm:flex-row text-white rounded-2xl p-4 shadow-xl flex items-center justify-between border border-white/10 z-10">
+                            <div className="sticky bottom-0 left-0 right-0 w-full bg-slate-700 flex-col sm:flex-row text-white rounded-2xl p-4 shadow-xl flex items-center justify-between border border-white/10 z-10 mt-6 animate-in slide-in-from-bottom-4 duration-300">
                                 <div className="flex flex-col pl-2 mb-3 sm:mb-0">
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Terpilih</span>
                                     <span className="text-sm font-black text-white">{selectedTemplateIds.length} Template</span>
@@ -349,7 +349,7 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                             }
                                         }}
                                         disabled={assignMutation.isPending}
-                                        className="rounded-xl px-6 h-10 w-full sm:w-auto text-xs font-bold uppercase tracking-wider bg-primary hover:bg-primary/90 text-white shadow-lg"
+                                        className="rounded-xl px-6 h-10 w-full sm:w-auto text-xs font-bold uppercase tracking-wider bg-primary hover:bg-primary/90 shadow-lg"
                                     >
                                         {assignMutation.isPending ? (
                                             <>
