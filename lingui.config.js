@@ -1,3 +1,5 @@
+const { formatter } = require("@lingui/format-json");
+
 /** @type {import('@lingui/conf').LinguiConfig} */
 module.exports = {
     locales: ["en", "id"],
@@ -8,5 +10,5 @@ module.exports = {
             include: ["src"],
         },
     ],
-    format: "json",
+    format: formatter({ style: "minimal" }),
 };

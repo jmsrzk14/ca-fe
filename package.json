@@ -50,6 +50,7 @@
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
     "@lingui/cli": "^5.9.1",
+    "@lingui/format-json": "^5.9.2",
     "@lingui/loader": "^5.9.1",
     "@lingui/macro": "^5.9.1",
     "@lingui/swc-plugin": "^5.11.0",
