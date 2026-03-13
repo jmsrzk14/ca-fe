@@ -45,7 +45,7 @@ const ADMIN_ITEMS: NavItem[] = [
 ];
 
 export function DashboardSidebar() {
-    const pathname = usePathname();
+    const pathname = usePathname() || '';
     const { user, logout } = useAuth();
     const { isCollapsed } = useSidebar();
 

@@ -1,0 +1,18 @@
+Compiling message catalogsΓÇª
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+Error: Unknown format "json". Use one of following: lingui, minimal, po, csv, po-gettext
+    at getFormat (D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\@lingui\cli\dist\api\formats\index.js:44:15)
+    at getCatalogs (D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\@lingui\cli\dist\api\catalog\getCatalogs.js:25:50)
+    at compileLocale (D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\@lingui\cli\dist\workers\compileWorker.js:23:60)
+    at D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\threads\dist\worker\index.js:109:26
+    at Generator.next (<anonymous>)
+    at D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\threads\dist\worker\index.js:8:71
+    at new Promise (<anonymous>)
+    at __awaiter (D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\threads\dist\worker\index.js:4:12)
+    at runFunction (D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\threads\dist\worker\index.js:106:12)
+    at D:\Dimensi Kreasi Nusantara App\Credit Analytics (CA)\credit_analytics_v6\dots-ca-fe\node_modules\threads\dist\worker\index.js:163:17
+
+Node.js v24.14.0

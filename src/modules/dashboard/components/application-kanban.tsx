@@ -75,7 +75,7 @@ import { ApplicationFormSheet } from './application-form-sheet';
 
 export function ApplicationKanban() {
     const router = useRouter();
-    const pathname = usePathname();
+    const pathname = usePathname() || '';
     const [loanType, setLoanType] = React.useState('All');
     const [viewMode, setViewMode] = React.useState<'board' | 'list'>('board');
     const [data, setData] = React.useState<KanbanColumnData[] | null>(null);
