@@ -56,7 +56,7 @@ export const kanbanService = {
             referenceService.listApplicationStatuses()
         ]);
 
-        const statuses = statusResponse.statuses || [];
+        const statuses = (statusResponse.statuses || []).filter((s: any) => !!s.statusCode);
 
         // Map status colors for fallback
         const colorMap: Record<string, string> = {

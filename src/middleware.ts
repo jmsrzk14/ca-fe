@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
 
   // Public paths — bypass auth check.
   const publicPaths = ["/login", "/auth/callback"];
-  if (pathname && publicPaths.some((p) => pathname.startsWith(p))) {
+  if (pathname && publicPaths.some((p) => pathname?.startsWith(p))) {
     return NextResponse.next();
   }
 
