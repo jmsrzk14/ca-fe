@@ -7,3 +7,46 @@ Done in 909ms
    Γû▓ Next.js 15.1.12
 
    Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+ ΓÜá Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/17) ...
+   Generating static pages (4/17) 
+   Generating static pages (8/17) 
+   Generating static pages (12/17) 
+ Γ£ô Generating static pages (17/17)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+Γöî Γùï /                                    1.56 kB         389 kB
+Γö£ Γùï /_not-found                          986 B           107 kB
+Γö£ Γùï /applications                        286 B           388 kB
+Γö£ Γùï /auth/callback                       2.19 kB         108 kB
+Γö£ Γùï /borrowers                           237 B           260 kB
+Γö£ ╞Æ /borrowers/[id]                      408 B           260 kB
+Γö£ ╞Æ /borrowers/[id]/edit                 442 B           260 kB
+Γö£ Γùï /borrowers/add                       237 B           260 kB
+Γö£ Γùï /credit-bureau                       3.84 kB         118 kB
+Γö£ Γùï /loans                               1.56 kB         389 kB
+Γö£ ╞Æ /loans/[id]                          1.56 kB         389 kB
+Γö£ ╞Æ /loans/[id]/survey/assign            4.12 kB         162 kB
+Γö£ Γùï /loans/add                           237 B           260 kB
+Γö£ Γùï /login                               3.35 kB         118 kB
+Γö£ Γùï /settings                            137 B           106 kB
+Γö£ Γùï /settings/attributes                 6.13 kB         203 kB
+Γö£ Γùï /settings/categories                 6.81 kB         201 kB
+Γöö Γùï /settings/surveys                    5.85 kB         194 kB
++ First Load JS shared by all            106 kB
+  Γö£ chunks/4bd1b696-e01b8d46a35d74bf.js  53 kB
+  Γö£ chunks/517-c035ca754032d1eb.js       50.8 kB
+  Γöö other shared chunks (total)          2.1 kB
+
+
+╞Æ Middleware                             32.3 kB
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
