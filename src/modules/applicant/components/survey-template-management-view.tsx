@@ -6,9 +6,10 @@ import { surveyService, referenceService } from '@/core/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { Plus, Loader2, Pencil, Trash2, AlertTriangle, ClipboardList, Package, User } from 'lucide-react';
+import { Plus, Loader2, Pencil, Trash2, AlertTriangle, ClipboardList, Package, User, Eye } from 'lucide-react';
 import { t } from '@/shared/lib/t';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import {
     Dialog,
     DialogContent,
@@ -120,7 +121,137 @@ function TemplateForm({
             <DialogFooter className="pt-4">
                 <Button type="submit" className="w-full" disabled={isPending}>
                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isEdit ? t`Simpan Perubahan` : t`Simpan Template`}
+                    {isEdit ? t`Simpan Perubahan` : t`Simpan Template & Lanjut`}
+                </Button>
+            </DialogFooter>
+        </form>
+    );
+}
+
+const EMPTY_SECTION = {
+    sectionName: '',
+    sequence: 0,
+};
+
+function SectionForm({
+    value,
+    onChange,
+    onSubmit,
+    isPending,
+}: {
+    value: typeof EMPTY_SECTION;
+    onChange: (patch: Partial<typeof EMPTY_SECTION>) => void;
+    onSubmit: (e: React.FormEvent) => void;
+    isPending: boolean;
+}) {
+    return (
+        <form onSubmit={onSubmit} className="space-y-4 py-4">
+            <div className="space-y-1.5">
+                <Label htmlFor="sectionName">{t`Nama Section`}</Label>
+                <Input
+                    id="sectionName"
+                    value={value.sectionName}
+                    onChange={e => onChange({ sectionName: e.target.value })}
+                    required
+                    placeholder="e.g. Data Peribadi"
+                />
+            </div>
+            <div className="space-y-1.5">
+                <Label htmlFor="sequence">{t`Urutan (Sequence)`}</Label>
+                <Input
+                    id="sequence"
+                    type="number"
+                    value={value.sequence}
+                    onChange={e => onChange({ sequence: parseInt(e.target.value) || 0 })}
+                    required
+                />
+            </div>
+
+            <DialogFooter className="pt-4">
+                <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t`Simpan Section & Lanjut`}
+                </Button>
+            </DialogFooter>
+        </form>
+    );
+}
+
+const EMPTY_QUESTION = {
+    questionText: '',
+    answerType: 'TEXT',
+    sequence: 0,
+    isRequired: true,
+};
+
+function QuestionForm({
+    value,
+    onChange,
+    onSubmit,
+    isPending,
+}: {
+    value: typeof EMPTY_QUESTION;
+    onChange: (patch: Partial<typeof EMPTY_QUESTION>) => void;
+    onSubmit: (e: React.FormEvent) => void;
+    isPending: boolean;
+}) {
+    return (
+        <form onSubmit={onSubmit} className="space-y-4 py-4">
+            <div className="space-y-1.5">
+                <Label htmlFor="questionText">{t`Teks Pertanyaan`}</Label>
+                <Input
+                    id="questionText"
+                    value={value.questionText}
+                    onChange={e => onChange({ questionText: e.target.value })}
+                    required
+                    placeholder="e.g. Berapa penghasilan per bulan?"
+                />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                    <Label htmlFor="answerType">{t`Tipe Jawaban`}</Label>
+                    <Select
+                        value={value.answerType}
+                        onValueChange={v => onChange({ answerType: v })}
+                    >
+                        <SelectTrigger id="answerType">
+                            <SelectValue placeholder="Pilih Tipe" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="TEXT">TEXT</SelectItem>
+                            <SelectItem value="NUMBER">NUMBER</SelectItem>
+                            <SelectItem value="BOOLEAN">BOOLEAN</SelectItem>
+                            <SelectItem value="DATE">DATE</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-1.5">
+                    <Label htmlFor="q-sequence">{t`Urutan (Sequence)`}</Label>
+                    <Input
+                        id="q-sequence"
+                        type="number"
+                        value={value.sequence}
+                        onChange={e => onChange({ sequence: parseInt(e.target.value) || 0 })}
+                        required
+                    />
+                </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+                <input
+                    type="checkbox"
+                    id="isRequired"
+                    checked={value.isRequired}
+                    onChange={e => onChange({ isRequired: e.target.checked })}
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="isRequired">{t`Wajib Diisi`}</Label>
+            </div>
+
+            <DialogFooter className="pt-4">
+                <Button type="submit" className="w-full" disabled={isPending}>
+                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t`Selesaikan Template`}
                 </Button>
             </DialogFooter>
         </form>
@@ -128,8 +259,13 @@ function TemplateForm({
 }
 
 export function SurveyTemplateManagementView() {
+    const router = useRouter();
     const queryClient = useQueryClient();
     const [isAddOpen, setIsAddOpen] = React.useState(false);
+    const [formStep, setFormStep] = React.useState(0);
+    const [createdTemplateId, setCreatedTemplateId] = React.useState('');
+    const [createdSectionId, setCreatedSectionId] = React.useState('');
+
     const [editingTemplate, setEditingTemplate] = React.useState<SurveyTemplate | null>(null);
     const [deletingTemplate, setDeletingTemplate] = React.useState<SurveyTemplate | null>(null);
 
@@ -155,6 +291,14 @@ export function SurveyTemplateManagementView() {
     const patchNew = (patch: Partial<typeof EMPTY_TEMPLATE>) =>
         setNewTemplate(prev => ({ ...prev, ...patch }));
 
+    const [newSection, setNewSection] = React.useState({ ...EMPTY_SECTION });
+    const patchSection = (patch: Partial<typeof EMPTY_SECTION>) =>
+        setNewSection(prev => ({ ...prev, ...patch }));
+
+    const [newQuestion, setNewQuestion] = React.useState({ ...EMPTY_QUESTION });
+    const patchQuestion = (patch: Partial<typeof EMPTY_QUESTION>) =>
+        setNewQuestion(prev => ({ ...prev, ...patch }));
+
     const patchEdit = (patch: Partial<typeof EMPTY_TEMPLATE>) =>
         setEditingTemplate(prev => prev ? { ...prev, ...patch } as SurveyTemplate : prev);
 
@@ -170,15 +314,54 @@ export function SurveyTemplateManagementView() {
         },
         onSuccess: (res) => {
             queryClient.invalidateQueries({ queryKey: ['survey-templates'] });
-            toast.success(t`Template baru berhasil ditambahkan!`);
-            setIsAddOpen(false);
-            setNewTemplate({ ...EMPTY_TEMPLATE });
+            toast.success(t`Template berhasil dibuat! Lanjutkan ke buat section.`);
+            setCreatedTemplateId(res.id);
+            setFormStep(1);
         },
         onError: (err: any) => {
             console.error('Create Error:', err);
             toast.error(err.message || t`Gagal menambahkan template`);
         },
     });
+
+    const createSectionMutation = useMutation({
+        mutationFn: (data: typeof EMPTY_SECTION) => {
+            return surveyService.createSection(createdTemplateId, data);
+        },
+        onSuccess: (res) => {
+            toast.success(t`Section berhasil dibuat! Lanjutkan ke buat pertanyaan.`);
+            setCreatedSectionId(res.id);
+            setFormStep(2);
+        },
+        onError: (err: any) => {
+            console.error('Create Section Error:', err);
+            toast.error(err.message || t`Gagal menambahkan section`);
+        },
+    });
+
+    const createQuestionMutation = useMutation({
+        mutationFn: (data: typeof EMPTY_QUESTION) => {
+            return surveyService.createQuestion(createdSectionId, data);
+        },
+        onSuccess: () => {
+            toast.success(t`Template survey lengkap berhasil dibuat!`);
+            setIsAddOpen(false);
+            resetForms();
+        },
+        onError: (err: any) => {
+            console.error('Create Question Error:', err);
+            toast.error(err.message || t`Gagal menambahkan pertanyaan`);
+        },
+    });
+
+    const resetForms = () => {
+        setFormStep(0);
+        setCreatedTemplateId('');
+        setCreatedSectionId('');
+        setNewTemplate({ ...EMPTY_TEMPLATE });
+        setNewSection({ ...EMPTY_SECTION });
+        setNewQuestion({ ...EMPTY_QUESTION });
+    };
 
     const updateMutation = useMutation({
         mutationFn: (data: SurveyTemplate) => {
@@ -218,6 +401,16 @@ export function SurveyTemplateManagementView() {
         createMutation.mutate(newTemplate);
     };
 
+    const handleCreateSection = (e: React.FormEvent) => {
+        e.preventDefault();
+        createSectionMutation.mutate(newSection);
+    };
+
+    const handleCreateQuestion = (e: React.FormEvent) => {
+        e.preventDefault();
+        createQuestionMutation.mutate(newQuestion);
+    };
+
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingTemplate) return;
@@ -238,7 +431,10 @@ export function SurveyTemplateManagementView() {
                     <p className="text-xs text-muted-foreground mt-1">{t`Kelola daftar template survey untuk penilaian kredit.`}</p>
                 </div>
 
-                <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                <Dialog open={isAddOpen} onOpenChange={(open) => {
+                    setIsAddOpen(open);
+                    if (!open) resetForms();
+                }}>
                     <DialogTrigger asChild>
                         <Button size="sm">
                             <Plus className="h-3.5 w-3.5" />
@@ -247,17 +443,44 @@ export function SurveyTemplateManagementView() {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                            <DialogTitle>{t`Tambah Template Baru`}</DialogTitle>
+                            <DialogTitle>
+                                {formStep === 0 && t`Tambah Template Baru`}
+                                {formStep === 1 && t`Tambah Section`}
+                                {formStep === 2 && t`Tambah Pertanyaan`}
+                            </DialogTitle>
                             <DialogDescription>
-                                {t`Buat template survey baru.`}
+                                {formStep === 0 && t`Tahap 1: Informasi dasar template survey.`}
+                                {formStep === 1 && t`Tahap 2: Tambahkan section untuk template ini.`}
+                                {formStep === 2 && t`Tahap 3: Tambahkan pertanyaan untuk section ini.`}
                             </DialogDescription>
                         </DialogHeader>
-                        <TemplateForm
-                            value={newTemplate}
-                            onChange={patchNew}
-                            onSubmit={handleCreate}
-                            isPending={createMutation.isPending}
-                        />
+                        
+                        {formStep === 0 && (
+                            <TemplateForm
+                                value={newTemplate}
+                                onChange={patchNew}
+                                onSubmit={handleCreate}
+                                isPending={createMutation.isPending}
+                            />
+                        )}
+
+                        {formStep === 1 && (
+                            <SectionForm
+                                value={newSection}
+                                onChange={patchSection}
+                                onSubmit={handleCreateSection}
+                                isPending={createSectionMutation.isPending}
+                            />
+                        )}
+
+                        {formStep === 2 && (
+                            <QuestionForm
+                                value={newQuestion}
+                                onChange={patchQuestion}
+                                onSubmit={handleCreateQuestion}
+                                isPending={createQuestionMutation.isPending}
+                            />
+                        )}
                     </DialogContent>
                 </Dialog>
             </div>
@@ -303,22 +526,24 @@ export function SurveyTemplateManagementView() {
                                 <TableHead>{t`Nama Survey`}</TableHead>
                                 <TableHead>{t`Kode`}</TableHead>
                                 <TableHead>{t`Target`}</TableHead>
-                                <TableHead className="text-center w-20"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {templatesData?.templates?.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                    <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
                                         {t`Belum ada template.`}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 templatesData?.templates?.map((template: SurveyTemplate) => (
-                                    <TableRow key={template.id} className="group">
-                                        <TableCell>
+                                    <TableRow key={template.id} className="group transition-colors hover:bg-muted/50">
+                                        <TableCell 
+                                            className="cursor-pointer hover:text-primary transition-colors py-4 font-medium"
+                                            onClick={() => router.push(`/settings/surveys/${template.id}`)}
+                                        >
                                             <div className="flex items-center gap-3">
-                                                <span className="font-semibold">{template.templateName}</span>
+                                                <span>{template.templateName}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -340,26 +565,6 @@ export function SurveyTemplateManagementView() {
                                                         {productMap[template.productId || ''] || t`Semua Produk`}
                                                     </span>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-muted-foreground hover:text-primary"
-                                                    onClick={() => setEditingTemplate(template)}
-                                                >
-                                                    <Pencil className="h-3.5 w-3.5" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                                    onClick={() => setDeletingTemplate(template)}
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </Button>
                                             </div>
                                         </TableCell>
                                     </TableRow>
