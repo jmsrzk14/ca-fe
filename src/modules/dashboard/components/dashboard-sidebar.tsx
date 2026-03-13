@@ -151,9 +151,7 @@ export function DashboardSidebar() {
 }
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
-    const safePathname = pathname || '';
-    const safeHref = item.href || '';
-    const isActive = safePathname === safeHref || (safeHref !== '/' && !!safeHref && safePathname.startsWith(safeHref));
+    const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
     const { isCollapsed } = useSidebar();
 
     return (
@@ -184,9 +182,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
 }
 
 function NavLinkWithChildren({ item, pathname }: { item: NavItem; pathname: string }) {
-    const safePathname = pathname || '';
-    const safeHref = item.href || '';
-    const isActive = safePathname === safeHref || (safeHref !== '/' && !!safeHref && safePathname.startsWith(safeHref));
+    const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
     const [open, setOpen] = React.useState(isActive);
     const { isCollapsed } = useSidebar();
 
