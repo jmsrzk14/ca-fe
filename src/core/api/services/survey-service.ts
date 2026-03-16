@@ -20,7 +20,7 @@ export const surveyService = {
         apiClient.put<SurveyTemplate>(`/v1/admin/survey-templates/${id}`, payload),
 
     updateTemplateStatus: (id: string, active: boolean) =>
-        apiClient.patch<SurveyTemplate>(`/v1/admin/survey-templates/${id}/status`, { active }),
+        apiClient.patch<SurveyTemplate>(`/v1/admin/survey-templates/${id}/status`, { id, active }),
 
     // SECTIONS & QUESTIONS
     listSections: (templateId: string) =>

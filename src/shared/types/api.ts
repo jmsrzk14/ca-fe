@@ -127,7 +127,7 @@ export interface SurveyQuestion {
     id: string;
     sectionId: string;
     questionText: string;
-    answerType: 'TEXT' | 'NUMBER' | 'BOOLEAN' | 'DATE' | 'OPTION';
+    answerType: 'TEXT' | 'NUMBER' | 'BOOLEAN' | 'DATE' | 'OPTION' | 'SELECT' | 'IMAGE' | 'LOCATION';
     sequence: number;
     isRequired: boolean;
     options?: SurveyQuestionOption[];
