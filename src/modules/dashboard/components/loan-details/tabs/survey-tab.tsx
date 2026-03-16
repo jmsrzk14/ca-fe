@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { t } from '@/shared/lib/t';
+import { useRouter } from 'next/navigation';
 import { Survey, SurveyStatus } from '@/shared/types/api';
 import { SurveyAssignModal } from './survey-assign-modal';
 
@@ -33,6 +34,7 @@ const statusConfig: Record<SurveyStatus, { label: string, color: string, icon: a
 };
 
 export function SurveyTab({ applicationId }: SurveyTabProps) {
+    const router = useRouter();
     const [isAssignModalOpen, setIsAssignModalOpen] = React.useState(false);
 
     const { data, isLoading, error } = useQuery({
@@ -155,7 +157,8 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                     return (
                         <div
                             key={survey.id}
-                            className="bg-card border border-border/50 hover:border-primary/50 transition-all rounded-2xl p-5 group flex flex-col gap-4 shadow-sm"
+                            className="bg-card border border-border/50 hover:border-primary/50 cursor-pointer transition-all rounded-2xl p-5 group flex flex-col gap-4 shadow-sm active:scale-[0.98]"
+                            onClick={() => router.push(`/loans/${applicationId}/survey/${survey.id}`)}
                         >
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">

@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-02-20 14:15+0700\n"
-"PO-Revision-Date: 2026-02-20 14:15+0700\n"
+"POT-Creation-Date: 2026-03-16 11:58+0700\n"
+"PO-Revision-Date: 2026-03-16 11:58+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Antigravity\n"
 
 msgid "First Name"
 msgstr "First Name"
@@ -368,7 +368,7 @@ msgid "of"
 msgstr "of"
 
 msgid "Ajukan Pinjaman"
-msgstr "Submit Loan"
+msgstr "Submit Loan Application"
 
 msgid "Sebelumnya"
 msgstr "Previous"
@@ -424,38 +424,637 @@ msgstr "View Details"
 msgid "Peminjam"
 msgstr "Borrowers"
 
-msgid "Tambah peminjam"
-msgstr "Add Borrower"
-
 msgid "Cari berdasarkan nama atau NIK"
 msgstr "Search by name or ID number"
 
 msgid "Search by name or ID number..."
 msgstr "Search by name or ID number"
 
-msgid "Identitas"
-msgstr "Identity"
-
-msgid "Pasangan"
-msgstr "Spouse"
-
-msgid "Kontak & Alamat"
-msgstr "Contact & Address"
-
-msgid "Profil Rumah Tangga"
-msgstr "Household Profile"
-
-msgid "Pendidikan & Sosial"
-msgstr "Education & Social"
-
-msgid "Pekerjaan"
-msgstr "Occupation"
-
-msgid "Usaha"
-msgstr "Business"
-
-msgid "Karakter & Perilaku"
-msgstr "Character & Behavior"
-
 msgid "Add Applicant"
 msgstr "Add Applicant"
+
+# ─── applicant-add-page: Tambah Peminjam ───────────────────────────────────────
+
+msgid "Milik Sendiri"
+msgstr "Own Property"
+
+msgid "Sewa/Kontrak"
+msgstr "Rented/Contract"
+
+msgid "Milik Keluarga"
+msgstr "Family Property"
+
+msgid "Tipe Peminjam"
+msgstr "Borrower Type"
+
+msgid "Perorangan"
+msgstr "Individual"
+
+msgid "Perusahaan"
+msgstr "Company"
+
+msgid "Nama Lengkap"
+msgstr "Full Name"
+
+msgid "Masukkan Nama Sesuai Identitas"
+msgstr "Enter Name as per Identity Card"
+
+msgid "NIK / No. KTP"
+msgstr "ID Number (NIK/KTP)"
+
+msgid "NPWP otomatis sama dengan NIK"
+msgstr "Tax ID (NPWP) is automatically the same as NIK"
+
+msgid "NPWP Lama (Opsional)"
+msgstr "Old NPWP (Optional)"
+
+msgid "Tanggal Lahir"
+msgstr "Date of Birth"
+
+msgid "Tanggal Pendirian"
+msgstr "Establishment Date"
+
+msgid "Harap isi Nama Lengkap dan NIK/NPWP"
+msgstr "Please fill in Full Name and NIK/NPWP"
+
+msgid "Peminjam berhasil ditambahkan"
+msgstr "Borrower added successfully"
+
+msgid "Gagal menambahkan peminjam"
+msgstr "Failed to add borrower"
+
+msgid "Tambah Data Peminjam"
+msgstr "Add Borrower Data"
+
+msgid "Isi informasi peminjam sesuai dokumen identitas"
+msgstr "Fill in borrower information according to identity documents"
+
+msgid "Memuat data..."
+msgstr "Loading data..."
+
+msgid "Kembali"
+msgstr "Back"
+
+msgid "Simpan Peminjam"
+msgstr "Save Borrower"
+
+msgid "Konfirmasi Simpan Peminjam"
+msgstr "Confirm Save Borrower"
+
+msgid "Pastikan semua data peminjam sudah benar sebelum disimpan."
+msgstr "Please ensure all borrower data is correct before saving."
+
+msgid "Ya, Simpan"
+msgstr "Yes, Save"
+
+msgid "Batalkan Pengisian?"
+msgstr "Cancel Form Filling?"
+
+msgid "Data yang sudah diisi akan hilang. Apakah Anda yakin ingin keluar?"
+msgstr "All entered data will be lost. Are you sure you want to exit?"
+
+msgid "Lanjut Mengisi"
+msgstr "Continue Filling"
+
+msgid "Ya, Keluar"
+msgstr "Yes, Exit"
+
+msgid "Alamat Domisili sama dengan Alamat KTP"
+msgstr "Domicile Address same as ID Card Address"
+
+msgid "Centang jika alamat domisili Anda sama dengan alamat yang tertera di KTP. Data akan disalin otomatis."
+msgstr "Check if your domicile address is the same as the address on your ID card. Data will be copied automatically."
+
+# ─── application-add-page: Buat Pengajuan Pinjaman ────────────────────────────
+
+msgid "Informasi Dasar"
+msgstr "Basic Information"
+
+msgid "Detail Pinjaman"
+msgstr "Loan Details"
+
+msgid "Informasi Tambahan"
+msgstr "Additional Information"
+
+msgid "Memuat formulir..."
+msgstr "Loading form..."
+
+msgid "Buat Pengajuan Pinjaman Baru"
+msgstr "Create New Loan Application"
+
+msgid "Pilih Peminjam..."
+msgstr "Select Borrower..."
+
+msgid "Cari NIK atau Nama..."
+msgstr "Search NIK or Name..."
+
+msgid "Cabang"
+msgstr "Branch"
+
+msgid "Pilih Cabang..."
+msgstr "Select Branch..."
+
+msgid "Cari Cabang..."
+msgstr "Search Branch..."
+
+msgid "Petugas (AO)"
+msgstr "Loan Officer (AO)"
+
+msgid "Memuat..."
+msgstr "Loading..."
+
+msgid "Pilih AO..."
+msgstr "Select AO..."
+
+msgid "Cari AO..."
+msgstr "Search AO..."
+
+msgid "Saluran Pengajuan"
+msgstr "Application Channel"
+
+msgid "Online"
+msgstr "Online"
+
+msgid "Mobile"
+msgstr "Mobile"
+
+msgid "Pilih Saluran..."
+msgstr "Select Channel..."
+
+msgid "Produk Pinjaman"
+msgstr "Loan Product"
+
+msgid "Pilih Produk..."
+msgstr "Select Product..."
+
+msgid "Cari Produk..."
+msgstr "Search Product..."
+
+msgid "Nilai Pinjaman"
+msgstr "Loan Amount"
+
+msgid "Tenor (Bulan)"
+msgstr "Tenor (Months)"
+
+msgid "Suku Bunga (%)"
+msgstr "Interest Rate (%)"
+
+msgid "Tipe Bunga"
+msgstr "Interest Type"
+
+msgid "Flat"
+msgstr "Flat"
+
+msgid "Efektif"
+msgstr "Effective"
+
+msgid "Anuitas"
+msgstr "Annuity"
+
+msgid "Pilih Tipe Bunga..."
+msgstr "Select Interest Type..."
+
+msgid "Tujuan Pinjaman"
+msgstr "Loan Purpose"
+
+msgid "Contoh: Modal Kerja, Investasi, dll"
+msgstr "Example: Working Capital, Investment, etc."
+
+msgid "Tidak ada atribut tambahan"
+msgstr "No additional attributes"
+
+msgid "Lanjut"
+msgstr "Next"
+
+msgid "Submit Pengajuan"
+msgstr "Submit Application"
+
+msgid "Apakah Anda yakin data pengajuan ini sudah benar?"
+msgstr "Are you sure the application data is correct?"
+
+msgid "Ya, Buat Pengajuan"
+msgstr "Yes, Create Application"
+
+msgid "Pengajuan berhasil dibuat"
+msgstr "Application created successfully"
+
+msgid "Gagal membuat pengajuan"
+msgstr "Failed to create application"
+
+# ─── survey-template-management-view ──────────────────────────────────────────
+
+msgid "Nama Template"
+msgstr "Template Name"
+
+msgid "Kode Template"
+msgstr "Template Code"
+
+msgid "Tipe Pemohon"
+msgstr "Applicant Type"
+
+msgid "Target Produk"
+msgstr "Target Product"
+
+msgid "Semua Produk"
+msgstr "All Products"
+
+msgid "Simpan Perubahan"
+msgstr "Save Changes"
+
+msgid "Simpan Template & Lanjut"
+msgstr "Save Template & Continue"
+
+msgid "Nama Section"
+msgstr "Section Name"
+
+msgid "Urutan (Sequence)"
+msgstr "Order (Sequence)"
+
+msgid "Simpan Section & Lanjut"
+msgstr "Save Section & Continue"
+
+msgid "Teks Pertanyaan"
+msgstr "Question Text"
+
+msgid "Tipe Jawaban"
+msgstr "Answer Type"
+
+msgid "Wajib Diisi"
+msgstr "Required"
+
+msgid "Selesaikan Template"
+msgstr "Complete Template"
+
+msgid "Template berhasil dibuat! Lanjutkan ke buat section."
+msgstr "Template created successfully! Continue to create a section."
+
+msgid "Gagal menambahkan template"
+msgstr "Failed to add template"
+
+msgid "Section berhasil dibuat! Lanjutkan ke buat pertanyaan."
+msgstr "Section created successfully! Continue to create questions."
+
+msgid "Gagal menambahkan section"
+msgstr "Failed to add section"
+
+msgid "Template survey lengkap berhasil dibuat!"
+msgstr "Complete survey template created successfully!"
+
+msgid "Gagal menambahkan pertanyaan"
+msgstr "Failed to add question"
+
+msgid "Template berhasil diperbarui!"
+msgstr "Template updated successfully!"
+
+msgid "Gagal memperbarui template"
+msgstr "Failed to update template"
+
+msgid "Status template berhasil diperbarui!"
+msgstr "Template status updated successfully!"
+
+msgid "Gagal memperbarui status template"
+msgstr "Failed to update template status"
+
+msgid "Registri Survey Templates"
+msgstr "Survey Template Registry"
+
+msgid "Kelola daftar template survey untuk penilaian kredit."
+msgstr "Manage the list of survey templates for credit assessment."
+
+msgid "Tambah Template"
+msgstr "Add Template"
+
+msgid "Tambah Template Baru"
+msgstr "Add New Template"
+
+msgid "Tambah Section"
+msgstr "Add Section"
+
+msgid "Tambah Pertanyaan"
+msgstr "Add Question"
+
+msgid "Aktif"
+msgstr "Active"
+
+msgid "Nonaktif"
+msgstr "Inactive"
+
+msgid "Hapus"
+msgstr "Delete"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Konfirmasi Hapus"
+msgstr "Confirm Delete"
+
+msgid "Ya, Hapus"
+msgstr "Yes, Delete"
+
+msgid "Ya, Hapus Kategori"
+msgstr "Yes, Delete Category"
+
+msgid "Ya, Nonaktifkan"
+msgstr "Yes, Deactivate"
+
+msgid "Ya, Simpan (Pengecekan BI Checking) tidak bisa"
+msgstr "Yes, Save (BI Checking) not possible"
+
+# ─── survey-detail-view ────────────────────────────────────────────────────────
+
+msgid "Memuat detail survey..."
+msgstr "Loading survey details..."
+
+msgid "Detail Survey"
+msgstr "Survey Details"
+
+msgid "Lihat Pengajuan"
+msgstr "View Application"
+
+msgid "Isi Survey"
+msgstr "Fill Survey"
+
+msgid "No."
+msgstr "No."
+
+msgid "Pertanyaan"
+msgstr "Question"
+
+msgid "Jawaban"
+msgstr "Answer"
+
+msgid "Tipe"
+msgstr "Type"
+
+msgid "Belum dijawab"
+msgstr "Not yet answered"
+
+msgid "Tidak ada pertanyaan dalam section ini."
+msgstr "No questions in this section."
+
+msgid "Template ini belum memiliki section."
+msgstr "This template has no sections yet."
+
+msgid "Preview Gambar"
+msgstr "Image Preview"
+
+msgid "Lihat"
+msgstr "View"
+
+# ─── dashboard / application-kanban ───────────────────────────────────────────
+
+msgid "Tampilkan"
+msgstr "Show"
+
+msgid "entri"
+msgstr "entries"
+
+msgid "Selanjutnya"
+msgstr "Next"
+
+msgid "Tujuan"
+msgstr "Purpose"
+
+# ─── shared / dynamic-field ───────────────────────────────────────────────────
+
+msgid "Tidak ada pilihan"
+msgstr "No options available"
+
+msgid "Pilih..."
+msgstr "Select..."
+
+msgid "Masukkan"
+msgstr "Enter"
+
+# ─── survey-assign page ────────────────────────────────────────────────────────
+
+msgid "Pilih Peminjam"
+msgstr "Select Borrower"
+
+msgid "Assign Survey"
+msgstr "Assign Survey"
+
+msgid "Tipe Survey"
+msgstr "Survey Type"
+
+msgid "Ditugaskan Kepada"
+msgstr "Assigned To"
+
+msgid "Pilih Template..."
+msgstr "Select Template..."
+
+msgid "Cari Template..."
+msgstr "Search Template..."
+
+msgid "Survey berhasil ditugaskan"
+msgstr "Survey assigned successfully"
+
+msgid "Gagal menugaskan survey"
+msgstr "Failed to assign survey"
+
+msgid "Pilih template survey"
+msgstr "Select survey template"
+
+msgid "Isi detail penugasan"
+msgstr "Fill assignment details"
+
+msgid "Sebelumnya"
+msgstr "Previous"
+
+msgid "Konfirmasi Penugasan"
+msgstr "Assignment Confirmation"
+
+msgid "Berhasil"
+msgstr "Success"
+
+msgid "Gagal"
+msgstr "Failed"
+
+# ─── applicant-list / applicant-card / applicant-detail ───────────────────────
+
+msgid "Lihat Detail"
+msgstr "View Details"
+
+msgid "Peminjam tidak ditemukan."
+msgstr "Borrower not found."
+
+msgid "Detail Peminjam"
+msgstr "Borrower Details"
+
+msgid "Edit Data"
+msgstr "Edit Data"
+
+msgid "Hapus Data"
+msgstr "Delete Data"
+
+msgid "Konfirmasi Hapus Peminjam"
+msgstr "Confirm Delete Borrower"
+
+msgid "Apakah Anda yakin ingin menghapus data peminjam ini?"
+msgstr "Are you sure you want to delete this borrower's data?"
+
+msgid "Peminjam berhasil dihapus"
+msgstr "Borrower deleted successfully"
+
+msgid "Gagal menghapus peminjam"
+msgstr "Failed to delete borrower"
+
+msgid "Data sedang dimuat..."
+msgstr "Data is loading..."
+
+# ─── dashboard sidebar / layout ───────────────────────────────────────────────
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Pengajuan"
+msgstr "Applications"
+
+msgid "Pinjaman"
+msgstr "Loans"
+
+msgid "Keluar"
+msgstr "Sign Out"
+
+msgid "Ya, Keluar"
+msgstr "Yes, Sign Out"
+
+msgid "Pengaturan"
+msgstr "Settings"
+
+msgid "Atribut"
+msgstr "Attributes"
+
+msgid "Kategori"
+msgstr "Categories"
+
+msgid "Survey"
+msgstr "Survey"
+
+# ─── attribute / category management ──────────────────────────────────────────
+
+msgid "Registri Atribut"
+msgstr "Attribute Registry"
+
+msgid "Tambah Atribut"
+msgstr "Add Attribute"
+
+msgid "Kode Atribut"
+msgstr "Attribute Code"
+
+msgid "Label UI"
+msgstr "UI Label"
+
+msgid "Tipe Data"
+msgstr "Data Type"
+
+msgid "Scope"
+msgstr "Scope"
+
+msgid "Wajib"
+msgstr "Required"
+
+msgid "Atribut berhasil disimpan"
+msgstr "Attribute saved successfully"
+
+msgid "Gagal menyimpan atribut"
+msgstr "Failed to save attribute"
+
+msgid "Atribut berhasil dihapus"
+msgstr "Attribute deleted successfully"
+
+msgid "Gagal menghapus atribut"
+msgstr "Failed to delete attribute"
+
+msgid "Registri Kategori"
+msgstr "Category Registry"
+
+msgid "Tambah Kategori"
+msgstr "Add Category"
+
+msgid "Nama Kategori"
+msgstr "Category Name"
+
+msgid "Kode Kategori"
+msgstr "Category Code"
+
+msgid "Urutan Tampilan"
+msgstr "Display Order"
+
+msgid "Kategori berhasil disimpan"
+msgstr "Category saved successfully"
+
+msgid "Gagal menyimpan kategori"
+msgstr "Failed to save category"
+
+msgid "Kategori berhasil dihapus"
+msgstr "Category deleted successfully"
+
+msgid "Gagal menghapus kategori"
+msgstr "Failed to delete category"
+
+# ─── credit-bureau ─────────────────────────────────────────────────────────────
+
+msgid "Credit Bureau"
+msgstr "Credit Bureau"
+
+msgid "Upload SLIK"
+msgstr "Upload SLIK"
+
+msgid "Unggah file SLIK"
+msgstr "Upload SLIK file"
+
+msgid "File berhasil diunggah"
+msgstr "File uploaded successfully"
+
+msgid "Gagal mengunggah file"
+msgstr "Failed to upload file"
+
+# ─── Loan details tabs ─────────────────────────────────────────────────────────
+
+msgid "Profil Peminjam"
+msgstr "Borrower Profile"
+
+msgid "Dokumen"
+msgstr "Documents"
+
+msgid "Keputusan Kredit"
+msgstr "Credit Decision"
+
+msgid "Riwayat"
+msgstr "History"
+
+# ─── Misc shared ───────────────────────────────────────────────────────────────
+
+msgid "Muat lebih banyak"
+msgstr "Load more"
+
+msgid "Tidak ada data"
+msgstr "No data available"
+
+msgid "Terjadi kesalahan"
+msgstr "An error occurred"
+
+msgid "Coba lagi"
+msgstr "Try again"
+
+msgid "Simpan"
+msgstr "Save"
+
+msgid "Tutup"
+msgstr "Close"
+
+msgid "Konfirmasi"
+msgstr "Confirm"
+
+msgid "Deskripsi"
+msgstr "Description"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Tanggal"
+msgstr "Date"
+
+msgid "Aksi"
+msgstr "Action"
