@@ -22,6 +22,23 @@ import {
     Heart,
     GraduationCap,
     Home,
+    Calendar,
+    UserPlus,
+    Save,
+    IdCard,
+    Book,
+    Store,
+    ShieldCheck,
+    UserCheck, UserX, Users, Baby, PersonStanding, Fingerprint, ScanFace,
+    MessageSquare, Send, AtSign, Bell, Rss, Radio,
+    Factory, Landmark, Newspaper, ClipboardList, Award, Star,
+    CreditCard, Banknote, Wallet, PiggyBank, TrendingUp, TrendingDown, BarChart2, Receipt,
+    Shield, Stethoscope, AlertTriangle, ThumbsUp, ThumbsDown,
+    Globe, Car, Truck, Plane, Anchor, Navigation,
+    FileText, File, FolderOpen, BookOpen, Link, Hash, Tag, Paperclip,
+    Clock, Timer, Hourglass,
+    Zap, Lock, Key, Eye, Cpu, Wifi, Image, Smile,
+    Trash2,
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
 import { toast } from 'sonner';
@@ -54,7 +71,18 @@ interface DynamicApplicantFormProps {
 const ICON_MAP: Record<string, any> = {
     User, Building2, Settings, CheckCircle2,
     Phone, Mail, MapPin, Briefcase, DollarSign, Activity, Heart,
-    GraduationCap, Home,
+    GraduationCap, Home, Calendar, UserPlus, Save,
+    IdCard, Book, Store, ShieldCheck, UserCheck, 
+    UserX, Users, Baby, PersonStanding, Fingerprint, ScanFace,
+    MessageSquare, Send, AtSign, Bell, Rss, Radio,
+    Factory, Landmark, Newspaper, ClipboardList, Award, Star,
+    CreditCard, Banknote, Wallet, PiggyBank, TrendingUp, TrendingDown, BarChart2, Receipt,
+    Shield, Stethoscope, AlertTriangle, ThumbsUp, ThumbsDown,
+    Globe, Car, Truck, Plane, Anchor, Navigation,
+    FileText, File, FolderOpen, BookOpen, Link, Hash, Tag, Paperclip,
+    Clock, Timer, Hourglass,
+    Zap, Lock, Key, Eye, Cpu, Wifi, Image, Smile,
+    Trash2,
 };
 
 const CATEGORY_ICON_FALLBACK: Record<string, any> = {
@@ -73,7 +101,18 @@ const CATEGORY_ICON_FALLBACK: Record<string, any> = {
 };
 
 function resolveIcon(iconName?: string, categoryTitle?: string) {
-    if (iconName && ICON_MAP[iconName]) return ICON_MAP[iconName];
+    if (iconName) {
+        // Normalize: kebab-case/snake_case to PascalCase
+        const normalized = iconName
+            .split(/[-_]/)
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+            .join('');
+
+        // Case-insensitive lookup
+        const found = Object.keys(ICON_MAP).find(k => k.toLowerCase() === normalized.toLowerCase());
+        if (found) return ICON_MAP[found];
+    }
+    
     if (categoryTitle) {
         const upper = categoryTitle.toUpperCase();
         for (const [keyword, icon] of Object.entries(CATEGORY_ICON_FALLBACK)) {
@@ -84,6 +123,13 @@ function resolveIcon(iconName?: string, categoryTitle?: string) {
 }
 
 const PRIMARY_KEYS = ['full_name', 'identity_number', 'tax_id', 'birth_date', 'tanggal_lahir', 'establishment_date', 'tanggal_pendirian', 'applicant_type'];
+
+const primarySchema = z.object({
+    fullName: z.string().min(1, 'Nama wajib diisi'),
+    identityNumber: z.string().min(1, 'NIK/NPWP wajib diisi'),
+    taxId: z.string(),
+    birthDate: z.string(),
+});
 
 export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: DynamicApplicantFormProps) {
     const queryClient = useQueryClient();
@@ -102,6 +148,11 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
     const getRegistryLabel = (code: string, fallback: string) => {
         const item = registry.find(r => r.attributeCode === code);
         return item?.uiLabel || item?.description || fallback;
+    };
+
+    const getCategoryLabel = (code: string, fallback: string) => {
+        const cat = apiCategories.find(c => c.categoryCode === code);
+        return cat?.categoryName || fallback;
     };
 
     const { data: categoriesResponse, isLoading: isCategoriesLoading } = useQuery({
@@ -133,20 +184,31 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         : localType;
     const setType = (t: ApplicantType) => { if (!applicantId) setLocalType(t); };
 
-    const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
     const apiCategories = categoriesResponse?.categories || [];
 
     // Dynamic attributes grouped by category
     const categories = React.useMemo(() => {
         const groups: Record<string, AttributeRegistry[]> = {};
+        const categoriesWithRelevantFields = new Set<string>();
 
         registry.forEach(attr => {
-            if (PRIMARY_KEYS.includes(attr.attributeCode)) return;
-            if (attr.scope !== 'APPLICANT') return;
-            if (attr.appliesTo !== 'BOTH' && attr.appliesTo !== type) return;
-            if (!applicantId && attr.hideOnCreate) return;
+            if (attr.scope && attr.scope !== 'APPLICANT') return;
+            
+            // Refined appliesTo logic
+            const targetApplies = (attr.appliesTo || '').toUpperCase();
+            const currentType = type.toUpperCase();
+            const isMatch = targetApplies === 'BOTH' || 
+                            targetApplies === currentType ||
+                            (currentType === 'CORPORATE' && targetApplies === 'COMPANY');
+            
+            if (!isMatch) return;
 
             const catCode = attr.categoryCode || 'IDENTITAS';
+            categoriesWithRelevantFields.add(catCode);
+
+            if (PRIMARY_KEYS.includes(attr.attributeCode)) return;
+            if (!applicantId && attr.hideOnCreate) return;
+
             if (!groups[catCode]) groups[catCode] = [];
             groups[catCode].push(attr);
         });
@@ -157,22 +219,27 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
                 .map(cat => ({
                     id: (cat.categoryCode || '').toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                    title: cat.categoryName || 'Lainnya',
+                    categoryCode: cat.categoryCode,
+                    title: getCategoryLabel(cat.categoryCode || '', cat.categoryName || 'Lainnya'),
                     fields: (groups[cat.categoryCode] || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
                     iconName: cat.uiIcon,
+                    hasRelevantAttributes: categoriesWithRelevantFields.has(cat.categoryCode),
                 }))
-                .filter(cat => cat.fields.length > 0);
+                // Include category if it was EXPLICITLY marked as having relevant fields (core or dynamic)
+                // OR if it's the IDENTITAS category (fallback safety)
+                .filter(cat => cat.hasRelevantAttributes || cat.categoryCode === 'IDENTITAS');
         }
 
         return Object.entries(groups)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([name, fields]) => ({
                 id: name.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                title: name || 'Lainnya',
+                categoryCode: name,
+                title: getCategoryLabel(name, name || 'Lainnya'),
                 fields: fields.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
                 iconName: undefined as string | undefined,
             }))
-            .filter(cat => cat.fields.length > 0);
+            .filter(cat => cat.fields.length > 0 || cat.categoryCode === 'IDENTITAS');
     }, [registry, apiCategories, type, applicantId]);
 
     const steps = React.useMemo(() => {
@@ -502,7 +569,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
                                 <div className="space-y-1.5 col-span-full md:col-span-2">
                                     <Label className="text-xs font-medium text-muted-foreground">
-                                        {t`Nama Lengkap`} <span className="text-destructive">*</span>
+                                        {getRegistryLabel('full_name', t`Nama Lengkap`)} <span className="text-destructive">*</span>
                                     </Label>
                                     <Input
                                         {...primaryForm.register('fullName')}
@@ -516,7 +583,9 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-medium text-muted-foreground">
-                                        {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NPWP`} <span className="text-destructive">*</span>
+                                        {type === 'PERSONAL' 
+                                            ? getRegistryLabel('identity_number', t`NIK / No. KTP`) 
+                                            : getRegistryLabel('tax_id', t`NPWP`)} <span className="text-destructive">*</span>
                                     </Label>
                                     <Input
                                         {...primaryForm.register('identityNumber', {
@@ -553,7 +622,9 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-medium text-muted-foreground">
-                                        {type === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`}
+                                        {type === 'PERSONAL' 
+                                            ? getRegistryLabel('birth_date', getRegistryLabel('tanggal_lahir', t`Tanggal Lahir`)) 
+                                            : getRegistryLabel('establishment_date', getRegistryLabel('tanggal_pendirian', t`Tanggal Pendirian`))}
                                     </Label>
                                     <Input
                                         {...primaryForm.register('birthDate')}
@@ -595,7 +666,8 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                             </div>
                         )}
 
-                        {currentStep > 0 && steps[currentStep]?.fields?.map((field: AttributeRegistry) => (
+                        {/* Registry fields for this step */}
+                        {steps[currentStep]?.fields?.map((field: AttributeRegistry) => (
                             <DynamicField
                                 key={field.attributeCode}
                                 field={field}

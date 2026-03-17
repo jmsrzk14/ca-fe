@@ -22,6 +22,20 @@ import {
     GraduationCap,
     Home,
     UserPlus,
+    IdCard,
+    Book,
+    Store,
+    ShieldCheck,
+    UserCheck, UserX, Users, Baby, PersonStanding, Fingerprint, ScanFace,
+    MessageSquare, Send, AtSign, Bell, Rss, Radio,
+    Factory, Landmark, Newspaper, ClipboardList, Award, Star,
+    CreditCard, Banknote, Wallet, PiggyBank, TrendingUp, TrendingDown, BarChart2, Receipt,
+    Shield, Stethoscope, AlertTriangle, ThumbsUp, ThumbsDown,
+    Globe, Car, Truck, Plane, Anchor, Navigation,
+    FileText, File, FolderOpen, BookOpen, Link, Hash, Tag, Paperclip,
+    Clock, Timer, Hourglass,
+    Zap, Lock, Key, Eye, Cpu, Wifi, Image, Smile,
+    Trash2,
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
 import { toast } from 'sonner';
@@ -54,12 +68,33 @@ interface ApplicantAddPageProps {
 
 const getIconWithName = (name?: string) => {
     if (!name) return Settings;
+    
     const icons: Record<string, any> = {
         User, Building2, Settings, CheckCircle2,
         Phone, Mail, MapPin, Briefcase, DollarSign, Activity, Heart,
-        GraduationCap, Home,
+        GraduationCap, Home, Calendar, UserPlus, Save,
+        IdCard, Book, Store, ShieldCheck, UserCheck, 
+        UserX, Users, Baby, PersonStanding, Fingerprint, ScanFace,
+        MessageSquare, Send, AtSign, Bell, Rss, Radio,
+        Factory, Landmark, Newspaper, ClipboardList, Award, Star,
+        CreditCard, Banknote, Wallet, PiggyBank, TrendingUp, TrendingDown, BarChart2, Receipt,
+        Shield, Stethoscope, AlertTriangle, ThumbsUp, ThumbsDown,
+        Globe, Car, Truck, Plane, Anchor, Navigation,
+        FileText, File, FolderOpen, BookOpen, Link, Hash, Tag, Paperclip,
+        Clock, Timer, Hourglass,
+        Zap, Lock, Key, Eye, Cpu, Wifi, Image, Smile,
+        Trash2,
     };
-    return icons[name] || Settings;
+
+    // Normalize: kebab-case/snake_case to PascalCase
+    const normalized = name
+        .split(/[-_]/)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join('');
+
+    // Case-insensitive lookup
+    const found = Object.keys(icons).find(k => k.toLowerCase() === normalized.toLowerCase());
+    return found ? icons[found] : Settings;
 };
 
 const getCommonOptions = (): Record<string, { label: string; value: string }[]> => ({
@@ -95,7 +130,7 @@ const getCommonOptions = (): Record<string, { label: string; value: string }[]> 
 });
 
 // Core fields handled as primary columns — excluded from dynamic registry steps
-const PRIMARY_KEYS = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate', 'applicantType'];
+const PRIMARY_KEYS = ['full_name', 'identity_number', 'tax_id', 'birth_date', 'tanggal_lahir', 'establishment_date', 'tanggal_pendirian', 'applicant_type'];
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Component
@@ -153,17 +188,40 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
     const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
     const apiCategories = categoriesResponse?.categories || [];
 
+    const getRegistryLabel = React.useCallback((code: string, fallback: string) => {
+        const item = registry.find(r => r.attributeCode === code);
+        return item?.uiLabel || item?.description || fallback;
+    }, [registry]);
+
+    const getCategoryLabel = React.useCallback((code: string, fallback: string) => {
+        const cat = apiCategories.find(c => c.categoryCode === code);
+        return cat?.categoryName || fallback;
+    }, [apiCategories]);
+
     // ── Build steps from registry (scope=APPLICANT) ───────────────────────────
+    // Dynamic attributes grouped by category
     const categories = React.useMemo(() => {
         const groups: Record<string, AttributeRegistry[]> = {};
+        const categoriesWithRelevantFields = new Set<string>();
 
         registry.forEach(attr => {
             // Only APPLICANT scope (or no scope restriction)
             if (attr.scope && attr.scope !== 'APPLICANT') return;
-            if (PRIMARY_KEYS.includes(attr.attributeCode)) return;
-            if (attr.appliesTo !== 'BOTH' && attr.appliesTo !== type) return;
+            
+            // Refined appliesTo logic
+            const targetApplies = (attr.appliesTo || '').toUpperCase();
+            const currentType = type.toUpperCase();
+            const isMatch = targetApplies === 'BOTH' || 
+                            targetApplies === currentType ||
+                            (currentType === 'CORPORATE' && targetApplies === 'COMPANY');
+            
+            if (!isMatch) return;
 
             const catCode = attr.categoryCode || 'IDENTITAS';
+            categoriesWithRelevantFields.add(catCode);
+
+            if (PRIMARY_KEYS.includes(attr.attributeCode)) return;
+
             if (!groups[catCode]) groups[catCode] = [];
             groups[catCode].push(attr);
         });
@@ -174,23 +232,27 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                 .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
                 .map(cat => ({
                     id: (cat.categoryCode || '').toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                    title: cat.categoryName || 'Lainnya',
-                    fields: groups[cat.categoryCode] || [],
-                    iconName: cat.uiIcon,
                     categoryCode: cat.categoryCode,
+                    title: getCategoryLabel(cat.categoryCode || '', cat.categoryName || 'Lainnya'),
+                    fields: (groups[cat.categoryCode] || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
+                    iconName: cat.uiIcon,
+                    hasRelevantAttributes: categoriesWithRelevantFields.has(cat.categoryCode),
                 }))
-                .filter(cat => cat.fields.length > 0); // skip empty categories
+                // Include category if it was EXPLICITLY marked as having relevant fields (core or dynamic)
+                // OR if it's the IDENTITAS category (fallback safety)
+                .filter(cat => cat.hasRelevantAttributes || cat.categoryCode === 'IDENTITAS');
         }
 
         return Object.entries(groups)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([name, fields]) => ({
                 id: name.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-                title: name,
-                fields,
-                iconName: undefined,
                 categoryCode: name,
-            }));
+                title: getCategoryLabel(name, name),
+                fields: fields.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
+                iconName: undefined,
+            }))
+            .filter(cat => cat.fields.length > 0 || cat.categoryCode === 'IDENTITAS');
     }, [registry, apiCategories, type]);
 
     const steps = React.useMemo(() =>
@@ -255,12 +317,6 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
     };
 
     const nextStep = () => {
-        if (currentStep === 0) {
-            if (!formData.fullName || !formData.identityNumber) {
-                toast.error(t`Harap isi Nama Lengkap dan NIK/NPWP`);
-                return;
-            }
-        }
         if (currentStep < steps.length - 1) {
             setCurrentStep(prev => prev + 1);
         }
@@ -536,7 +592,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     <div className="space-y-1 col-span-full md:col-span-2">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
                                             <User className="h-4 w-4 text-primary/70" />
-                                            {t`Nama Lengkap`} <span className="text-red-500">*</span>
+                                            {getRegistryLabel('full_name', t`Nama Lengkap`)} <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             id="fullName"
@@ -552,7 +608,9 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     <div className="space-y-1">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
                                             <CheckCircle2 className="h-4 w-4 text-primary/70" />
-                                            {type === 'PERSONAL' ? t`NIK / No. KTP` : t`NPWP`} <span className="text-red-500">*</span>
+                                            {type === 'PERSONAL' 
+                                                ? getRegistryLabel('identity_number', t`NIK / No. KTP`) 
+                                                : getRegistryLabel('tax_id', t`NPWP`)} <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             id="identityNumber"
@@ -578,7 +636,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                         <div className="space-y-1">
                                             <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
                                                 <Activity className="h-4 w-4 text-primary/70" />
-                                                {t`NPWP Lama (Opsional)`}
+                                                {getRegistryLabel('tax_id', t`NPWP Lama (Opsional)`)}
                                             </Label>
                                             <Input
                                                 id="taxId"
@@ -595,7 +653,9 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                     <div className="space-y-1">
                                         <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
                                             <Calendar className="h-4 w-4 text-primary/70" />
-                                            {type === 'PERSONAL' ? t`Tanggal Lahir` : t`Tanggal Pendirian`}
+                                            {type === 'PERSONAL' 
+                                                ? getRegistryLabel('birth_date', getRegistryLabel('tanggal_lahir', t`Tanggal Lahir`)) 
+                                                : getRegistryLabel('establishment_date', getRegistryLabel('tanggal_pendirian', t`Tanggal Pendirian`))}
                                         </Label>
                                         <Input
                                             id="birthDate"
