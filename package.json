@@ -7,8 +7,8 @@
     "build": "lingui compile && next build",
     "start": "next start",
     "lint": "eslint",
-    "gen-proto": "npx @bufbuild/buf generate buf.build/dots-credit-analytics/credit-analytics",
-    "gen-proto-local": "npx @bufbuild/buf generate src/proto",
+    "gen-proto": "npx @bufbuild/buf export buf.build/dots-credit-analytics/credit-analytics --output src/proto && npx @bufbuild/buf generate",
+    "gen-proto-debug": "npx @bufbuild/buf generate src/proto",
     "pages:build": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
     "build:cloudflare": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\"",
     "pages:deploy": "next build && npx @cloudflare/next-on-pages && node -e \"require('fs').writeFileSync('.vercel/output/static/.assetsignore', '_worker.js')\""
