@@ -24,7 +24,8 @@ import {
     MapPin, Globe, Home, Car, Truck, Plane, Anchor, Navigation,
     FileText, File, FolderOpen, BookOpen, Link, Hash, Tag, Paperclip,
     Calendar, Clock, Timer, Hourglass,
-    Zap, Lock, Key, Eye, Cpu, Wifi, Image, Smile,
+    Zap, Lock, Key, Eye, Cpu, Wifi, Image, Smile, Trash2, GraduationCap,
+    CheckCircle2,
 } from 'lucide-react';
 import { t } from '@/shared/lib/t';
 import { toast } from 'sonner';
@@ -67,7 +68,7 @@ const ICON_OPTIONS = [
     { name: 'Bell', icon: Bell },
     { name: 'Rss', icon: Rss },
     { name: 'Radio', icon: Radio },
-    { name: 'Building', icon: Building2 },
+    { name: 'Building2', icon: Building2 },
     { name: 'Briefcase', icon: Briefcase },
     { name: 'Factory', icon: Factory },
     { name: 'Store', icon: Store },
@@ -120,7 +121,18 @@ const ICON_OPTIONS = [
     { name: 'Wifi', icon: Wifi },
     { name: 'Image', icon: Image },
     { name: 'Smile', icon: Smile },
+    { name: 'GraduationCap', icon: GraduationCap },
+    { name: 'Trash2', icon: Trash2 },
+    { name: 'CheckCircle2', icon: CheckCircle2 },
+    { name: 'Plus', icon: Plus },
+    { name: 'Loader2', icon: Loader2 },
+    { name: 'AlertCircle', icon: AlertCircle },
+    { name: 'Database', icon: Database },
+    { name: 'Pencil', icon: Pencil },
+    { name: 'ChevronDown', icon: ChevronDown },
+    { name: 'ChevronRight', icon: ChevronRight },
     { name: 'Settings', icon: Settings },
+    { name: 'Table', icon: TableIcon },
 ] as const;
 
 const ICON_MAP: Record<string, React.ElementType> = Object.fromEntries(
@@ -130,12 +142,15 @@ const ICON_MAP: Record<string, React.ElementType> = Object.fromEntries(
 const EMPTY_FIELD = {
     attributeCode: '',
     description: '',
-    dataType: 'STRING',
+    valueType: 'STRING',
     categoryCode: 'LAINNYA',
     categoryName: 'Lainnya',
     categoryIcon: 'User',
     isRequired: false,
     riskRelevant: false,
+    isActive: true,
+    displayOrder: 0,
+    hideOnCreate: false,
     appliesTo: 'BOTH',
     scope: 'APPLICANT',
     uiLabel: '',
@@ -147,12 +162,14 @@ function AttributeForm({
     onChange,
     onSubmit,
     isPending,
+    categories = [],
     isEdit = false,
 }: {
     value: typeof EMPTY_FIELD;
     onChange: (patch: Partial<typeof EMPTY_FIELD>) => void;
     onSubmit: (e: React.FormEvent) => void;
     isPending: boolean;
+    categories?: any[];
     isEdit?: boolean;
 }) {
     const handleAddOption = () => {
@@ -212,48 +229,11 @@ function AttributeForm({
                 <p className="text-[10px] text-muted-foreground italic">{t`Jika dikosongkan, akan menggunakan Nama Internal.`}</p>
             </div>
 
-            <div className="space-y-1.5">
-                <Label htmlFor="categoryIcon">{t`Pilih Icon Kategori`}</Label>
-                <Select
-                    value={value.categoryIcon}
-                    onValueChange={v => onChange({ categoryIcon: v })}
-                >
-                    <SelectTrigger>
-                        {(() => {
-                            const SelIcon = ICON_MAP[value.categoryIcon];
-                            return SelIcon ? (
-                                <div className="flex items-center gap-2">
-                                    <SelIcon className="h-4 w-4 text-primary" />
-                                    <span>{value.categoryIcon}</span>
-                                </div>
-                            ) : (
-                                <SelectValue placeholder={t`Pilih Icon untuk Kategori`} />
-                            );
-                        })()}
-                    </SelectTrigger>
-                    <SelectContent className="max-h-72 overflow-y-auto">
-                        <div className="grid grid-cols-6 gap-0.5 p-2">
-                            {ICON_OPTIONS.map((opt) => (
-                                <SelectItem
-                                    key={opt.name}
-                                    value={opt.name}
-                                    className="flex items-center justify-center p-1.5 rounded-md hover:bg-muted cursor-pointer data-[state=checked]:bg-primary/10"
-                                >
-                                    <div className="flex flex-col items-center gap-0.5 min-w-0">
-                                        <opt.icon className="h-4 w-4 text-primary shrink-0" />
-                                        <span className="text-[7px] uppercase font-bold opacity-40 truncate w-full text-center leading-none">{opt.name}</span>
-                                    </div>
-                                </SelectItem>
-                            ))}
-                        </div>
-                    </SelectContent>
-                </Select>
-            </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                     <Label>{t`Tipe Data`}</Label>
-                    <Select value={value.dataType} onValueChange={v => onChange({ dataType: v })}>
+                    <Select value={value.valueType} onValueChange={v => onChange({ valueType: v })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="STRING">STRING</SelectItem>
@@ -265,40 +245,42 @@ function AttributeForm({
                     </Select>
                 </div>
                 <div className="space-y-1.5">
-                    <Label htmlFor="categoryCode">{t`Kode Kategori`}</Label>
-                    <Input
-                        id="categoryCode"
-                        value={value.categoryCode}
-                        onChange={e => onChange({ categoryCode: e.target.value })}
-                        required
-                    />
-                </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                    <Label htmlFor="categoryName">{t`Nama Kategori`}</Label>
-                    <Input
-                        id="categoryName"
-                        value={value.categoryName}
-                        onChange={e => onChange({ categoryName: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className="space-y-1.5">
-                    <Label>{t`Applies To`}</Label>
-                    <Select value={value.appliesTo} onValueChange={v => onChange({ appliesTo: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                    <Label>{t`Kategori`}</Label>
+                    <Select 
+                        value={value.categoryCode} 
+                        onValueChange={v => {
+                            const cat = categories.find(c => c.categoryCode === v);
+                            onChange({ 
+                                categoryCode: v, 
+                                categoryName: cat?.categoryName || v,
+                                categoryIcon: cat?.uiIcon || 'User'
+                            });
+                        }}
+                    >
+                        <SelectTrigger><SelectValue placeholder={t`Pilih Kategori`} /></SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="PERSONAL">PERSONAL</SelectItem>
-                            <SelectItem value="CORPORATE">CORPORATE</SelectItem>
-                            <SelectItem value="BOTH">BOTH</SelectItem>
+                            {categories.map(cat => (
+                                <SelectItem key={cat.categoryCode} value={cat.categoryCode}>
+                                    {cat.categoryName}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                    <Label htmlFor="appliesTo">{t`Applies To`}</Label>
+                    <Select value={value.appliesTo} onValueChange={v => onChange({ appliesTo: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="PERSONAL">PERSONAL</SelectItem>
+                            <SelectItem value="COMPANY">COMPANY</SelectItem>
+                            <SelectItem value="BOTH">BOTH</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
                 <div className="space-y-1.5">
                     <Label>{t`Scope`}</Label>
                     <Select value={value.scope} onValueChange={v => onChange({ scope: v })}>
@@ -311,7 +293,19 @@ function AttributeForm({
                 </div>
             </div>
 
-            {value.dataType === 'SELECT' && (
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                    <Label htmlFor="displayOrder">{t`Urutan Tampilan`}</Label>
+                    <Input
+                        id="displayOrder"
+                        type="number"
+                        value={value.displayOrder}
+                        onChange={e => onChange({ displayOrder: Number(e.target.value) })}
+                    />
+                </div>
+            </div>
+
+            {value.valueType === 'SELECT' && (
                 <div className="space-y-3 p-4 border rounded-xl bg-muted/20">
                     <div className="flex items-center justify-between">
                         <Label className="font-semibold">{t`Opsi Pilihan (Select Options)`}</Label>
@@ -345,7 +339,7 @@ function AttributeForm({
                 </div>
             )}
 
-            <div className="flex items-center gap-6 pt-2">
+            <div className="flex items-center gap-6 flex-wrap pt-2">
                 <div className="flex items-center space-x-2">
                     <Checkbox
                         id="required"
@@ -364,6 +358,26 @@ function AttributeForm({
                     />
                     <Label htmlFor="riskRelevant" className="text-sm font-medium leading-none">
                         {t`Risk Relevant`}
+                    </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="isActive"
+                        checked={value.isActive}
+                        onCheckedChange={(checked: boolean) => onChange({ isActive: !!checked })}
+                    />
+                    <Label htmlFor="isActive" className="text-sm font-medium leading-none">
+                        {t`Aktif`}
+                    </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="hideOnCreate"
+                        checked={value.hideOnCreate}
+                        onCheckedChange={(checked: boolean) => onChange({ hideOnCreate: !!checked })}
+                    />
+                    <Label htmlFor="hideOnCreate" className="text-sm font-medium leading-none">
+                        {t`Sembunyikan saat Create`}
                     </Label>
                 </div>
             </div>
@@ -392,6 +406,11 @@ export function AttributeManagementView() {
     const patchNew = (patch: Partial<typeof EMPTY_FIELD>) =>
         setNewField(prev => ({ ...prev, ...patch }));
 
+    const { data: catData } = useQuery({
+        queryKey: ['attribute-categories'],
+        queryFn: () => referenceService.listAttributeCategories(),
+    });
+
     const patchEdit = (patch: Partial<typeof EMPTY_FIELD>) =>
         setEditingAttr(prev => prev ? { ...prev, ...patch } : prev);
 
@@ -418,19 +437,23 @@ export function AttributeManagementView() {
 
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
-        createMutation.mutate({ ...newField, appliesTo: 'BOTH', scope: 'APPLICANT' });
+        createMutation.mutate(newField);
     };
 
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingAttr) return;
-        updateMutation.mutate({ ...editingAttr, appliesTo: 'BOTH', scope: 'APPLICANT' });
+        updateMutation.mutate(editingAttr);
     };
 
     const openEdit = (attr: any) => {
         setEditingAttr({
             ...attr,
+            valueType: attr.valueType || attr.dataType || 'STRING',
             choices: attr.choices || [],
+            isActive: attr.isActive ?? true,
+            displayOrder: attr.displayOrder || 0,
+            hideOnCreate: attr.hideOnCreate ?? false,
         });
     };
 
@@ -439,10 +462,7 @@ export function AttributeManagementView() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl font-bold text-foreground">{t`Manajemen Field Dinamis`}</h1>
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                        {t`Kelola field kuesioner applicant tanpa menyentuh database.`}
-                    </p>
+                    <h1 className="text-xl font-bold text-foreground">{t`Registry Field`}</h1>
                 </div>
 
                 <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
@@ -464,6 +484,7 @@ export function AttributeManagementView() {
                             onChange={patchNew}
                             onSubmit={handleCreate}
                             isPending={createMutation.isPending}
+                            categories={catData?.categories || []}
                         />
                     </DialogContent>
                 </Dialog>
@@ -487,6 +508,7 @@ export function AttributeManagementView() {
                             onChange={patchEdit}
                             onSubmit={handleUpdate}
                             isPending={updateMutation.isPending}
+                            categories={catData?.categories || []}
                             isEdit
                         />
                     )}
@@ -585,7 +607,15 @@ function ScopeFilteredRegistryView({ attributes, onEdit }: { attributes: any[]; 
                     categories.map(({ catName, attrs }) => {
                         const catKey = `${activeScope}:${catName}`;
                         const isCatCollapsed = collapsedCategories.has(catKey);
-                        const CatIcon = ICON_MAP[attrs[0]?.categoryIcon] ?? Settings;
+                        
+                        // Robust icon resolution for category header
+                        const rawIcon = attrs[0]?.categoryIcon || 'User';
+                        const normalizedIcon = rawIcon
+                            .split(/[-_]/)
+                            .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+                            .join('');
+                        const foundIconKey = Object.keys(ICON_MAP).find(k => k.toLowerCase() === normalizedIcon.toLowerCase());
+                        const CatIcon = foundIconKey ? ICON_MAP[foundIconKey] : User;
 
                         return (
                             <div key={catKey}>
@@ -629,7 +659,7 @@ function ScopeFilteredRegistryView({ attributes, onEdit }: { attributes: any[]; 
                                                     </TableCell>
                                                     <TableCell className="py-2">
                                                         <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700 border-blue-200">
-                                                            {attr.dataType}
+                                                            {attr.valueType || attr.dataType}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell className="py-2">

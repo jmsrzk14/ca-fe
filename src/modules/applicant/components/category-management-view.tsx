@@ -61,7 +61,7 @@ const ICON_OPTIONS = [
     { name: 'Bell', icon: Bell },
     { name: 'Rss', icon: Rss },
     { name: 'Radio', icon: Radio },
-    { name: 'Building', icon: Building2 },
+    { name: 'Building2', icon: Building2 },
     { name: 'Briefcase', icon: Briefcase },
     { name: 'Factory', icon: Factory },
     { name: 'Store', icon: Store },
@@ -115,34 +115,18 @@ const ICON_OPTIONS = [
     { name: 'Image', icon: Image },
     { name: 'Smile', icon: Smile },
     { name: 'Settings', icon: Settings },
+    { name: 'GraduationCap', icon: GraduationCap },
+    { name: 'Trash2', icon: Trash2 },
+    { name: 'Plus', icon: Plus },
+    { name: 'Loader2', icon: Loader2 },
+    { name: 'Pencil', icon: Pencil },
+    { name: 'Table', icon: TableIcon },
 ] as const;
 
 const ICON_MAP: Record<string, React.ElementType> = Object.fromEntries(
     ICON_OPTIONS.map(o => [o.name, o.icon])
 );
 
-// Fallback for icons not in the small list but used in the data
-const FULL_ICON_MAP: Record<string, React.ElementType> = {
-    ...ICON_MAP,
-    'id-card': IdCard,
-    'users': Users,
-    'book': BookOpen,
-    'map-pin': MapPin,
-    'phone': Phone,
-    'home': Home,
-    'graduation-cap': GraduationCap,
-    'briefcase': Briefcase,
-    'store': Store,
-    'shield-check': Shield,
-    'dollar-sign': DollarSign,
-    'credit-card': CreditCard,
-    'banknote': Banknote,
-    'wallet': Wallet,
-    'piggy-bank': PiggyBank,
-    'landmark': Landmark,
-    'receipt': Receipt,
-    'building-2': Building2,
-};
 
 const EMPTY_CATEGORY = {
     categoryCode: '',
@@ -413,7 +397,14 @@ export function CategoryManagementView() {
                                 </TableRow>
                             ) : (
                                 data?.categories?.sort((a: any, b: any) => a.displayOrder - b.displayOrder).map((cat: any) => {
-                                    const IconComp = FULL_ICON_MAP[cat.uiIcon] || Settings;
+                                    const rawIcon = cat.uiIcon || 'Settings';
+                                    const normalizedIcon = rawIcon
+                                        .split(/[-_]/)
+                                        .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+                                        .join('');
+                                    const foundIconKey = Object.keys(ICON_MAP).find(k => k.toLowerCase() === normalizedIcon.toLowerCase());
+                                    const IconComp = foundIconKey ? ICON_MAP[foundIconKey] : Settings;
+                                    
                                     return (
                                         <TableRow key={cat.categoryCode} className="group">
                                             <TableCell className="text-center font-medium text-muted-foreground">

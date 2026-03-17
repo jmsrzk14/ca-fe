@@ -161,11 +161,13 @@ export interface Survey {
 }
 
 export interface SurveyAnswer {
+    id?: string;
     surveyId: string;
     questionId: string;
     answerText?: string;
     answerNumber?: string;
     answerBoolean?: boolean;
+    answerDate?: string;
     answeredAt?: string;
 }
 

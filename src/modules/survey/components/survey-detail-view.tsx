@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Pencil, ArrowLeft, Loader2, Eye } from 'lucide-react';
+import { Pencil, ArrowLeft, Loader2, Eye, User } from 'lucide-react';
 import {
     Table,
     TableBody,
@@ -23,6 +23,8 @@ import { useQuery } from '@tanstack/react-query';
 import { surveyService } from '@/core/api';
 import { Badge } from '@/shared/ui/badge';
 import { t } from '@/shared/lib/t';
+import { cn } from '@/shared/lib/utils';
+import { SurveyAnswer, SurveyQuestion } from '@/shared/types/api';
 
 interface SurveyDetailViewProps {
     applicationId: string;
@@ -82,21 +84,26 @@ export function SurveyDetailView({ applicationId, surveyId }: SurveyDetailViewPr
                     </Button>
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-xl font-bold text-foreground">{template?.templateName || t`Detail Survey`}</h1>
-                        <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-primary/5 text-primary border-primary/20">
+                        <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-600 border-emerald-200">
                             {survey?.status}
                         </Badge>
                     </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" asChild className="rounded-full px-4">
-                        <Link href={`/loans/${applicationId}`}>
-                            {t`Lihat Pengajuan`}
-                        </Link>
-                    </Button>
-                    <Button size="sm" className="rounded-full px-4 gap-2">
-                        <Pencil className="h-3.5 w-3.5" />
-                        {t`Isi Survey`}
-                    </Button>
+                    {survey && (
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1 font-medium">
+                            <span className="flex items-center gap-1.5 text-foreground/80">
+                                <User className="h-3 w-3 text-indigo-500" />
+                                {survey.applicantName || t`Pemohon`}
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-border" />
+                            <span className="bg-slate-100 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase text-slate-600">
+                                {survey.surveyType}
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-border" />
+                            <span className="italic opacity-80">
+                                {survey.surveyPurpose}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -144,16 +151,35 @@ export function SurveyDetailView({ applicationId, surveyId }: SurveyDetailViewPr
                                                 <TableCell>
                                                     {answer ? (
                                                         <div className="flex items-center gap-3">
-                                                            {q.answerType === 'IMAGE' && (answer.answerText || answer.answerNumber) && (
+                                                            {/* 1. Check for Link (answerText) */}
+                                                            {answer.answerText && (answer.answerText.startsWith('http://') || answer.answerText.startsWith('https://')) ? (
                                                                 <Button 
                                                                     variant="outline" 
                                                                     size="sm" 
                                                                     className="h-8 gap-2 rounded-full text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-                                                                    onClick={() => setPreviewImage(answer.answerText || answer.answerNumber)}
+                                                                    onClick={() => setPreviewImage(answer.answerText!)}
                                                                 >
                                                                     <Eye className="h-3.5 w-3.5" />
                                                                     {t`Lihat`}
                                                                 </Button>
+                                                            ) : (
+                                                                /* 2. Check for Boolean (If text and number are empty, and boolean exists) */
+                                                                (!answer.answerText && !answer.answerNumber && answer.answerBoolean !== undefined && answer.answerBoolean !== null)
+                                                            ) ? (
+                                                                <Badge 
+                                                                    variant="outline" 
+                                                                    className={cn(
+                                                                        "rounded-full px-3 py-0.5 text-[10px] font-bold uppercase",
+                                                                        answer.answerBoolean ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-red-50 text-red-600 border-red-200"
+                                                                    )}
+                                                                >
+                                                                    {answer.answerBoolean ? t`Ya` : t`Tidak`}
+                                                                </Badge>
+                                                            ) : (
+                                                                /* 3. Fallback to other values */
+                                                                <span className="text-sm font-medium text-foreground">
+                                                                    {answer.answerText || answer.answerNumber || (answer.answerDate && answer.answerDate !== "0001-01-01T00:00:00Z" ? new Date(answer.answerDate).toLocaleDateString('id-ID') : '—')}
+                                                                </span>
                                                             )}
                                                         </div>
                                                     ) : (
