@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { cn } from '@/shared/lib/utils';
 import { Label } from '@/shared/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { t } from '@/shared/lib/t';
 
 interface SurveyAssignModalProps {
     applicationId: string;
@@ -128,12 +129,12 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
             }
         },
         onSuccess: () => {
-            toast.success(`${selectedTemplateIds.length} survey berhasil ditugaskan`);
+            toast.success(t`${selectedTemplateIds.length} survey berhasil ditugaskan`);
             queryClient.invalidateQueries({ queryKey: ['surveys', applicationId] });
             onClose();
         },
         onError: (err: any) => {
-            toast.error('Gagal menugaskan survey: ' + (err.message || 'Terjadi kesalahan'));
+            toast.error(t`Gagal menugaskan survey: ` + (err.message || t`Terjadi kesalahan`));
         }
     });
 
@@ -173,10 +174,10 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                         <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                             <ClipboardList className="h-6 w-6" />
                         </div>
-                        Assign Survey
+                        {t`Assign Survey`}
                     </DialogTitle>
                     <DialogDescription>
-                        Pilih template survey yang akan ditugaskan untuk pengajuan ini.
+                        {t`Pilih template survey yang akan ditugaskan untuk pengajuan ini.`}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -193,7 +194,7 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         className="pl-10 h-12 bg-card border-border/50 focus:border-primary/50 text-sm rounded-xl"
-                                        placeholder="Cari template survey..."
+                                        placeholder={t`Cari template survey...`}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
@@ -342,7 +343,7 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                                 setStep(2);
                                             } else {
                                                 if (!formData.surveyType || !formData.surveyPurpose) {
-                                                    toast.error('Mohon lengkapi semua field form');
+                                                    toast.error(t`Mohon lengkapi semua field form`);
                                                     return;
                                                 }
                                                 assignMutation.mutate(selectedTemplateIds);
@@ -354,15 +355,15 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                         {assignMutation.isPending ? (
                                             <>
                                                 <Loader2 className="h-3 w-3 animate-spin mr-2" />
-                                                Memproses...
+                                                {t`Memproses...`}
                                             </>
                                         ) : step === 1 ? (
                                             <>
-                                                Lanjutkan
+                                                {t`Lanjutkan`}
                                             </>
                                         ) : (
                                             <>
-                                                Assign Sekarang
+                                                {t`Assign Sekarang`}
                                                 <CheckCircle2 className="h-3 w-3 ml-2" />
                                             </>
                                         )}

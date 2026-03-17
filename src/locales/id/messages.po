@@ -430,6 +430,21 @@ msgstr "Cari berdasarkan nama atau NIK"
 msgid "Add Applicant"
 msgstr "Tambah Peminjam"
 
+msgid "Tambah Peminjam Baru"
+msgstr "Tambah Peminjam Baru"
+
+msgid "All"
+msgstr "Semua"
+
+msgid "Personal"
+msgstr "Perorangan"
+
+msgid "Company"
+msgstr "Perusahaan"
+
+msgid "Cari nama atau NIK..."
+msgstr "Cari nama atau NIK..."
+
 # ─── applicant-add-page: Tambah Peminjam ───────────────────────────────────────
 
 msgid "Milik Sendiri"
@@ -517,6 +532,9 @@ msgid "Centang jika alamat domisili Anda sama dengan alamat yang tertera di KTP.
 msgstr "Centang jika alamat domisili Anda sama dengan alamat yang tertera di KTP. Data akan disalin otomatis."
 
 # ─── application-add-page: Buat Pengajuan Pinjaman ────────────────────────────
+
+msgid "Pengajuan Baru"
+msgstr "Pengajuan Baru"
 
 msgid "Informasi Dasar"
 msgstr "Informasi Dasar"

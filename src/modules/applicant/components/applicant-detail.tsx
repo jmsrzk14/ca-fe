@@ -95,7 +95,7 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                     : getLabel('tanggal_lahir', t`Tanggal Lahir`),
                 value: data.birthDate
                     ? new Date(data.birthDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
-                    : '-',
+                    : new Date(data.establishmentDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }),
             },
         ];
 

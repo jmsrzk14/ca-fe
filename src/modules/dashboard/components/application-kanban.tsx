@@ -416,15 +416,15 @@ export function ApplicationKanban() {
                                 <DropdownMenuContent align="start">
                                     <DropdownMenuItem onClick={() => { setLoanType('All'); setPageIndex(0); }} className="gap-2 cursor-pointer">
                                         <Filter className="h-3.5 w-3.5" />
-                                        All
+                                        {t`All`}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => { setLoanType('Personal'); setPageIndex(0); }} className="gap-2 cursor-pointer">
                                         <User className="h-3.5 w-3.5" />
-                                        Personal
+                                        {t`Personal`}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => { setLoanType('Company'); setPageIndex(0); }} className="gap-2 cursor-pointer">
                                         <Briefcase className="h-3.5 w-3.5" />
-                                        Company
+                                        {t`Company`}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

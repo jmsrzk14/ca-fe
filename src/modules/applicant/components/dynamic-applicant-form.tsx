@@ -83,15 +83,7 @@ function resolveIcon(iconName?: string, categoryTitle?: string) {
     return Settings;
 }
 
-const PRIMARY_KEYS = ['fullName', 'identityNumber', 'taxId', 'birthDate', 'establishmentDate', 'applicantType'];
-
-// Schema for the primary (step-0) fields
-const primarySchema = z.object({
-    fullName: z.string().min(1, 'Nama wajib diisi'),
-    identityNumber: z.string().min(1, 'NIK/NPWP wajib diisi'),
-    taxId: z.string(),
-    birthDate: z.string(),
-});
+const PRIMARY_KEYS = ['full_name', 'identity_number', 'tax_id', 'birth_date', 'tanggal_lahir', 'establishment_date', 'tanggal_pendirian', 'applicant_type'];
 
 export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: DynamicApplicantFormProps) {
     const queryClient = useQueryClient();
@@ -104,6 +96,13 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
         queryKey: ['attribute-registry'],
         queryFn: () => referenceService.getAttributeRegistry(),
     });
+
+    const registry = (registryResponse?.attributes as AttributeRegistry[]) || [];
+
+    const getRegistryLabel = (code: string, fallback: string) => {
+        const item = registry.find(r => r.attributeCode === code);
+        return item?.uiLabel || item?.description || fallback;
+    };
 
     const { data: categoriesResponse, isLoading: isCategoriesLoading } = useQuery({
         queryKey: ['attribute-categories'],
@@ -406,12 +405,8 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             fullName: primary.fullName,
             identityNumber: primary.identityNumber,
             taxId: primary.taxId,
-            birthDate: type === 'PERSONAL' && primary.birthDate
-                ? new Date(primary.birthDate).toISOString()
-                : '',
-            establishmentDate: type === 'CORPORATE' && primary.birthDate
-                ? new Date(primary.birthDate).toISOString()
-                : '',
+            birthDate: type === 'PERSONAL' && primary.birthDate ? primary.birthDate : '',
+            establishmentDate: type === 'CORPORATE' && primary.birthDate ? primary.birthDate : '',
             attributes,
             ...(applicantId ? {} : { createdAt: now }),
         };
@@ -593,7 +588,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                             {t`Alamat Domisili sama dengan Alamat KTP`}
                                         </Label>
                                         <span className="text-[10px] text-muted-foreground select-none">
-                                            {t`Centang jika alamat domisili sama dengan alamat KTP. `}
+                                            {t`Centang jika alamat domisili Anda sama dengan alamat yang tertera di KTP. Data akan disalin otomatis.`}
                                         </span>
                                     </div>
                                 </div>

@@ -140,7 +140,7 @@ export function ApplicantList() {
                                     onClick={() => handleSort('identityNumber')}
                                 >
                                     <div className="flex items-center gap-1.5">
-                                        {t`NIK / NPWP`} <SortIcon column="identityNumber" />
+                                        {t`NIK / No. KTP`} <SortIcon column="identityNumber" />
                                     </div>
                                 </TableHead>
                                 <TableHead
@@ -156,7 +156,7 @@ export function ApplicantList() {
                                     onClick={() => handleSort('applicantType')}
                                 >
                                     <div className="flex items-center gap-1.5">
-                                        {t`Tipe`} <SortIcon column="applicantType" />
+                                        {t`Perorangan/Perusahaan`} <SortIcon column="applicantType" />
                                     </div>
                                 </TableHead>
                                 <TableHead
@@ -276,7 +276,7 @@ export function ApplicantList() {
                         size="sm"
                         onClick={() => window.location.reload()}
                     >
-                        {t`Coba Lagi`}
+                        {t`Coba lagi`}
                     </Button>
                 </div>
             </div>
@@ -292,7 +292,7 @@ export function ApplicantList() {
                 <Button size="sm" asChild>
                     <Link href="/borrowers/add">
                         <Plus className="h-3.5 w-3.5" />
-                        {t`Tambah Peminjam`}
+                        {t`Tambah Peminjam Baru`}
                     </Link>
                 </Button>
             </div>

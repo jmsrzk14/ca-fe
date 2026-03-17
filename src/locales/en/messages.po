@@ -10,54 +10,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Antigravity\n"
 
-msgid "First Name"
-msgstr "First Name"
-
-msgid "Last Name"
-msgstr "Last Name"
-
-msgid "Company Name"
-msgstr "Company Name"
-
-msgid "Date of Birth"
-msgstr "Date of Birth"
-
-msgid "Establishment Date"
-msgstr "Establishment Date"
-
-msgid "Personal ID Number (NIK)"
-msgstr "Personal ID Number (NIK)"
-
-msgid "Business Registration Number"
-msgstr "Business Registration Number"
-
-msgid "Home Address"
-msgstr "Home Address"
-
-msgid "Email"
-msgstr "Email"
-
-msgid "Phone"
-msgstr "Phone"
-
-msgid "Save Borrower"
-msgstr "Save Borrower"
-
-msgid "Cancel"
-msgstr "Cancel"
-
-msgid "Basic Information"
-msgstr "Basic Information"
-
-msgid "Contact Details"
-msgstr "Contact Details"
-
-msgid "Person"
-msgstr "Person"
-
-msgid "Company"
-msgstr "Company"
-
 msgid "Identitas"
 msgstr "Identity"
 
@@ -82,8 +34,20 @@ msgstr "Business"
 msgid "Karakter & Perilaku"
 msgstr "Character & Behavior"
 
-msgid "Nama lengkap sesuai dengan KTP"
+msgid "Nama Lengkap"
 msgstr "Full Name"
+
+msgid "Nama"
+msgstr "Name"
+
+msgid "Tipe"
+msgstr "Type"
+
+msgid "Tanggal Dibuat"
+msgstr "Created"
+
+msgid "NIK / No. KTP"
+msgstr "NIK / ID Number"
 
 msgid "NIK"
 msgstr "ID Number (NIK)"
@@ -412,8 +376,20 @@ msgstr "Add Borrower"
 msgid "Tambah peminjam"
 msgstr "Add Borrower"
 
+msgid "Cari nama atau NIK..."
+msgstr "Search by name or ID number"
+
 msgid "Tidak ada data peminjam."
 msgstr "No borrower data found."
+
+msgid "Tampilkan"
+msgstr "Show"
+
+msgid "entri"
+msgstr "entries"
+
+msgid "Entri"
+msgstr "Entries"
 
 msgid "Fill in the details below to register a new borrower in the system."
 msgstr "Fill in the details below to register a new borrower in the system."
@@ -433,6 +409,18 @@ msgstr "Search by name or ID number"
 msgid "Add Applicant"
 msgstr "Add Applicant"
 
+msgid "Tambah Peminjam Baru"
+msgstr "Add New Borrower"
+
+msgid "All"
+msgstr "All"
+
+msgid "Personal"
+msgstr "Personal"
+
+msgid "Company"
+msgstr "Company"
+
 # ─── applicant-add-page: Tambah Peminjam ───────────────────────────────────────
 
 msgid "Milik Sendiri"
@@ -447,8 +435,11 @@ msgstr "Family Property"
 msgid "Tipe Peminjam"
 msgstr "Borrower Type"
 
+msgid "Perorangan/Perusahaan"
+msgstr "Personal/Company"
+
 msgid "Perorangan"
-msgstr "Individual"
+msgstr "Personal"
 
 msgid "Perusahaan"
 msgstr "Company"
@@ -526,6 +517,9 @@ msgid "Centang jika alamat domisili Anda sama dengan alamat yang tertera di KTP.
 msgstr "Check if your domicile address is the same as the address on your ID card. Data will be copied automatically."
 
 # ─── application-add-page: Buat Pengajuan Pinjaman ────────────────────────────
+
+msgid "Pengajuan Baru"
+msgstr "New Application"
 
 msgid "Informasi Dasar"
 msgstr "Basic Information"
@@ -915,9 +909,6 @@ msgstr "Loans"
 
 msgid "Keluar"
 msgstr "Sign Out"
-
-msgid "Ya, Keluar"
-msgstr "Yes, Sign Out"
 
 msgid "Pengaturan"
 msgstr "Settings"

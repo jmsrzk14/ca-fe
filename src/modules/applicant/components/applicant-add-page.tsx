@@ -300,8 +300,8 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
             fullName: formData.fullName,
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
-            birthDate: type === 'PERSONAL' && formData.birthDate ? new Date(formData.birthDate).toISOString() : '',
-            establishmentDate: type === 'CORPORATE' && formData.birthDate ? new Date(formData.birthDate).toISOString() : '',
+            birthDate: type === 'PERSONAL' && formData.birthDate ? formData.birthDate : '',
+            establishmentDate: type === 'CORPORATE' && formData.birthDate ? formData.birthDate : '',
             attributes,
             createdAt: now,
         };
@@ -441,18 +441,6 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
         <div className="max-w-5xl mx-auto space-y-8 pb-12">
             {/* Page header */}
             <div className="flex flex-col gap-6">
-                <div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.back()}
-                        className="group -ml-2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                        <ChevronLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                        {t`Kembali`}
-                    </Button>
-                </div>
-
                 <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
                         <UserPlus className="h-6 w-6 text-primary" />

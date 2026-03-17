@@ -14,12 +14,6 @@ export function ApplicantAddView() {
     return (
         <div className="space-y-5">
             <div className="space-y-1">
-                <Button variant="ghost" size="sm" className="h-7 px-2 text-muted-foreground -ml-2" asChild>
-                    <Link href="/borrowers">
-                        <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-                        {t`Kembali`}
-                    </Link>
-                </Button>
                 <h1 className="text-lg font-bold text-foreground">{t`Tambah Peminjam Baru`}</h1>
             </div>
 

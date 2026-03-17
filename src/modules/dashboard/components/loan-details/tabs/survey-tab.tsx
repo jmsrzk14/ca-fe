@@ -61,7 +61,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
         return (
             <div className="flex flex-col items-center justify-center p-20 gap-4">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground animate-pulse">Memuat data survey...</p>
+                <p className="text-sm text-muted-foreground animate-pulse">{t`Memuat data survey...`}</p>
             </div>
         );
     }
@@ -71,8 +71,8 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
             <div className="flex flex-col items-center justify-center p-20 gap-4 bg-muted/50 rounded-2xl border border-dashed border-border">
                 <AlertCircle className="h-10 w-10 text-destructive" />
                 <div className="text-center">
-                    <h3 className="text-sm font-bold text-foreground">Gagal memuat survey</h3>
-                    <p className="text-xs text-muted-foreground mt-1">Terjadi kesalahan pada sistem.</p>
+                    <h3 className="text-sm font-bold text-foreground">{t`Gagal memuat survey`}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t`Terjadi kesalahan pada sistem.`}</p>
                 </div>
             </div>
         );
@@ -88,9 +88,9 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                     <ClipboardList className="h-8 w-8 text-muted-foreground/40" />
                 </div>
                 <div className="text-center max-w-xs">
-                    <h3 className="text-sm font-bold text-foreground">Belum ada survey</h3>
+                    <h3 className="text-sm font-bold text-foreground">{t`Belum ada survey`}</h3>
                     <p className="text-xs text-muted-foreground mt-1 mb-6">
-                        Belum ada tugas survey yang dibuat untuk pengajuan ini.
+                        {t`Belum ada tugas survey yang dibuat untuk pengajuan ini.`}
                     </p>
                     <Button 
                         variant="outline" 
@@ -99,7 +99,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                         className="h-9 gap-2 rounded-full px-6 text-[11px] font-bold uppercase tracking-wider border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors translate-z-0 shadow-sm"
                     >
                         <Plus className="h-3.5 w-3.5" />
-                        Assign Survey Baru
+                        {t`Assign Survey Baru`}
                     </Button>
                 </div>
             </div>
@@ -132,7 +132,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
             <div className="flex items-center justify-between mb-2">
                 <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                     <span className="w-1 h-5 bg-indigo-500 rounded-full"></span>
-                    Daftar Survey
+                    {t`Daftar Survey`}
                 </h2>
                 <div className="flex items-center gap-3">
                     <Badge variant="outline" className="rounded-full px-4 h-7 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-2">
@@ -144,7 +144,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                         className="h-8 gap-1 rounded-full px-4 text-[11px] font-bold uppercase tracking-wider"
                     >
                         <Plus className="h-3 w-3" />
-                        Assign Survey
+                        {t`Assign Survey`}
                     </Button>
                 </div>
             </div>
@@ -172,7 +172,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-bold text-foreground leading-tight">
-                                            {templateMap[survey.templateId]?.templateName || survey.surveyType || 'Survey Umum'}
+                                            {templateMap[survey.templateId]?.templateName || survey.surveyType || t`Survey Umum`}
                                         </span>
                                         <span className="text-[11px] text-muted-foreground mt-0.5 font-mono">
                                             CODE: {templateMap[survey.templateId]?.templateCode || '-'}
