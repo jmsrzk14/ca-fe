@@ -26,11 +26,11 @@ interface SurveyTabProps {
 }
 
 const statusConfig: Record<SurveyStatus, { label: string, color: string, icon: any }> = {
-    'UNASSIGNED': { label: 'UNASSIGNED', color: 'bg-slate-500', icon: AlertCircle },
-    'ASSIGNED': { label: 'ASSIGNED', color: 'bg-blue-500', icon: User },
-    'IN_PROGRESS': { label: 'IN_PROGRESS', color: 'bg-amber-500', icon: Clock },
-    'SUBMITTED': { label: 'SUBMITTED', color: 'bg-emerald-500', icon: CheckCircle2 },
-    'VERIFIED': { label: 'VERIFIED', color: 'bg-indigo-600', icon: CheckCircle2 },
+    'UNASSIGNED': { label: t`UNASSIGNED`, color: 'bg-slate-500', icon: AlertCircle },
+    'ASSIGNED': { label: t`ASSIGNED`, color: 'bg-blue-500', icon: User },
+    'IN_PROGRESS': { label: t`IN_PROGRESS`, color: 'bg-amber-500', icon: Clock },
+    'SUBMITTED': { label: t`SUBMITTED`, color: 'bg-emerald-500', icon: CheckCircle2 },
+    'VERIFIED': { label: t`VERIFIED`, color: 'bg-indigo-600', icon: CheckCircle2 },
 };
 
 export function SurveyTab({ applicationId }: SurveyTabProps) {
@@ -136,7 +136,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                 </h2>
                 <div className="flex items-center gap-3">
                     <Badge variant="outline" className="rounded-full px-4 h-7 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-2">
-                        {surveys.length} Survey
+                        {t`${surveys.length} Survey`}
                     </Badge>
                     <Button 
                         size="sm" 
@@ -175,7 +175,7 @@ export function SurveyTab({ applicationId }: SurveyTabProps) {
                                             {templateMap[survey.templateId]?.templateName || survey.surveyType || t`Survey Umum`}
                                         </span>
                                         <span className="text-[11px] text-muted-foreground mt-0.5 font-mono">
-                                            CODE: {templateMap[survey.templateId]?.templateCode || '-'}
+                                            {t`CODE: ${templateMap[survey.templateId]?.templateCode || '-'}`}
                                         </span>
                                     </div>
                                 </div>

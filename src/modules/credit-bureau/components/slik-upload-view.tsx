@@ -5,6 +5,7 @@ import { Upload, FileText, CheckCircle2, AlertCircle, Loader2, X, Files } from '
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
+import { t } from '@/shared/lib/t';
 
 interface FileEntry {
     file: File;
@@ -86,8 +87,8 @@ export function SlikUploadView() {
     return (
         <div className="space-y-5">
             <div>
-                <h1 className="text-lg font-bold text-foreground">Credit Bureau (SLIK OJK)</h1>
-                <p className="text-xs text-muted-foreground mt-1">Upload file teks SLIK OJK secara bulk untuk pemrosesan data riwayat kredit debitur</p>
+                <h1 className="text-lg font-bold text-foreground">{t`Credit Bureau (SLIK OJK)`}</h1>
+                <p className="text-xs text-muted-foreground mt-1">{t`Upload file teks SLIK OJK secara bulk untuk pemrosesan data riwayat kredit debitur`}</p>
             </div>
 
             <Card>
@@ -117,10 +118,10 @@ export function SlikUploadView() {
                             <div className="flex flex-col items-center gap-2">
                                 <Upload className="h-8 w-8 text-muted-foreground" />
                                 <p className="text-sm font-medium text-foreground">
-                                    Drag & drop file SLIK (.txt)
+                                    {t`Drag & drop file SLIK (.txt)`}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                    Bisa pilih banyak file sekaligus
+                                    {t`Bisa pilih banyak file sekaligus`}
                                 </p>
                             </div>
                         </div>
@@ -131,10 +132,10 @@ export function SlikUploadView() {
                                 <div className="flex items-center justify-between">
                                     <p className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
                                         <Files className="h-3.5 w-3.5" />
-                                        {files.length} file
+                                        {t`${files.length} file`}
                                         {successCount > 0 && (
                                             <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-none text-[10px] ml-1">
-                                                {successCount} selesai
+                                                {t`${successCount} selesai`}
                                             </Badge>
                                         )}
                                     </p>
@@ -143,7 +144,7 @@ export function SlikUploadView() {
                                             onClick={() => setFiles([])}
                                             className="text-xs text-destructive hover:underline"
                                         >
-                                            Hapus semua
+                                            {t`Hapus semua`}
                                         </button>
                                     )}
                                 </div>
@@ -177,12 +178,12 @@ export function SlikUploadView() {
 
                         {/* Instructions */}
                         <div className="bg-muted/50 rounded-lg p-4">
-                            <h4 className="text-xs font-bold text-foreground mb-2">Petunjuk:</h4>
+                            <h4 className="text-xs font-bold text-foreground mb-2">{t`Petunjuk:`}</h4>
                             <ul className="text-xs text-muted-foreground space-y-1">
-                                <li>1. Login ke sistem SLIK OJK dan lakukan pencarian debitur</li>
-                                <li>2. Export hasil pencarian dalam format teks (.txt)</li>
-                                <li>3. Upload satu atau banyak file sekaligus di halaman ini</li>
-                                <li>4. Sistem akan otomatis memproses dan mencocokkan data ke debitur terkait</li>
+                                <li>{t`1. Login ke sistem SLIK OJK dan lakukan pencarian debitur`}</li>
+                                <li>{t`2. Export hasil pencarian dalam format teks (.txt)`}</li>
+                                <li>{t`3. Upload satu atau banyak file sekaligus di halaman ini`}</li>
+                                <li>{t`4. Sistem akan otomatis memproses dan mencocokkan data ke debitur terkait`}</li>
                             </ul>
                         </div>
 
@@ -196,13 +197,13 @@ export function SlikUploadView() {
                                 >
                                     {processing ? (
                                         <>
-                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                            Memproses...
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
+                                            {t`Memproses...`}
                                         </>
                                     ) : (
                                         <>
-                                            <Upload className="h-3.5 w-3.5" />
-                                            Upload {pendingCount} File
+                                            <Upload className="h-3.5 w-3.5 mr-2" />
+                                            {t`Upload ${pendingCount} File`}
                                         </>
                                     )}
                                 </Button>

@@ -72,22 +72,22 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
         const attributes = data.attributes || [];
 
         const coreGroup = '1. Identitas';
-        groups[coreGroup] = [
+        const coreItems = [
             {
                 label: getLabel('applicant_type', t`Tipe Applicant`),
-                value: data.applicantType ? data.applicantType.charAt(0).toUpperCase() + data.applicantType.slice(1).toLowerCase() : '-',
+                value: data.applicantType ? data.applicantType.charAt(0).toUpperCase() + data.applicantType.slice(1).toLowerCase() : '',
             },
             {
                 label: data.applicantType?.toUpperCase() === 'COMPANY'
                     ? getLabel('company_name', t`Nama Perusahaan`)
                     : getLabel('full_name', t`Nama Lengkap`),
-                value: data.fullName,
+                value: data.fullName || '',
             },
             {
                 label: data.applicantType?.toUpperCase() === 'COMPANY'
                     ? getLabel('tax_id', t`NPWP`)
                     : getLabel('identity_number', t`NIK`),
-                value: data.identityNumber,
+                value: data.identityNumber || '',
             },
             {
                 label: data.applicantType?.toUpperCase() === 'COMPANY'
@@ -95,24 +95,35 @@ export function ApplicantDetail({ id }: ApplicantDetailProps) {
                     : getLabel('tanggal_lahir', t`Tanggal Lahir`),
                 value: data.birthDate
                     ? new Date(data.birthDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
-                    : new Date(data.establishmentDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }),
+                    : data.establishmentDate
+                        ? new Date(data.establishmentDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+                        : '',
             },
-        ];
+        ].filter(item => item.value && item.value !== '' && item.value !== '-');
+
+        if (coreItems.length > 0) {
+            groups[coreGroup] = coreItems;
+        }
 
         attributes.forEach((attr: any) => {
-            const config = getAttributeConfig(attr.key || attr.attributeCode);
+            const config = getAttributeConfig(attr.attributeId);
             const catVal = config?.categoryName || 'Informasi Lainnya';
             const cat = t`${catVal}`;
+
+            if (!attr.value || attr.value === '' || attr.value === '-') return;
 
             if (!groups[cat]) groups[cat] = [];
 
             groups[cat].push({
-                label: t`${config?.uiLabel || attr.key}`,
+                label: config?.uiLabel || attr.attributeId || attr.key || 'Unknown Field',
                 value: attr.value,
             });
         });
 
-        return Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]));
+        // Filter out groups with no items after filtering empty values
+        return Object.entries(groups)
+            .filter(([_, items]) => items.length > 0)
+            .sort((a, b) => a[0].localeCompare(b[0]));
     }, [applicant, getLabel, getAttributeConfig, t]);
 
     if (isLoading || isRegistryLoading) {
@@ -236,26 +247,14 @@ function BorrowerDataView({ groupedAttributes }: { groupedAttributes: [string, {
                     <h3 className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">
                         {category.replace(/^\d+\.\s*/, '')}
                     </h3>
-                    <div className="rounded-lg border overflow-hidden">
-                        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0">
-                            {/* Left column: even indices */}
-                            <div className="flex flex-col divide-y md:border-r">
-                                {items.filter((_, i) => i % 2 === 0).map((item, idx) => (
-                                    <div key={idx} className="flex items-center justify-between px-4 py-2.5">
-                                        <span className="text-xs text-muted-foreground">{item.label.replace(/_/g, ' ')}</span>
-                                        <span className="text-xs font-medium text-foreground text-right">{item.value || '-'}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            {/* Right column: odd indices */}
-                            <div className="flex flex-col divide-y">
-                                {items.filter((_, i) => i % 2 !== 0).map((item, idx) => (
-                                    <div key={idx} className="flex items-center justify-between px-4 py-2.5">
-                                        <span className="text-xs text-muted-foreground">{item.label.replace(/_/g, ' ')}</span>
-                                        <span className="text-xs font-medium text-foreground text-right">{item.value || '-'}</span>
-                                    </div>
-                                ))}
-                            </div>
+                    <div className="overflow-hidden">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                            {items.map((item, idx) => (
+                                <div key={idx} className="flex items-center justify-between py-2 hover:bg-muted/5 transition-colors">
+                                    <span className="text-xs text-muted-foreground">{item.label}</span>
+                                    <span className="text-xs font-medium text-foreground text-right">{item.value || '-'}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -298,6 +297,7 @@ const emptyPartyForm: PartyFormData = {
 
 function RelatedPartiesView({ applicantId, applicantType }: { applicantId: string; applicantType: string }) {
     const queryClient = useQueryClient();
+    const { getLabel } = useAttributeRegistry();
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [form, setForm] = React.useState<PartyFormData>(emptyPartyForm);
 
@@ -386,17 +386,17 @@ function RelatedPartiesView({ applicantId, applicantType }: { applicantId: strin
                     <p className="text-sm text-muted-foreground">{t`Belum ada pihak terkait.`}</p>
                 </div>
             ) : (
-                <div className="rounded-lg border overflow-hidden">
+                <div className="overflow-hidden">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-muted/30 hover:bg-muted/30">
-                                <TableHead>{t`Nama`}</TableHead>
-                                <TableHead>{t`NIK`}</TableHead>
-                                <TableHead>{t`Tgl Lahir`}</TableHead>
-                                <TableHead>{t`Peran`}</TableHead>
-                                {isCorporate && <TableHead>{t`Kepemilikan`}</TableHead>}
-                                {isCorporate && <TableHead>{t`Jabatan`}</TableHead>}
-                                <TableHead>{t`SLIK`}</TableHead>
+                            <TableRow className="hover:bg-muted/30">
+                                <TableHead>{getLabel('full_name', t`Nama`)}</TableHead>
+                                <TableHead>{getLabel('identity_number', t`NIK`)}</TableHead>
+                                <TableHead>{getLabel('tanggal_lahir', t`Tgl Lahir`)}</TableHead>
+                                <TableHead>{getLabel('role_code', t`Peran`)}</TableHead>
+                                {isCorporate && <TableHead>{getLabel('ownership_pct', t`Kepemilikan`)}</TableHead>}
+                                {isCorporate && <TableHead>{getLabel('position', t`Jabatan`)}</TableHead>}
+                                <TableHead>{getLabel('slik_required', t`SLIK`)}</TableHead>
                                 <TableHead className="w-10"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -540,6 +540,7 @@ function RelatedPartiesView({ applicantId, applicantType }: { applicantId: strin
 
 /* ── Loans list table ── */
 function LoansListView({ isLoading, applications }: { isLoading: boolean; applications?: any[] }) {
+    const { getLabel } = useAttributeRegistry();
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-32 gap-2 text-muted-foreground">
@@ -564,15 +565,15 @@ function LoansListView({ isLoading, applications }: { isLoading: boolean; applic
     }
 
     return (
-        <div className="rounded-lg border overflow-hidden">
+        <div className="overflow-hidden">
             <Table>
                 <TableHeader>
-                    <TableRow className="bg-muted/30 hover:bg-muted/30">
-                        <TableHead>{t`Jumlah Pinjaman`}</TableHead>
-                        <TableHead>{t`Tenor`}</TableHead>
-                        <TableHead>{t`Tujuan`}</TableHead>
-                        <TableHead>{t`Status`}</TableHead>
-                        <TableHead>{t`Tanggal`}</TableHead>
+                    <TableRow className="hover:bg-muted/30">
+                        <TableHead>{getLabel('loan_amount', t`Jumlah Pinjaman`)}</TableHead>
+                        <TableHead>{getLabel('tenor_months', t`Tenor`)}</TableHead>
+                        <TableHead>{getLabel('loan_purpose', t`Tujuan`)}</TableHead>
+                        <TableHead>{getLabel('status', t`Status`)}</TableHead>
+                        <TableHead>{getLabel('created_at', t`Tanggal`)}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -623,7 +624,6 @@ const STATUS_MAP: Record<string, { label: string; className: string }> = {
     ANALYSIS: { label: 'Analisis', className: 'bg-amber-100 text-amber-700' },
     APPROVED: { label: 'Disetujui', className: 'bg-emerald-100 text-emerald-700' },
     REJECTED: { label: 'Ditolak', className: 'bg-red-100 text-red-700' },
-    DISBURSED: { label: 'Dicairkan', className: 'bg-purple-100 text-purple-700' },
     CLOSED: { label: 'Selesai', className: 'bg-slate-100 text-slate-600' },
 };
 

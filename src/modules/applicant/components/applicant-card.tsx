@@ -56,7 +56,7 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
                         <h3 className="font-bold text-lg text-foreground truncate group-hover:text-primary transition-colors">
                             {applicant.fullName}
                         </h3>
-                        {applicant.applicantType === 'CORPORATE' ? (
+                        {applicant.applicantType === 'COMPANY' ? (
                             <Building2 className="h-3.5 w-3.5 text-blue-500" />
                         ) : (
                             <User className="h-3.5 w-3.5 text-primary" />
@@ -69,7 +69,7 @@ export default function ApplicantCard({ applicant }: ApplicantCardProps) {
             </CardHeader>
             <CardContent className="p-5 pt-4 space-y-3">
                 <div className="flex flex-wrap gap-2">
-                    <Badge variant={applicant.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="rounded-lg px-2 py-0.5 text-[10px] font-bold">
+                    <Badge variant={applicant.applicantType === 'COMPANY' ? 'default' : 'secondary'} className="rounded-lg px-2 py-0.5 text-[10px] font-bold">
                         {applicant.applicantType}
                     </Badge>
                     <Badge variant="outline" className="rounded-lg px-2 py-0.5 text-[10px] font-medium border-border/50 bg-muted/20">

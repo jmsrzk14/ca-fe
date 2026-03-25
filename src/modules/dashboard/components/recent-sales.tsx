@@ -29,7 +29,6 @@ export function RecentApplications() {
     const getStatusColor = (status: string) => {
         const s = status.toUpperCase();
         switch (s) {
-            case 'DISBURSED':
             case 'FUNDED': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
             case 'APPROVED': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
             case 'ANALYSIS':

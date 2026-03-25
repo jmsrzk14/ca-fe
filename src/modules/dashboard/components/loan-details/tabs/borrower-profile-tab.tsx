@@ -37,7 +37,6 @@ export function BorrowerProfileTab({ applicant }: BorrowerProfileTabProps) {
     }
 
     let type = applicant.applicantType || 'PERSONAL';
-    if (type === 'COMPANY') type = 'CORPORATE';
 
     // Filter attributes for this profile
     const profileAttributes = registry.filter((attr: any) =>

@@ -82,8 +82,8 @@ export function DashboardSidebar() {
                     <p className="text-[10px] text-sidebar-foreground/40 uppercase tracking-wide font-medium">
                         Kantor Pusat
                     </p>
-                    <p className="text-xs text-sidebar-foreground mt-0.5 truncate">
-                        {user?.username ?? "—"}
+                    <p className="text-xs text-sidebar-foreground mt-0.5 truncate capitalize">
+                        {user?.displayName ?? "—"}
                     </p>
                 </div>
             )}

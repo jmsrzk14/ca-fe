@@ -375,14 +375,14 @@ export function ApplicationKanban() {
                 <div className="p-3 bg-destructive/10 text-destructive rounded-full">
                     <RotateCw className="h-6 w-6" />
                 </div>
-                <p className="text-sm font-medium">Gagal memuat data pengajuan</p>
+                <p className="text-sm font-medium">{t`Gagal memuat data pengajuan`}</p>
                 <Button
                     onClick={() => fetchData()}
                     variant="outline"
                     size="sm"
                 >
                     <RotateCw className="h-3.5 w-3.5" />
-                    Coba Lagi
+                    {t`Coba Lagi`}
                 </Button>
             </div>
         );
@@ -394,7 +394,7 @@ export function ApplicationKanban() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <h1 className="text-2xl font-bold tracking-tight text-foreground whitespace-nowrap">
-                        {pathname.includes('/applications') ? 'Pengajuan' : 'Pinjaman'}
+                        {pathname.includes('/applications') ? t`Pengajuan` : t`Pinjaman`}
                     </h1>
                 </div>
 
@@ -481,7 +481,7 @@ export function ApplicationKanban() {
                         size="sm"
                     >
                         <Plus className="h-3.5 w-3.5" />
-                        Pengajuan Baru
+                        {t`Pengajuan Baru`}
                     </Button>
                 </div>
             </div>
@@ -529,15 +529,15 @@ export function ApplicationKanban() {
                             <DropdownMenuContent align="start">
                                 <DropdownMenuItem onClick={() => { setLoanType('All'); setPageIndex(0); }} className="gap-2 cursor-pointer">
                                     <Filter className="h-3.5 w-3.5" />
-                                    All
+                                    {t`All`}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => { setLoanType('Personal'); setPageIndex(0); }} className="gap-2 cursor-pointer">
                                     <User className="h-3.5 w-3.5" />
-                                    Personal
+                                    {t`Personal`}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => { setLoanType('Company'); setPageIndex(0); }} className="gap-2 cursor-pointer">
                                     <Briefcase className="h-3.5 w-3.5" />
-                                    Company
+                                    {t`Company`}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -545,7 +545,7 @@ export function ApplicationKanban() {
                         <div className="relative">
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                             <Input
-                                placeholder="Cari pengajuan..."
+                                placeholder={t`Cari pengajuan...`}
                                 className="pl-8 h-8 w-48 lg:w-64 text-xs rounded-md bg-background"
                                 value={search}
                                 onChange={(e) => { setSearch(e.target.value); setPageIndex(0); }}
@@ -616,13 +616,13 @@ export function ApplicationKanban() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-muted/30 hover:bg-muted/30">
-                                        <TableHead>NIK/NIB</TableHead>
-                                        <TableHead>Nama Lengkap</TableHead>
-                                        <TableHead>Branch</TableHead>
-                                        <TableHead>Loan Amount</TableHead>
-                                        <TableHead>Tenor</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Tanggal</TableHead>
+                                        <TableHead>{t`NIK/NIB`}</TableHead>
+                                        <TableHead>{t`Nama Lengkap`}</TableHead>
+                                        <TableHead>{t`Branch`}</TableHead>
+                                        <TableHead>{t`Loan Amount`}</TableHead>
+                                        <TableHead>{t`Tenor`}</TableHead>
+                                        <TableHead>{t`Status`}</TableHead>
+                                        <TableHead>{t`Tanggal`}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -646,7 +646,7 @@ export function ApplicationKanban() {
                                                     {app.amount > 0 ? `Rp ${app.amount.toLocaleString('id-ID')}` : '-'}
                                                 </TableCell>
                                                 <TableCell className="text-muted-foreground">
-                                                    {app.tenorMonths} bln
+                                                    {app.tenorMonths} {t`bln`}
                                                 </TableCell>
                                                 <TableCell>
                                                     <LoanStatusBadge status={app.status} />
@@ -661,7 +661,7 @@ export function ApplicationKanban() {
                                             <TableCell colSpan={7} className="h-32 text-center">
                                                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                                                     <Search className="h-5 w-5 opacity-30" />
-                                                    <p className="text-sm">Tidak ada data pengajuan.</p>
+                                                    <p className="text-sm">{t`Tidak ada data pengajuan.`}</p>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -708,14 +708,13 @@ export function ApplicationKanban() {
 }
 
 const STATUS_MAP: Record<string, { label: string; className: string }> = {
-    INTAKE: { label: 'Intake', className: 'bg-slate-100 text-slate-600' },
-    ANALYSIS: { label: 'Analisis', className: 'bg-blue-100 text-blue-700' },
-    SURVEY: { label: 'Survey', className: 'bg-purple-100 text-purple-700' },
-    COMMITTEE: { label: 'Committee', className: 'bg-amber-100 text-amber-700' },
-    APPROVED: { label: 'Disetujui', className: 'bg-emerald-100 text-emerald-700' },
-    REJECTED: { label: 'Ditolak', className: 'bg-red-100 text-red-700' },
-    DISBURSED: { label: 'Dicairkan', className: 'bg-teal-100 text-teal-700' },
-    CANCELLED: { label: 'Dibatalkan', className: 'bg-slate-100 text-slate-600' },
+    INTAKE: { label: t`Intake`, className: 'bg-slate-100 text-slate-600' },
+    ANALYSIS: { label: t`Analisis`, className: 'bg-blue-100 text-blue-700' },
+    SURVEY: { label: t`Survey`, className: 'bg-purple-100 text-purple-700' },
+    COMMITTEE: { label: t`Committee`, className: 'bg-amber-100 text-amber-700' },
+    APPROVED: { label: t`Disetujui`, className: 'bg-emerald-100 text-emerald-700' },
+    REJECTED: { label: t`Ditolak`, className: 'bg-red-100 text-red-700' },
+    CANCELLED: { label: t`Dibatalkan`, className: 'bg-slate-100 text-slate-600' },
 };
 
 function LoanStatusBadge({ status }: { status?: string }) {

@@ -20,6 +20,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
 import { useRouter } from 'next/navigation';
+import { t } from '@/shared/lib/t';
 
 const LOAN_DATA = [
     {
@@ -160,10 +161,10 @@ export function LoanListView() {
                         <CalendarIcon className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                     </div>
                     <Button size="sm" className="h-8 text-xs">
-                        Filter
+                        {t`Filter`}
                     </Button>
                     <span className="text-xs text-muted-foreground px-1">
-                        {LOAN_DATA.length} pengajuan
+                        {t`${LOAN_DATA.length} pengajuan`}
                     </span>
                 </div>
 
@@ -172,11 +173,11 @@ export function LoanListView() {
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                         <Input
                             className="h-8 w-56 pl-8 text-xs rounded-md"
-                            placeholder="Cari nama atau NIK..."
+                            placeholder={t`Cari nama atau NIK...`}
                         />
                     </div>
                     <Button size="sm">
-                        Ajukan Peminjaman
+                        {t`Ajukan Peminjaman`}
                     </Button>
                 </div>
             </div>
@@ -186,16 +187,16 @@ export function LoanListView() {
                 <Table>
                     <TableHeader>
                         <TableRow className="bg-muted/30 hover:bg-muted/30">
-                            <TableHead className="w-12 text-center">No.</TableHead>
-                            <TableHead>NIK</TableHead>
-                            <TableHead>Nama Lengkap</TableHead>
-                            <TableHead>Kredit</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Tgl Pengajuan</TableHead>
-                            <TableHead>Tgl Diubah</TableHead>
-                            <TableHead>Diubah Oleh</TableHead>
-                            <TableHead>Status Klaim</TableHead>
-                            <TableHead className="text-center">Aksi</TableHead>
+                            <TableHead className="w-12 text-center">{t`No.`}</TableHead>
+                            <TableHead>{t`NIK`}</TableHead>
+                            <TableHead>{t`Nama Lengkap`}</TableHead>
+                            <TableHead>{t`Kredit`}</TableHead>
+                            <TableHead>{t`Status`}</TableHead>
+                            <TableHead>{t`Tgl Pengajuan`}</TableHead>
+                            <TableHead>{t`Tgl Diubah`}</TableHead>
+                            <TableHead>{t`Diubah Oleh`}</TableHead>
+                            <TableHead>{t`Status Klaim`}</TableHead>
+                            <TableHead className="text-center">{t`Aksi`}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -237,7 +238,7 @@ export function LoanListView() {
                                         onClick={() => router.push(`/loans/${row.no}`)}
                                         className="h-7 px-3 text-xs text-primary hover:text-primary"
                                     >
-                                        Detail
+                                        {t`Detail`}
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -247,7 +248,7 @@ export function LoanListView() {
 
                 {/* Pagination */}
                 <div className="flex items-center justify-between text-xs text-muted-foreground px-4 py-3 border-t">
-                    <span>Showing 1–10 of 11</span>
+                    <span>{t`Showing 1–10 of 11`}</span>
                     <div className="flex items-center gap-1">
                         <Button variant="ghost" size="icon" className="h-7 w-7">
                             <ChevronLeft className="h-3.5 w-3.5" />

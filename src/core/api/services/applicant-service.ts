@@ -1,6 +1,7 @@
 import { createPromiseClient } from "@connectrpc/connect";
 import { transport } from "../grpc-client";
 import { ApplicantService } from "@/gen/applicant/v1/applicant_connect";
+import { Applicant, ApplicantParty, ApplicantAttribute } from "@/shared/types/api";
 
 const client = createPromiseClient(ApplicantService, transport);
 
@@ -31,54 +32,124 @@ function normalizeType(val: string | undefined): 'PERSONAL' | 'COMPANY' {
     return 'PERSONAL';
 }
 
-// --- DUMMY DATA BLOCK START ---
+// ============================================================
+// DUMMY DATA — aligned with proto: Applicant message
+// ============================================================
 const USE_DUMMY_DATA = false;
 
-const DUMMY_APPLICANTS: any[] = [
+const DUMMY_APPLICANTS: Applicant[] = [
     {
-        id: "dummy-app-1",
+        id: "apct-001",
         applicantType: "PERSONAL",
         identityNumber: "3271234567890001",
         taxId: "89.123.456.7-890.000",
         fullName: "Budi Santoso",
-        birthDate: "1985-08-17T00:00:00.000Z",
+        birthDate: "1985-08-17",
         establishmentDate: "",
-        attributes: [],
-        createdAt: new Date().toISOString(),
+        attributes: [
+            { attributeId: "attr-001", value: "Wiraswasta", dataType: "STRING", choiceId: "" },
+            { attributeId: "attr-002", value: "5", dataType: "NUMBER", choiceId: "" },
+        ],
+        createdAt: new Date("2026-01-10T08:00:00Z").toISOString(),
     },
     {
-        id: "dummy-app-2",
+        id: "apct-002",
         applicantType: "COMPANY",
         identityNumber: "1234567890",
         taxId: "12.345.678.9-012.000",
         fullName: "PT Sejahtera Abadi",
         birthDate: "",
-        establishmentDate: "2010-05-15T00:00:00.000Z",
-        attributes: [],
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        establishmentDate: "2010-05-15",
+        attributes: [
+            { attributeId: "attr-003", value: "Manufaktur", dataType: "STRING", choiceId: "ch-01" },
+            { attributeId: "attr-004", value: "50", dataType: "NUMBER", choiceId: "" },
+        ],
+        createdAt: new Date("2026-01-15T09:00:00Z").toISOString(),
     },
     {
-        id: "dummy-app-3",
+        id: "apct-003",
         applicantType: "PERSONAL",
         identityNumber: "3171234567890002",
         taxId: "77.123.456.7-890.000",
         fullName: "Siti Aminah",
-        birthDate: "1992-12-01T00:00:00.000Z",
+        birthDate: "1992-12-01",
         establishmentDate: "",
-        attributes: [],
-        createdAt: new Date(Date.now() - 172800000).toISOString(),
-    }
+        attributes: [
+            { attributeId: "attr-001", value: "Karyawan Swasta", dataType: "STRING", choiceId: "" },
+        ],
+        createdAt: new Date("2026-02-01T07:00:00Z").toISOString(),
+    },
+    {
+        id: "apct-004",
+        applicantType: "COMPANY",
+        identityNumber: "0987654321",
+        taxId: "98.765.432.1-000.000",
+        fullName: "CV Maju Bersama",
+        birthDate: "",
+        establishmentDate: "2015-03-20",
+        attributes: [
+            { attributeId: "attr-003", value: "Perdagangan", dataType: "STRING", choiceId: "ch-02" },
+            { attributeId: "attr-004", value: "15", dataType: "NUMBER", choiceId: "" },
+        ],
+        createdAt: new Date("2026-02-10T10:00:00Z").toISOString(),
+    },
 ];
-// --- DUMMY DATA BLOCK END ---
+
+// Dummy parties — maps to proto: ApplicantPartyResponse
+const DUMMY_APPLICANT_PARTIES: Record<string, ApplicantParty[]> = {
+    "apct-002": [
+        {
+            partyId: "apty-001",
+            partyType: "PERSON",
+            name: "Ahmad Direktur",
+            identifier: "3271000000000001",
+            dateOfBirth: "1975-04-10",
+            roleCode: "DIRECTOR",
+            ownershipPct: 60.0,
+            position: "Direktur Utama",
+            slikRequired: true,
+        },
+        {
+            partyId: "apty-002",
+            partyType: "PERSON",
+            name: "Rina Komisaris",
+            identifier: "3271000000000003",
+            dateOfBirth: "1978-09-22",
+            roleCode: "COMMISSIONER",
+            ownershipPct: 40.0,
+            position: "Komisaris",
+            slikRequired: false,
+        },
+    ],
+    "apct-004": [
+        {
+            partyId: "apty-003",
+            partyType: "PERSON",
+            name: "Hendra Owner",
+            identifier: "3272000000000001",
+            dateOfBirth: "1980-06-15",
+            roleCode: "OWNER",
+            ownershipPct: 100.0,
+            position: "Pemilik",
+            slikRequired: true,
+        },
+    ],
+};
 
 export const applicantService = {
-    create: async (data: any) => {
+    /** Maps to proto: CreateApplicant */
+    create: async (data: Partial<Applicant>) => {
         if (USE_DUMMY_DATA) {
-            const newApp = {
-                ...data,
-                id: `dummy-app-${Date.now()}`,
-                createdAt: new Date().toISOString(),
+            const newApp: Applicant = {
+                id: `apct-${Date.now()}`,
                 applicantType: data.applicantType || "PERSONAL",
+                identityNumber: data.identityNumber || "",
+                taxId: data.taxId || "",
+                fullName: data.fullName || "",
+                birthDate: data.birthDate || "",
+                establishmentDate: data.establishmentDate || "",
+                attributes: data.attributes || [],
+                createdAt: new Date().toISOString(),
             };
             DUMMY_APPLICANTS.unshift(newApp);
             return newApp;
@@ -91,16 +162,18 @@ export const applicantService = {
             fullName: data.fullName,
             birthDate: data.birthDate,
             establishmentDate: data.establishmentDate,
-            attributes: data.attributes?.map((attr: any) => ({
-                attributeId: attr.key || attr.attributeId,
+            attributes: data.attributes?.map((attr: ApplicantAttribute) => ({
+                attributeId: attr.attributeId,
                 value: attr.value,
                 dataType: attr.dataType,
+                choiceId: attr.choiceId,
             })) || [],
         });
         return response;
     },
 
-    getById: async (id: string) => {
+    /** Maps to proto: GetApplicant */
+    getById: async (id: string): Promise<Applicant | null> => {
         if (USE_DUMMY_DATA) {
             const app = DUMMY_APPLICANTS.find(a => a.id === id);
             return app ? { ...app } : null;
@@ -113,24 +186,26 @@ export const applicantService = {
             identityNumber: response.identityNumber || '',
             taxId: response.taxId || '',
             fullName: response.fullName || '',
-            birthDate: parseTimestamp(response.birthDate as any) || '',
-            establishmentDate: parseTimestamp(response.establishmentDate as any) || '',
+            birthDate: response.birthDate || '',
+            establishmentDate: response.establishmentDate || '',
             attributes: (response.attributes || []).map((attr: any) => ({
-                key: attr.key || attr.attributeId || '',
+                attributeId: attr.attributeId || '',
                 value: attr.value || '',
                 dataType: attr.dataType || 'STRING',
+                updatedAt: parseTimestamp(attr.updatedAt) || null,
+                choiceId: attr.choiceId || '',
             })),
             createdAt: parseTimestamp(response.createdAt as any) || '',
         };
     },
 
-
-    update: async (id: string, data: any) => {
+    /** Maps to proto: UpdateApplicant */
+    update: async (id: string, data: Partial<Applicant>) => {
         if (USE_DUMMY_DATA) {
             const index = DUMMY_APPLICANTS.findIndex(a => a.id === id);
             if (index !== -1) {
                 DUMMY_APPLICANTS[index] = { ...DUMMY_APPLICANTS[index], ...data };
-                return DUMMY_APPLICANTS[index];
+                return { ...DUMMY_APPLICANTS[index] };
             }
             return null;
         }
@@ -143,14 +218,16 @@ export const applicantService = {
             fullName: data.fullName,
             birthDate: data.birthDate,
             establishmentDate: data.establishmentDate,
-            attributes: data.attributes?.map((attr: any) => ({
-                attributeId: attr.key || attr.attributeId,
+            attributes: data.attributes?.map((attr: ApplicantAttribute) => ({
+                attributeId: attr.attributeId,
                 value: attr.value,
                 dataType: attr.dataType,
+                choiceId: attr.choiceId,
             })) || [],
         });
     },
 
+    /** Maps to proto: ListApplicants */
     list: async (params?: { cursor?: string; pageSize?: number }) => {
         if (USE_DUMMY_DATA) {
             return {
@@ -164,9 +241,6 @@ export const applicantService = {
             cursor: params?.cursor || "",
             pageSize: params?.pageSize || 0,
         });
-        if (typeof window !== 'undefined') {
-            (window as any).lastApplicants = response;
-        }
 
         return {
             applicants: (response.applicants || []).map((app: any) => ({
@@ -175,12 +249,14 @@ export const applicantService = {
                 identityNumber: app.identityNumber || "",
                 taxId: app.taxId || "",
                 fullName: app.fullName || "Unnamed Applicant",
-                birthDate: parseTimestamp(app.birthDate) || "",
-                establishmentDate: parseTimestamp(app.establishmentDate) || "",
+                birthDate: app.birthDate || "",
+                establishmentDate: app.establishmentDate || "",
                 attributes: (app.attributes || []).map((attr: any) => ({
-                    key: attr.key || attr.attributeId || '',
+                    attributeId: attr.attributeId || '',
                     value: attr.value || '',
                     dataType: attr.dataType || 'STRING',
+                    updatedAt: parseTimestamp(attr.updatedAt) || null,
+                    choiceId: attr.choiceId || '',
                 })),
                 createdAt: parseTimestamp(app.createdAt) || new Date().toISOString(),
             })),
@@ -189,22 +265,46 @@ export const applicantService = {
         };
     },
 
-    upsertAttribute: async (applicantId: string, attribute: any) => {
+    /** Maps to proto: UpsertApplicantAttributes */
+    upsertAttributes: async (applicantId: string, attributes: ApplicantAttribute[]) => {
         if (USE_DUMMY_DATA) {
-            return { success: true };
+            const index = DUMMY_APPLICANTS.findIndex(a => a.id === applicantId);
+            if (index !== -1) {
+                attributes.forEach(attr => {
+                    const existing = DUMMY_APPLICANTS[index].attributes.findIndex(
+                        a => a.attributeId === attr.attributeId
+                    );
+                    if (existing !== -1) {
+                        DUMMY_APPLICANTS[index].attributes[existing] = attr;
+                    } else {
+                        DUMMY_APPLICANTS[index].attributes.push(attr);
+                    }
+                });
+            }
+            return { attributes };
         }
 
         return client.upsertApplicantAttributes({
             applicantId,
-            attributes: [{
-                attributeId: attribute.key || attribute.attributeId,
-                value: attribute.value,
-                dataType: attribute.dataType,
-            }],
+            attributes: attributes.map(attr => ({
+                attributeId: attr.attributeId,
+                value: attr.value,
+                dataType: attr.dataType,
+                choiceId: attr.choiceId,
+            })),
         });
     },
 
-    listParties: async (applicantId: string) => {
+    /** @deprecated Use upsertAttributes */
+    upsertAttribute: async (applicantId: string, attribute: ApplicantAttribute) => {
+        return applicantService.upsertAttributes(applicantId, [attribute]);
+    },
+
+    /** Maps to proto: ListApplicantParties */
+    listParties: async (applicantId: string): Promise<ApplicantParty[]> => {
+        if (USE_DUMMY_DATA) {
+            return DUMMY_APPLICANT_PARTIES[applicantId] || [];
+        }
         const response = await client.listApplicantParties({ applicantId });
         return (response.parties || []).map((p: any) => ({
             partyId: p.partyId,
@@ -219,6 +319,7 @@ export const applicantService = {
         }));
     },
 
+    /** Maps to proto: AddApplicantParty */
     addParty: async (applicantId: string, data: {
         partyType: string;
         name: string;
@@ -229,6 +330,22 @@ export const applicantService = {
         position?: string;
         slikRequired?: boolean;
     }) => {
+        if (USE_DUMMY_DATA) {
+            const newParty: ApplicantParty = {
+                partyId: `apty-${Date.now()}`,
+                partyType: data.partyType,
+                name: data.name,
+                identifier: data.identifier,
+                dateOfBirth: data.dateOfBirth,
+                roleCode: data.roleCode,
+                ownershipPct: data.ownershipPct || 0,
+                position: data.position || '',
+                slikRequired: data.slikRequired || false,
+            };
+            if (!DUMMY_APPLICANT_PARTIES[applicantId]) DUMMY_APPLICANT_PARTIES[applicantId] = [];
+            DUMMY_APPLICANT_PARTIES[applicantId].push(newParty);
+            return newParty;
+        }
         return client.addApplicantParty({
             applicantId,
             partyType: data.partyType,
@@ -242,12 +359,22 @@ export const applicantService = {
         });
     },
 
+    /** Maps to proto: UpdateApplicantParty */
     updateParty: async (applicantId: string, partyId: string, data: {
         roleCode: string;
         ownershipPct?: number;
         position?: string;
         slikRequired?: boolean;
     }) => {
+        if (USE_DUMMY_DATA) {
+            const parties = DUMMY_APPLICANT_PARTIES[applicantId] || [];
+            const idx = parties.findIndex(p => p.partyId === partyId);
+            if (idx !== -1) {
+                parties[idx] = { ...parties[idx], ...data };
+                return parties[idx];
+            }
+            return null;
+        }
         return client.updateApplicantParty({
             applicantId,
             partyId,
@@ -258,11 +385,16 @@ export const applicantService = {
         });
     },
 
+    /** Maps to proto: RemoveApplicantParty */
     removeParty: async (applicantId: string, partyId: string, roleCode: string) => {
-        return client.removeApplicantParty({
-            applicantId,
-            partyId,
-            roleCode,
-        });
+        if (USE_DUMMY_DATA) {
+            if (DUMMY_APPLICANT_PARTIES[applicantId]) {
+                DUMMY_APPLICANT_PARTIES[applicantId] = DUMMY_APPLICANT_PARTIES[applicantId].filter(
+                    p => p.partyId !== partyId
+                );
+            }
+            return {};
+        }
+        return client.removeApplicantParty({ applicantId, partyId, roleCode });
     },
 };

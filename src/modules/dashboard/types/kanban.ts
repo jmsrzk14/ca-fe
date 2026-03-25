@@ -9,7 +9,6 @@ export const APPLICATION_STATUS_COLUMNS: { id: ApplicationStatus; title: string;
     { id: 'COMMITTEE', title: 'Committee', color: 'border-t-orange-400' },
     { id: 'APPROVED', title: 'Approved', color: 'border-t-emerald-400' },
     { id: 'REJECTED', title: 'Rejected', color: 'border-t-rose-400' },
-    { id: 'DISBURSED', title: 'Disbursed', color: 'border-t-teal-400' },
     { id: 'CANCELLED', title: 'Cancelled', color: 'border-t-slate-300' },
 ];
 

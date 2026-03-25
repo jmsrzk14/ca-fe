@@ -184,7 +184,7 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                 {isDataLoading ? (
                     <div className="flex flex-col items-center justify-center p-20 gap-4">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-sm text-muted-foreground animate-pulse">Memuat data...</p>
+                        <p className="text-sm text-muted-foreground animate-pulse">{t`Memuat data...`}</p>
                     </div>
                 ) : (
                     <div className="space-y-6 mt-4 relative">
@@ -204,8 +204,8 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                     <div className="bg-muted/30 rounded-3xl border border-dashed border-border p-20 flex flex-col items-center justify-center text-center gap-4">
                                         <Info className="h-10 w-10 text-muted-foreground/30" />
                                         <div>
-                                            <p className="text-sm font-bold text-foreground">Tidak ada template ditemukan</p>
-                                            <p className="text-xs text-muted-foreground mt-1">Coba gunakan kata kunci pencarian yang lain.</p>
+                                            <p className="text-sm font-bold text-foreground">{t`Tidak ada template ditemukan`}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">{t`Coba gunakan kata kunci pencarian yang lain.`}</p>
                                         </div>
                                     </div>
                                 ) : (
@@ -253,11 +253,11 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                                     </CardHeader>
                                                     <CardContent className="p-5 pt-0 mt-4 flex items-center justify-between border-t border-border/30 pt-4">
                                                         <div className="flex flex-col">
-                                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Target Produk</span>
+                                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t`Target Produk`}</span>
                                                             <div className="flex items-center gap-1.5">
                                                                 <Package className="h-3 w-3 text-primary" />
                                                                 <span className="text-xs font-semibold text-foreground">
-                                                                    {productMap[template.productId] || template.productId || 'Semua Produk'}
+                                                                    {productMap[template.productId] || template.productId || t`Semua Produk`}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -272,20 +272,20 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                             <div className="space-y-6 pb-24 animate-in slide-in-from-right-4">
                                 <Card className="border-border/50">
                                     <CardHeader className="pb-4">
-                                        <CardTitle className="text-lg">Detail Penugasan Survey</CardTitle>
+                                        <CardTitle className="text-lg">{t`Detail Penugasan Survey`}</CardTitle>
                                         <CardDescription>
-                                            Lengkapi detail penugasan untuk {selectedTemplateIds.length} template yang dipilih.
+                                            {t`Lengkapi detail penugasan untuk ${selectedTemplateIds.length} template yang dipilih.`}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="surveyType" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tipe Survey</Label>
+                                            <Label htmlFor="surveyType" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t`Tipe Survey`}</Label>
                                             <Select 
                                                 value={formData.surveyType} 
                                                 onValueChange={(value) => setFormData(prev => ({ ...prev, surveyType: value }))}
                                             >
                                                 <SelectTrigger id="surveyType" className="h-12 rounded-xl">
-                                                    <SelectValue placeholder="Pilih Tipe Survey" />
+                                                    <SelectValue placeholder={t`Pilih Tipe Survey`} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="FIELD">FIELD</SelectItem>
@@ -297,13 +297,13 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
 
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="surveyPurpose" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tujuan Survey</Label>
+                                            <Label htmlFor="surveyPurpose" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t`Tujuan Survey`}</Label>
                                             <Select 
                                                 value={formData.surveyPurpose} 
                                                 onValueChange={(value) => setFormData(prev => ({ ...prev, surveyPurpose: value }))}
                                             >
                                                 <SelectTrigger id="surveyPurpose" className="h-12 rounded-xl">
-                                                    <SelectValue placeholder="Pilih Tujuan Survey" />
+                                                    <SelectValue placeholder={t`Pilih Tujuan Survey`} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="GENERAL">GENERAL</SelectItem>
@@ -320,8 +320,8 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                         {selectedTemplateIds.length > 0 && (
                             <div className="sticky bottom-0 left-0 right-0 w-full bg-slate-700 flex-col sm:flex-row text-white rounded-2xl p-4 shadow-xl flex items-center justify-between border border-white/10 z-10 mt-6 animate-in slide-in-from-bottom-4 duration-300">
                                 <div className="flex flex-col pl-2 mb-3 sm:mb-0">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Terpilih</span>
-                                    <span className="text-sm font-black text-white">{selectedTemplateIds.length} Template</span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t`Terpilih`}</span>
+                                    <span className="text-sm font-black text-white">{t`${selectedTemplateIds.length} Template`}</span>
                                 </div>
                                 <div className="flex gap-2 w-full sm:w-auto">
                                     {step === 2 && (
@@ -333,7 +333,7 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                                             }}
                                             className="rounded-xl px-4 h-10 w-full sm:w-auto text-xs font-bold tracking-wider text-slate-300 border-white/20 hover:bg-white/10"
                                         >
-                                            Kembali
+                                            {t`Kembali`}
                                         </Button>
                                     )}
                                     <Button

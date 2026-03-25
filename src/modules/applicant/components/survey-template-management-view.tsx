@@ -88,7 +88,7 @@ function TemplateForm({
                         onValueChange={v => onChange({ applicantType: v })}
                     >
                         <SelectTrigger id="applicantType">
-                            <SelectValue placeholder="Pilih Tipe" />
+                            <SelectValue placeholder={t`Pilih Tipe`} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="ALL">ALL</SelectItem>
@@ -104,7 +104,7 @@ function TemplateForm({
                         onValueChange={v => onChange({ productId: v })}
                     >
                         <SelectTrigger id="productId">
-                            <SelectValue placeholder="Semua Produk" />
+                            <SelectValue placeholder={t`Semua Produk`} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="ALL">{t`Semua Produk`}</SelectItem>
@@ -215,7 +215,7 @@ function QuestionForm({
                         onValueChange={v => onChange({ answerType: v })}
                     >
                         <SelectTrigger id="answerType">
-                            <SelectValue placeholder="Pilih Tipe" />
+                            <SelectValue placeholder={t`Pilih Tipe`} />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="TEXT">TEXT</SelectItem>

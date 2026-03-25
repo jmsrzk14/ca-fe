@@ -182,7 +182,7 @@ export function ApplicantList() {
                                             </Link>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant={app.applicantType === 'CORPORATE' ? 'default' : 'secondary'} className="capitalize">
+                                            <Badge variant={app.applicantType === 'COMPANY' ? 'default' : 'secondary'} className="capitalize">
                                                 {app.applicantType}
                                             </Badge>
                                         </TableCell>

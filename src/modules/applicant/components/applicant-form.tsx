@@ -430,7 +430,7 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                                 <User className="h-4 w-4" />
                                 {t`Person`}
                             </TabsTrigger>
-                            <TabsTrigger value="CORPORATE" className="rounded-lg gap-2 data-[state=active]:bg-primary data-[state=active]:text-white h-9">
+                            <TabsTrigger value="COMPANY" className="rounded-lg gap-2 data-[state=active]:bg-primary data-[state=active]:text-white h-9">
                                 <Building2 className="h-4 w-4" />
                                 {t`Company`}
                             </TabsTrigger>

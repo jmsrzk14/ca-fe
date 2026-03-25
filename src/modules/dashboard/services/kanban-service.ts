@@ -66,7 +66,6 @@ export const kanbanService = {
             'COMMITTEE': 'border-t-orange-400',
             'APPROVED': 'border-t-emerald-400',
             'REJECTED': 'border-t-rose-400',
-            'DISBURSED': 'border-t-teal-400',
             'CANCELLED': 'border-t-slate-300',
         };
 

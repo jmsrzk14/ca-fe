@@ -53,6 +53,7 @@ function CallbackHandler() {
           id: payload.sub,
           username: payload.email?.split("@")[0] ?? payload.sub,
           fullName: payload.name || payload.email || payload.sub,
+          displayName: payload.display_name || payload.name || payload.email || payload.sub,
           email: payload.email || "",
           roles,
         };

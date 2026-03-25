@@ -48,6 +48,7 @@ export interface SSOTokenPayload {
   sub: string;
   email: string;
   name: string;
+  display_name: string;
   tenant_id?: string;
   tenant_slug?: string;
   roles?: Record<string, string[]>;
@@ -142,7 +143,7 @@ export function parseTokenPayload(token: string): SSOTokenPayload {
     const payload = token.split(".")[1];
     return JSON.parse(atob(payload)) as SSOTokenPayload;
   } catch {
-    return { sub: "", email: "", name: "" };
+    return { sub: "", email: "", name: "", display_name: "" };
   }
 }
 

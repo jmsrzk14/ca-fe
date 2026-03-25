@@ -26,6 +26,7 @@ import {
 import { Input } from '@/shared/ui/input';
 import { toast } from 'sonner';
 import { cn } from '@/shared/lib/utils';
+import { t } from '@/shared/lib/t';
 
 export function SurveyAssignPage() {
     const router = useRouter();
@@ -82,12 +83,12 @@ export function SurveyAssignPage() {
             }
         },
         onSuccess: () => {
-            toast.success(`${selectedTemplateIds.length} survey berhasil ditugaskan`);
+            toast.success(t`${selectedTemplateIds.length} survey berhasil ditugaskan`);
             queryClient.invalidateQueries({ queryKey: ['surveys', applicationId] });
             router.push(`/loans/${applicationId}`);
         },
         onError: (err: any) => {
-            toast.error('Gagal menugaskan survey: ' + (err.message || 'Terjadi kesalahan'));
+            toast.error(t`Gagal menugaskan survey: ` + (err.message || t`Terjadi kesalahan`));
         }
     });
 
@@ -123,7 +124,7 @@ export function SurveyAssignPage() {
         return (
             <div className="flex flex-col items-center justify-center p-20 gap-4">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground animate-pulse">Memuat data...</p>
+                <p className="text-sm text-muted-foreground animate-pulse">{t`Memuat data...`}</p>
             </div>
         );
     }
@@ -138,13 +139,13 @@ export function SurveyAssignPage() {
                         className="flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors mb-2 w-fit"
                     >
                         <ArrowLeft className="h-3 w-3" />
-                        Kembali ke Detail Pinjaman
+                        {t`Kembali ke Detail Pinjaman`}
                     </button>
                     <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
                         <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                             <Plus className="h-6 w-6" />
                         </div>
-                        Assign Survey Baru
+                        {t`Assign Survey Baru`}
                     </h1>
                 </div>
             </div>
@@ -164,8 +165,8 @@ export function SurveyAssignPage() {
                     <div className="bg-muted/30 rounded-3xl border border-dashed border-border p-20 flex flex-col items-center justify-center text-center gap-4">
                         <Info className="h-10 w-10 text-muted-foreground/30" />
                         <div>
-                            <p className="text-sm font-bold text-foreground">Tidak ada template ditemukan</p>
-                            <p className="text-xs text-muted-foreground mt-1">Coba gunakan kata kunci pencarian yang lain.</p>
+                            <p className="text-sm font-bold text-foreground">{t`Tidak ada template ditemukan`}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t`Coba gunakan kata kunci pencarian yang lain.`}</p>
                         </div>
                     </div>
                 ) : (
@@ -205,19 +206,19 @@ export function SurveyAssignPage() {
                                                             "text-base font-bold mt-4 leading-snug transition-colors",
                                                             isSelected ? "text-primary" : "text-foreground group-hover:text-primary"
                                                         )}>
-                                                            {template.templateName || 'Template Survey'}
+                                                            {template.templateName || t`Template Survey`}
                                                         </CardTitle>
                                                         <CardDescription className="font-mono text-[10px] uppercase tracking-widest mt-1">
-                                                            CODE: {template.templateCode}
+                                                            {t`CODE: ${template.templateCode}`}
                                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="p-5 pt-0 mt-4 flex items-center justify-between border-t border-border/30 pt-4">
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Target Produk</span>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t`Target Produk`}</span>
                                             <div className="flex items-center gap-1.5">
                                                 <Package className="h-3 w-3 text-primary" />
                                                 <span className="text-xs font-semibold text-foreground">
-                                                    {productMap[template.productId] || template.productId || 'Semua Produk'}
+                                                    {productMap[template.productId] || template.productId || t`Semua Produk`}
                                                 </span>
                                             </div>
                                         </div>
@@ -234,10 +235,10 @@ export function SurveyAssignPage() {
                 <div className="sticky bottom-8 left-0 right-0 w-full z-20 animate-in slide-in-from-bottom-10 duration-500 max-w-2xl mx-auto">
                     <div className="bg-indigo-950/95 text-white rounded-[2rem] p-4 shadow-[0_20px_50px_rgba(0,0,0,0.4)] flex items-center justify-between border border-white/10 backdrop-blur-xl">
                         <div className="flex flex-col pl-4">
-                            <span className="text-[10px] font-bold text-indigo-300/60 uppercase tracking-widest">Item Terpilih</span>
+                            <span className="text-[10px] font-bold text-indigo-300/60 uppercase tracking-widest">{t`Item Terpilih`}</span>
                             <span className="text-lg font-black text-indigo-50 flex items-center gap-2">
                                 <div className="h-2 w-2 rounded-full bg-indigo-400 animate-pulse" />
-                                {selectedTemplateIds.length} Template
+                                {t`${selectedTemplateIds.length} Template`}
                             </span>
                         </div>
                         <Button
@@ -251,11 +252,11 @@ export function SurveyAssignPage() {
                             {assignMutation.isPending ? (
                                 <>
                                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    Memproses...
+                                    {t`Memproses...`}
                                 </>
                             ) : (
                                 <>
-                                    Assign Sekarang
+                                    {t`Assign Sekarang`}
                                     <CheckCircle2 className="h-4 w-4 ml-2" />
                                 </>
                             )}

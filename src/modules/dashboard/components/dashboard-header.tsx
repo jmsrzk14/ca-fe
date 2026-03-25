@@ -41,7 +41,7 @@ export function DashboardHeader() {
                 </Button>
 
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-accent transition-colors cursor-pointer border border-transparent hover:border-border">
-                    <span className="text-xs font-medium text-muted-foreground">
+                    <span className="text-xs font-medium text-muted-foreground capitalize">
                         {user?.username ?? "—"}
                     </span>
                     <div className="h-7 w-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">

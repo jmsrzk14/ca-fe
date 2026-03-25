@@ -12,7 +12,7 @@ interface ApplicantKanbanProps {
 
 export function ApplicantKanban({ applicants }: ApplicantKanbanProps) {
     const personalApplicants = applicants.filter(a => a.applicantType === 'PERSONAL');
-    const corporateApplicants = applicants.filter(a => a.applicantType === 'CORPORATE');
+    const corporateApplicants = applicants.filter(a => a.applicantType === 'COMPANY');
 
     return (
         <div className="flex gap-6 overflow-x-auto pb-6 -mx-2 px-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">

@@ -14,6 +14,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { applicationService } from '@/core/api/services/application-service';
 import { applicantService } from '@/core/api/services/applicant-service';
 import { referenceService } from '@/core/api/services/reference-service';
+import { t } from '@/shared/lib/t';
 
 import { LoanInfoTab } from './loan-details/tabs/loan-info-tab';
 import { DebtHistoryTab } from './loan-details/tabs/debt-history-tab';
@@ -25,13 +26,13 @@ import { SurveyTab } from './loan-details/tabs/survey-tab';
 import Link from 'next/link';
 
 const TABS = [
-    'Pinjaman',
-    'Riwayat Hutang',
-    'Kelengkapan Dokumen',
-    'Finansial',
-    'CRR',
-    'Survey',
-    'Histori'
+    t`Pinjaman`,
+    t`Riwayat Hutang`,
+    t`Kelengkapan Dokumen`,
+    t`Finansial`,
+    t`CRR`,
+    t`Survey`,
+    t`Histori`
 ];
 
 interface LoanDetailsViewProps {
@@ -45,7 +46,7 @@ const STATUS_VARIANT: Record<string, string> = {
 };
 
 export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
-    const [activeTab, setActiveTab] = React.useState('Pinjaman');
+    const [activeTab, setActiveTab] = React.useState(TABS[0]);
     const [application, setApplication] = React.useState<any>(null);
     const [applicant, setApplicant] = React.useState<any>(null);
     const [productName, setProductName] = React.useState<string | null>(null);
@@ -77,10 +78,10 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                         }
                     }
                 } else {
-                    setError('Application not found');
+                    setError(t`Application not found`);
                 }
             } catch {
-                setError('Failed to load loan details');
+                setError(t`Failed to load loan details`);
             } finally {
                 setLoading(false);
             }
@@ -106,16 +107,15 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
             );
         }
 
-        switch (activeTab) {
-            case 'Pinjaman': return <LoanInfoTab application={application} applicant={applicant} productName={productName} />;
-            case 'Riwayat Hutang': return <DebtHistoryTab />;
-            case 'Kelengkapan Dokumen': return <DocumentCompletenessTab />;
-            case 'Finansial': return <FinancialInfoTab />;
-            case 'CRR': return <CRRTab />;
-            case 'Survey': return <SurveyTab applicationId={id} />;
-            case 'Histori': return <HistoryTab />;
-            default: return <LoanInfoTab application={application} applicant={applicant} />;
-        }
+        if (activeTab === TABS[0]) return <LoanInfoTab application={application} applicant={applicant} productName={productName} />;
+        if (activeTab === TABS[1]) return <DebtHistoryTab />;
+        if (activeTab === TABS[2]) return <DocumentCompletenessTab />;
+        if (activeTab === TABS[3]) return <FinancialInfoTab />;
+        if (activeTab === TABS[4]) return <CRRTab />;
+        if (activeTab === TABS[5]) return <SurveyTab applicationId={id} />;
+        if (activeTab === TABS[6]) return <HistoryTab />;
+        
+        return <LoanInfoTab application={application} applicant={applicant} />;
     };
 
     if (loading && !application) {
@@ -138,12 +138,12 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                     <Button variant="ghost" size="sm" className="h-7 px-2 text-muted-foreground -ml-2" asChild>
                         <Link href="/loans">
                             <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-                            Kembali
+                            {t`Kembali`}
                         </Link>
                     </Button>
                     <div className="flex items-center gap-2 flex-wrap">
                         <h1 className="text-lg font-bold text-foreground">
-                            {applicant?.applicantName || application?.applicantName || 'Peminjaman'}
+                            {applicant?.applicantName || application?.applicantName || t`Peminjaman`}
                         </h1>
                         <Badge variant="outline" className={cn("text-xs font-bold border", statusColor)}>
                             {application?.status || 'Pending'}
@@ -151,14 +151,14 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                     </div>
                     <p className="text-xs text-muted-foreground">
                         {application?.createdAt
-                            ? `Diajukan ${new Date(application.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                            ? t`Diajukan ${new Date(application.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
                             : ''}
                     </p>
                 </div>
                 <Button asChild variant="outline" size="sm">
                     <Link href={`/loans/${id}/edit`}>
                         <Pencil className="h-3.5 w-3.5" />
-                        Edit
+                        {t`Edit`}
                     </Link>
                 </Button>
             </div>
@@ -168,16 +168,16 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
-                            Informasi Pengajuan
+                            {t`Informasi Pengajuan`}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <Field label="Tanggal Pengajuan" value={
+                        <Field label={t`Tanggal Pengajuan`} value={
                             application?.createdAt
                                 ? new Date(application.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
                                 : '-'
                         } />
-                        <Field label="Produk" value={productName || '-'} />
+                        <Field label={t`Produk`} value={productName || '-'} />
                     </CardContent>
                 </Card>
                 <Card>
@@ -187,28 +187,28 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <Field label="Status Pengajuan" value={application?.status || 'Pending'} />
-                        <Field label="Diubah Oleh" value={application?.updatedBy || '-'} />
+                        <Field label={t`Status Pengajuan`} value={application?.status || 'Pending'} />
+                        <Field label={t`Diubah Oleh`} value={application?.updatedBy || '-'} />
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
-                                Peminjam
+                                {t`Peminjam`}
                             </CardTitle>
                             {applicant?.id && (
                                 <Button variant="ghost" size="sm" className="h-6 text-xs text-primary" asChild>
                                     <Link href={`/borrowers/${applicant.id}`}>
-                                        Lihat Detail
+                                        {t`Lihat Detail`}
                                     </Link>
                                 </Button>
                             )}
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <Field label="Nama" value={applicant?.applicantName || applicant?.fullName || '-'} />
-                        <Field label="NIK" value={applicant?.identityNumber || '-'} />
+                        <Field label={t`Nama`} value={applicant?.applicantName || applicant?.fullName || '-'} />
+                        <Field label={t`NIK`} value={applicant?.identityNumber || '-'} />
                     </CardContent>
                 </Card>
             </div>

@@ -175,7 +175,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
 
     const normalizeApplicantType = (val: string | undefined): ApplicantType => {
         const upper = (val || '').toUpperCase().trim();
-        if (upper === 'CORPORATE' || upper === 'COMPANY') return 'CORPORATE';
+        if (upper === 'COMPANY' || upper === 'COMPANY') return 'COMPANY';
         return 'PERSONAL';
     };
 
@@ -199,7 +199,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             const currentType = type.toUpperCase();
             const isMatch = targetApplies === 'BOTH' || 
                             targetApplies === currentType ||
-                            (currentType === 'CORPORATE' && targetApplies === 'COMPANY');
+                            (currentType === 'COMPANY' && targetApplies === 'COMPANY');
             
             if (!isMatch) return;
 
@@ -340,7 +340,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                 fullName: applicantData.fullName || '',
                 identityNumber: applicantData.identityNumber || '',
                 taxId: applicantData.taxId || '',
-                birthDate: normalizedType === 'CORPORATE'
+                birthDate: normalizedType === 'COMPANY'
                     ? parseToDateString(applicantData.establishmentDate)
                     : parseToDateString(applicantData.birthDate),
             });
@@ -473,7 +473,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
             identityNumber: primary.identityNumber,
             taxId: primary.taxId,
             birthDate: type === 'PERSONAL' && primary.birthDate ? primary.birthDate : '',
-            establishmentDate: type === 'CORPORATE' && primary.birthDate ? primary.birthDate : '',
+            establishmentDate: type === 'COMPANY' && primary.birthDate ? primary.birthDate : '',
             attributes,
             ...(applicantId ? {} : { createdAt: now }),
         };
@@ -550,11 +550,11 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                             </button>
                                             <button
                                                 type="button"
-                                                onClick={() => setType('CORPORATE')}
+                                                onClick={() => setType('COMPANY')}
                                                 disabled={!!applicantId}
                                                 className={cn(
                                                     "px-4 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5",
-                                                    type === 'CORPORATE'
+                                                    type === 'COMPANY'
                                                         ? "bg-primary text-primary-foreground"
                                                         : "text-muted-foreground hover:text-foreground",
                                                     !!applicantId && "cursor-default"
@@ -607,7 +607,7 @@ export function DynamicApplicantForm({ applicantId, onSuccess, onCancel }: Dynam
                                     )}
                                 </div>
 
-                                {type === 'CORPORATE' && (
+                                {type === 'COMPANY' && (
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             {t`NPWP Lama (Opsional)`}

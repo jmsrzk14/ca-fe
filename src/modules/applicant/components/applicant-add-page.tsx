@@ -213,7 +213,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
             const currentType = type.toUpperCase();
             const isMatch = targetApplies === 'BOTH' || 
                             targetApplies === currentType ||
-                            (currentType === 'CORPORATE' && targetApplies === 'COMPANY');
+                            (currentType === 'COMPANY' && targetApplies === 'COMPANY');
             
             if (!isMatch) return;
 
@@ -357,7 +357,7 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
             identityNumber: formData.identityNumber,
             taxId: formData.taxId,
             birthDate: type === 'PERSONAL' && formData.birthDate ? formData.birthDate : '',
-            establishmentDate: type === 'CORPORATE' && formData.birthDate ? formData.birthDate : '',
+            establishmentDate: type === 'COMPANY' && formData.birthDate ? formData.birthDate : '',
             attributes,
             createdAt: now,
         };
@@ -573,10 +573,10 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => setType('CORPORATE')}
+                                                    onClick={() => setType('COMPANY')}
                                                     className={cn(
                                                         'px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2.5',
-                                                        type === 'CORPORATE'
+                                                        type === 'COMPANY'
                                                             ? 'bg-primary text-white shadow-lg shadow-primary/20'
                                                             : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                                                     )}
@@ -631,8 +631,8 @@ export function ApplicantAddPage({ redirectTo = '/borrowers' }: ApplicantAddPage
                                         )}
                                     </div>
 
-                                    {/* Tax ID - only show for corporate */}
-                                    {type === 'CORPORATE' && (
+                                    {/* Tax ID - only show for COMPANY */}
+                                    {type === 'COMPANY' && (
                                         <div className="space-y-1">
                                             <Label className="text-sm font-semibold flex items-center gap-2 mb-1.5 text-slate-700">
                                                 <Activity className="h-4 w-4 text-primary/70" />
