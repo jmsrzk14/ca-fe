@@ -14,12 +14,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const accessToken = request.cookies.get("access_token")?.value;
-  if (!accessToken) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
+  // const accessToken = request.cookies.get("access_token")?.value;
+  // if (!accessToken) {
+  //   const loginUrl = new URL("/login", request.url);
+  //   loginUrl.searchParams.set("redirect", pathname);
+  //   return NextResponse.redirect(loginUrl);
+  // }
 
   return NextResponse.next();
 }
