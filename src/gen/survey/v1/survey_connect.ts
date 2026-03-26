@@ -3,8 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ApplicationSurvey, AssignSurveyRequest, CreateSurveyQuestionOptionRequest, CreateSurveyQuestionRequest, CreateSurveySectionRequest, CreateSurveyTemplateRequest, GetSurveyRequest, GetSurveyTemplateRequest, ListAdminSurveyTemplatesRequest, ListSurveyAnswersRequest, ListSurveyAnswersResponse, ListSurveyQuestionsRequest, ListSurveyQuestionsResponse, ListSurveysByApplicationRequest, ListSurveysByApplicationResponse, ListSurveySectionsRequest, ListSurveySectionsResponse, ListSurveysRequest, ListSurveysResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, StartSurveyRequest, SubmitSurveyAnswerRequest, SubmitSurveyRequest, SurveyAnswer, SurveyEvidence, SurveyQuestion, SurveyQuestionOption, SurveySection, SurveyTemplate, UpdateSurveyTemplateRequest, UpdateSurveyTemplateStatusRequest, UploadSurveyEvidenceRequest, VerifySurveyRequest } from "./survey_pb";
-import { MethodKind } from "@bufbuild/protobuf";
+import { ApplicationSurvey, AssignSurveyRequest, CreateSurveyQuestionOptionRequest, CreateSurveyQuestionRequest, CreateSurveySectionRequest, CreateSurveyTemplateRequest, DeleteSurveyQuestionOptionRequest, DeleteSurveyQuestionRequest, DeleteSurveySectionRequest, DeleteSurveyTemplateRequest, GetSurveyRequest, GetSurveyTemplateRequest, ListAdminSurveyTemplatesRequest, ListSurveyAnswersRequest, ListSurveyAnswersResponse, ListSurveyQuestionOptionsRequest, ListSurveyQuestionOptionsResponse, ListSurveyQuestionsRequest, ListSurveyQuestionsResponse, ListSurveysByApplicationRequest, ListSurveysByApplicationResponse, ListSurveySectionsRequest, ListSurveySectionsResponse, ListSurveysRequest, ListSurveysResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, ReorderSurveyQuestionsRequest, ReorderSurveySectionsRequest, StartSurveyRequest, SubmitSurveyAnswerRequest, SubmitSurveyRequest, SurveyAnswer, SurveyEvidence, SurveyQuestion, SurveyQuestionOption, SurveySection, SurveyTemplate, UpdateSurveyQuestionOptionRequest, UpdateSurveyQuestionRequest, UpdateSurveySectionRequest, UpdateSurveyTemplateRequest, UpdateSurveyTemplateStatusRequest, UploadSurveyEvidenceRequest, VerifySurveyRequest } from "./survey_pb";
+import { Empty, MethodKind } from "@bufbuild/protobuf";
 
 /**
  * @generated from service api.survey.v1.SurveyService
@@ -180,6 +180,33 @@ export const SurveyService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc api.survey.v1.SurveyService.UpdateSurveySection
+     */
+    updateSurveySection: {
+      name: "UpdateSurveySection",
+      I: UpdateSurveySectionRequest,
+      O: SurveySection,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.DeleteSurveySection
+     */
+    deleteSurveySection: {
+      name: "DeleteSurveySection",
+      I: DeleteSurveySectionRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.ReorderSurveySections
+     */
+    reorderSurveySections: {
+      name: "ReorderSurveySections",
+      I: ReorderSurveySectionsRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc api.survey.v1.SurveyService.CreateSurveyQuestion
      */
     createSurveyQuestion: {
@@ -189,12 +216,66 @@ export const SurveyService = {
       kind: MethodKind.Unary,
     },
     /**
+     * @generated from rpc api.survey.v1.SurveyService.UpdateSurveyQuestion
+     */
+    updateSurveyQuestion: {
+      name: "UpdateSurveyQuestion",
+      I: UpdateSurveyQuestionRequest,
+      O: SurveyQuestion,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.DeleteSurveyQuestion
+     */
+    deleteSurveyQuestion: {
+      name: "DeleteSurveyQuestion",
+      I: DeleteSurveyQuestionRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.ReorderSurveyQuestions
+     */
+    reorderSurveyQuestions: {
+      name: "ReorderSurveyQuestions",
+      I: ReorderSurveyQuestionsRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
      * @generated from rpc api.survey.v1.SurveyService.CreateSurveyQuestionOption
      */
     createSurveyQuestionOption: {
       name: "CreateSurveyQuestionOption",
       I: CreateSurveyQuestionOptionRequest,
       O: SurveyQuestionOption,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.UpdateSurveyQuestionOption
+     */
+    updateSurveyQuestionOption: {
+      name: "UpdateSurveyQuestionOption",
+      I: UpdateSurveyQuestionOptionRequest,
+      O: SurveyQuestionOption,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.DeleteSurveyQuestionOption
+     */
+    deleteSurveyQuestionOption: {
+      name: "DeleteSurveyQuestionOption",
+      I: DeleteSurveyQuestionOptionRequest,
+      O: Empty,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.ListSurveyQuestionOptions
+     */
+    listSurveyQuestionOptions: {
+      name: "ListSurveyQuestionOptions",
+      I: ListSurveyQuestionOptionsRequest,
+      O: ListSurveyQuestionOptionsResponse,
       kind: MethodKind.Unary,
     },
     /**
@@ -215,6 +296,15 @@ export const SurveyService = {
       name: "ListSurveyQuestions",
       I: ListSurveyQuestionsRequest,
       O: ListSurveyQuestionsResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.survey.v1.SurveyService.DeleteSurveyTemplate
+     */
+    deleteSurveyTemplate: {
+      name: "DeleteSurveyTemplate",
+      I: DeleteSurveyTemplateRequest,
+      O: Empty,
       kind: MethodKind.Unary,
     },
   }

@@ -7,7 +7,9 @@ import {
     Survey,
     SurveyAnswer,
     SurveyEvidence,
+    OrderItem,
 } from '@/shared/types/api';
+
 
 // ============================================================
 // DUMMY DATA — aligned with proto: survey.proto messages
@@ -232,6 +234,23 @@ export const surveyService = {
         return apiClient.post<SurveyTemplate>('/v1/admin/survey-templates', payload);
     },
 
+    /** Maps to proto: ReorderSurveySections */
+    reorderSections: async (templateId: string, sections: OrderItem[]): Promise<void> => {
+        if (USE_DUMMY_DATA) {
+            const tmpl = DUMMY_TEMPLATES.find(t => t.id === templateId);
+            if (tmpl && tmpl.sections) {
+                sections.forEach(item => {
+                    const sec = tmpl.sections?.find(s => s.id === item.id);
+                    if (sec) sec.sequence = item.sequence;
+                });
+                tmpl.sections.sort((a, b) => a.sequence - b.sequence);
+            }
+            return;
+        }
+        return apiClient.put(`/v1/survey-templates/${templateId}/sections/reorder`, { templateId, sections });
+    },
+
+
     /** Maps to proto: UpdateSurveyTemplate */
     updateTemplate: async (id: string, payload: {
         templateCode: string;
@@ -309,6 +328,26 @@ export const surveyService = {
         }
         return apiClient.post<SurveyQuestion>(`/v1/sections/${sectionId}/questions`, payload);
     },
+
+    /** Maps to proto: ReorderSurveyQuestions */
+    reorderQuestions: async (sectionId: string, questions: OrderItem[]): Promise<void> => {
+        if (USE_DUMMY_DATA) {
+            for (const tmpl of DUMMY_TEMPLATES) {
+                const sec = tmpl.sections?.find(s => s.id === sectionId);
+                if (sec && sec.questions) {
+                    questions.forEach(item => {
+                        const q = sec.questions?.find(qi => qi.id === item.id);
+                        if (q) q.sequence = item.sequence;
+                    });
+                    sec.questions.sort((a, b) => a.sequence - b.sequence);
+                    break;
+                }
+            }
+            return;
+        }
+        return apiClient.put(`/v1/sections/${sectionId}/questions/reorder`, { sectionId, questions });
+    },
+
 
     /** Maps to proto: CreateSurveyQuestionOption */
     createQuestionOption: async (questionId: string, payload: { optionText: string; optionValue: string }): Promise<SurveyQuestionOption> => {

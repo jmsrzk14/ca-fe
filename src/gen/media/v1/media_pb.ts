@@ -78,21 +78,29 @@ export class Document extends Message<Document> {
  */
 export class UploadDocumentRequest extends Message<UploadDocumentRequest> {
   /**
+   * @required
+   *
    * @generated from field: string application_id = 1;
    */
   applicationId = "";
 
   /**
+   * @required
+   *
    * @generated from field: string document_name = 2;
    */
   documentName = "";
 
   /**
+   * @required
+   *
    * @generated from field: string file_url = 3;
    */
   fileUrl = "";
 
   /**
+   * @required
+   *
    * @generated from field: string document_type = 4;
    */
   documentType = "";
@@ -133,6 +141,8 @@ export class UploadDocumentRequest extends Message<UploadDocumentRequest> {
  */
 export class ListDocumentsRequest extends Message<ListDocumentsRequest> {
   /**
+   * @required
+   *
    * @generated from field: string application_id = 1;
    */
   applicationId = "";
@@ -207,14 +217,24 @@ export class ListDocumentsResponse extends Message<ListDocumentsResponse> {
  */
 export class GetPresignedUrlRequest extends Message<GetPresignedUrlRequest> {
   /**
-   * @generated from field: string file_name = 1;
+   * @required
+   *
+   * @generated from field: string application_id = 1;
+   */
+  applicationId = "";
+
+  /**
+   * @required
+   *
+   * @generated from field: string file_name = 2;
    */
   fileName = "";
 
   /**
    * Hanya pdf, png, jpeg
+   * @required
    *
-   * @generated from field: string file_type = 2;
+   * @generated from field: string file_type = 3;
    */
   fileType = "";
 
@@ -226,8 +246,9 @@ export class GetPresignedUrlRequest extends Message<GetPresignedUrlRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "api.media.v1.GetPresignedUrlRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "file_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "file_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "application_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "file_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "file_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetPresignedUrlRequest {

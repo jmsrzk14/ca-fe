@@ -3,6 +3,7 @@ syntax = "proto3";
 package api.media.v1;
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "credit-analytics-backend/api/media/v1;v1";
@@ -40,14 +41,19 @@ message Document {
 }
 
 message UploadDocumentRequest {
-  string application_id = 1;
-  string document_name = 2;
-  string file_url = 3;
-  string document_type = 4;
+  // @required
+  string application_id = 1 [(google.api.field_behavior) = REQUIRED];
+  // @required
+  string document_name = 2 [(google.api.field_behavior) = REQUIRED];
+  // @required
+  string file_url = 3 [(google.api.field_behavior) = REQUIRED];
+  // @required
+  string document_type = 4 [(google.api.field_behavior) = REQUIRED];
 }
 
 message ListDocumentsRequest {
-  string application_id = 1;
+  // @required
+  string application_id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message ListDocumentsResponse {
@@ -55,8 +61,13 @@ message ListDocumentsResponse {
 }
 
 message GetPresignedUrlRequest {
-  string file_name = 1;
-  string file_type = 2; // Hanya pdf, png, jpeg
+  // @required
+  string application_id = 1 [(google.api.field_behavior) = REQUIRED];
+  // @required
+  string file_name = 2 [(google.api.field_behavior) = REQUIRED];
+  // Hanya pdf, png, jpeg
+  // @required
+  string file_type = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetPresignedUrlResponse {

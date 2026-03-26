@@ -16,8 +16,28 @@ import {
     ChevronUp,
     MoreVertical,
     Pencil,
-    Trash2
+    Trash2,
+    GripVertical
 } from 'lucide-react';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
 import { t } from '@/shared/lib/t';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -39,7 +59,10 @@ import {
 } from '@/shared/ui/select';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { SurveySection, SurveyQuestion, SurveyTemplate } from '@/shared/types/api';
+import { SurveySection, SurveyQuestion, SurveyTemplate, OrderItem } from '@/shared/types/api';
+import { cn } from '@/shared/lib/utils';
+
+
 
 const EMPTY_TEMPLATE = {
     templateName: '',
@@ -342,6 +365,14 @@ export function SurveyTemplateDetailView({ templateId }: { templateId: string })
     const [isDeleteTemplateOpen, setIsDeleteTemplateOpen] = React.useState(false);
     const [addingQuestionToSection, setAddingQuestionToSection] = React.useState<string | null>(null);
 
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+
     const [editingTemplate, setEditingTemplate] = React.useState<typeof EMPTY_TEMPLATE>({ ...EMPTY_TEMPLATE });
     const patchEditTemplate = (patch: Partial<typeof EMPTY_TEMPLATE>) =>
         setEditingTemplate(prev => ({ ...prev, ...patch }));
@@ -448,7 +479,27 @@ export function SurveyTemplateDetailView({ templateId }: { templateId: string })
         onError: (err: any) => toast.error(err.message || t`Gagal menonaktifkan template`),
     });
 
+    const reorderSectionsMutation = useMutation({
+        mutationFn: (sections: OrderItem[]) => surveyService.reorderSections(templateId, sections),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['survey-sections', templateId] });
+            toast.success(t`Urutan section diperbarui!`);
+        },
+        onError: (err: any) => toast.error(err.message || t`Gagal memperbarui urutan section`),
+    });
+
+    const reorderQuestionsMutation = useMutation({
+        mutationFn: ({ sectionId, questions }: { sectionId: string; questions: OrderItem[] }) =>
+            surveyService.reorderQuestions(sectionId, questions),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['survey-questions', variables.sectionId] });
+            toast.success(t`Urutan pertanyaan diperbarui!`);
+        },
+        onError: (err: any) => toast.error(err.message || t`Gagal memperbarui urutan pertanyaan`),
+    });
+
     const handleCreateSection = (e: React.FormEvent) => {
+
         e.preventDefault();
         createSectionMutation.mutate(newSection);
     };
@@ -464,6 +515,24 @@ export function SurveyTemplateDetailView({ templateId }: { templateId: string })
         e.preventDefault();
         updateTemplateMutation.mutate(editingTemplate);
     };
+
+    const handleSectionDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id && sectionsData?.sections) {
+            const oldIndex = sectionsData.sections.findIndex((s: any) => s.id === active.id);
+            const newIndex = sectionsData.sections.findIndex((s: any) => s.id === over.id);
+
+            const newSections = arrayMove(sectionsData.sections, oldIndex, newIndex);
+            const orderPayload: OrderItem[] = newSections.map((s: any, idx: number) => ({
+                id: s.id,
+                sequence: idx + 1,
+            }));
+
+            // Optimistic update if needed, but for now just call mutation
+            reorderSectionsMutation.mutate(orderPayload);
+        }
+    };
+
 
     if (isTemplateLoading) {
         return (
@@ -551,14 +620,31 @@ export function SurveyTemplateDetailView({ templateId }: { templateId: string })
                         </Button>
                     </div>
                 ) : (
-                    sectionsData?.sections?.map((section: SurveySection) => (
-                        <SectionCard 
-                            key={section.id} 
-                            section={section} 
-                            onAddQuestion={() => setAddingQuestionToSection(section.id)}
-                        />
-                    ))
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleSectionDragEnd}
+                        modifiers={[restrictToVerticalAxis]}
+                    >
+                        <SortableContext
+                            items={sectionsData?.sections?.map((s: any) => s.id) || []}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="space-y-4">
+                                {sectionsData?.sections?.map((section: SurveySection) => (
+                                    <SectionCard 
+                                        key={section.id} 
+                                        section={section} 
+                                        onAddQuestion={() => setAddingQuestionToSection(section.id)}
+                                        onReorderQuestions={(questions) => reorderQuestionsMutation.mutate({ sectionId: section.id, questions })}
+                                    />
+                                ))}
+                            </div>
+                        </SortableContext>
+                    </DndContext>
+
                 )}
+
             </div>
 
             <Dialog open={!!addingQuestionToSection} onOpenChange={(open) => !open && setAddingQuestionToSection(null)}>
@@ -629,8 +715,38 @@ export function SurveyTemplateDetailView({ templateId }: { templateId: string })
     );
 }
 
-function SectionCard({ section, onAddQuestion }: { section: SurveySection, onAddQuestion: () => void }) {
+function SectionCard({ 
+    section, 
+    onAddQuestion,
+    onReorderQuestions,
+}: { 
+    section: SurveySection, 
+    onAddQuestion: () => void,
+    onReorderQuestions: (questions: OrderItem[]) => void
+}) {
     const [isExpanded, setIsExpanded] = React.useState(true);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const { 
+        attributes, 
+        listeners, 
+        setNodeRef, 
+        transform, 
+        transition,
+        isDragging
+    } = useSortable({ id: section.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
 
     const { data: questionsData, isLoading } = useQuery({
         queryKey: ['survey-questions', section.id],
@@ -638,17 +754,47 @@ function SectionCard({ section, onAddQuestion }: { section: SurveySection, onAdd
         enabled: isExpanded
     });
 
+    const handleQuestionDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id && questionsData?.questions) {
+            const oldIndex = questionsData.questions.findIndex((q: any) => q.id === active.id);
+            const newIndex = questionsData.questions.findIndex((q: any) => q.id === over.id);
+
+            const newQuestions = arrayMove(questionsData.questions, oldIndex, newIndex);
+            const orderPayload: OrderItem[] = newQuestions.map((q: any, idx: number) => ({
+                id: q.id,
+                sequence: idx + 1,
+            }));
+
+            onReorderQuestions(orderPayload);
+        }
+    };
+
     return (
-        <Card className="overflow-hidden border-border/50 shadow-none">
+        <Card ref={setNodeRef} style={style} className="overflow-hidden border-border/50 shadow-none">
             <CardHeader 
-                className="p-4 bg-muted/5 flex flex-row items-center justify-between cursor-pointer hover:bg-muted/10 transition-colors"
-                onClick={() => setIsExpanded(!isExpanded)}
+                className={cn(
+                    "p-4 bg-muted/5 flex flex-row items-center justify-between transition-colors",
+                    isExpanded ? "border-b border-border/50" : ""
+                )}
             >
                 <div className="flex items-center gap-3">
+                    <div 
+                        {...attributes} 
+                        {...listeners} 
+                        className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded transition-colors"
+                    >
+                        <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+                    </div>
                     <Badge variant="outline" className="h-6 w-6 p-0 flex items-center justify-center rounded-full font-bold bg-background">
                         {section.sequence}
                     </Badge>
-                    <CardTitle className="text-sm font-bold">{section.sectionName}</CardTitle>
+                    <CardTitle 
+                        className="text-sm font-bold cursor-pointer flex-1"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                        {section.sectionName}
+                    </CardTitle>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button 
@@ -662,48 +808,102 @@ function SectionCard({ section, onAddQuestion }: { section: SurveySection, onAdd
                     >
                         <Plus className="h-4 w-4" />
                     </Button>
-                    {isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-muted-foreground"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>
                 </div>
             </CardHeader>
             {isExpanded && (
-                <CardContent className="p-0 border-t border-border/50">
+                <CardContent className="p-0">
                     {isLoading ? (
                         <div className="p-6 flex justify-center">
                             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                         </div>
-                    ) : questionsData?.questions?.length === 0 ? (
+                    ) : !questionsData?.questions || questionsData.questions.length === 0 ? (
                         <div className="p-4 text-center text-xs text-muted-foreground italic">
                             {t`Belum ada pertanyaan.`}
                         </div>
                     ) : (
-                        <div className="divide-y divide-border/40">
-                            {questionsData?.questions?.map((q: SurveyQuestion) => (
-                                <div key={q.id} className="p-4 flex items-center justify-between group hover:bg-primary/5 transition-colors">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xs font-mono text-muted-foreground w-6 text-center">{q.sequence}.</span>
-                                        <div>
-                                            <p className="text-sm font-medium">{q.questionText}</p>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Badge variant="secondary" className="text-[9px] font-black uppercase px-1.5 py-0">
-                                                    {q.answerType}
-                                                </Badge>
-                                                {q.isRequired && (
-                                                    <span className="text-[10px] text-destructive font-bold uppercase">{t`Wajib`}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
-                                            <MoreVertical className="h-3.5 w-3.5" />
-                                        </Button>
-                                    </div>
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleQuestionDragEnd}
+                            modifiers={[restrictToVerticalAxis]}
+                        >
+                            <SortableContext
+                                items={questionsData.questions.map((q: any) => q.id)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                <div className="divide-y divide-border/40">
+                                    {questionsData.questions.map((q: SurveyQuestion) => (
+                                        <SortableQuestion key={q.id} question={q} />
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
+                            </SortableContext>
+                        </DndContext>
                     )}
                 </CardContent>
             )}
         </Card>
     );
 }
+
+function SortableQuestion({ question }: { question: SurveyQuestion }) {
+    const { 
+        attributes, 
+        listeners, 
+        setNodeRef, 
+        transform, 
+        transition,
+        isDragging
+    } = useSortable({ id: question.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        position: 'relative' as const,
+        zIndex: isDragging ? 50 : 1,
+    };
+
+    return (
+        <div 
+            ref={setNodeRef} 
+            style={style} 
+            className="p-4 flex items-center justify-between group hover:bg-primary/5 transition-colors bg-card"
+        >
+            <div className="flex items-center gap-3">
+                <div 
+                    {...attributes} 
+                    {...listeners} 
+                    className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded transition-colors"
+                >
+                    <GripVertical className="h-3.5 w-3.5 text-muted-foreground/40" />
+                </div>
+                <span className="text-xs font-mono text-muted-foreground w-6 text-center">{question.sequence}.</span>
+                <div>
+                    <p className="text-sm font-medium">{question.questionText}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary" className="text-[9px] font-black uppercase px-1.5 py-0">
+                            {question.answerType}
+                        </Badge>
+                        {question.isRequired && (
+                            <span className="text-[10px] text-destructive font-bold uppercase">{t`Wajib`}</span>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
+                    <MoreVertical className="h-3.5 w-3.5" />
+                </Button>
+            </div>
+        </div>
+    );
+}
+

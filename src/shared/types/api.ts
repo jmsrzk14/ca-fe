@@ -345,7 +345,14 @@ export interface SurveyQuestionOption {
     optionValue: string;
 }
 
+/** Maps to proto: OrderItem */
+export interface OrderItem {
+    id: string;
+    sequence: number;
+}
+
 export type SurveyStatus = 'UNASSIGNED' | 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'VERIFIED';
+
 
 /** Maps to proto: ApplicationSurvey */
 export interface Survey {

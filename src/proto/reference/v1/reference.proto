@@ -94,6 +94,23 @@ service ReferenceService {
   rpc ListCities (google.protobuf.Empty) returns (ListCitiesResponse) {
     option (google.api.http) = { get: "/v1/reference/cities" };
   }
+
+  // ---- Attribute Choices ----
+  rpc CreateAttributeChoice (CreateAttributeChoiceRequest) returns (AttributeChoice) {
+    option (google.api.http) = {
+      post: "/v1/reference/attribute-registry/choices",
+      body: "*"
+    };
+  }
+  rpc UpdateAttributeChoice (UpdateAttributeChoiceRequest) returns (AttributeChoice) {
+    option (google.api.http) = {
+      put: "/v1/reference/attribute-registry/choices/{id}",
+      body: "*"
+    };
+  }
+  rpc DeleteAttributeChoice (DeleteAttributeChoiceRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/v1/reference/attribute-registry/choices/{id}" };
+  }
 }
 
 // ==============================
@@ -315,4 +332,23 @@ message ListProvincesResponse {
 
 message ListCitiesResponse {
   repeated Choice cities = 1;
+}
+
+message CreateAttributeChoiceRequest {
+  string attribute_id  = 1;
+  string code          = 2;
+  string value         = 3;
+  int32  display_order = 4;
+}
+
+message UpdateAttributeChoiceRequest {
+  string id            = 1;
+  string code          = 2;
+  string value         = 3;
+  int32  display_order = 4;
+  bool   is_active     = 5;
+}
+
+message DeleteAttributeChoiceRequest {
+  string id = 1;
 }

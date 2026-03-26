@@ -131,9 +131,49 @@ service SurveyService {
     };
   }
 
+  rpc UpdateSurveySection (UpdateSurveySectionRequest) returns (SurveySection) {
+    option (google.api.http) = {
+      put: "/v1/sections/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSurveySection (DeleteSurveySectionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/sections/{id}"
+    };
+  }
+
+  rpc ReorderSurveySections (ReorderSurveySectionsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/v1/survey-templates/{template_id}/sections/reorder"
+      body: "*"
+    };
+  }
+
   rpc CreateSurveyQuestion (CreateSurveyQuestionRequest) returns (SurveyQuestion) {
     option (google.api.http) = {
       post: "/v1/sections/{section_id}/questions"
+      body: "*"
+    };
+  }
+
+  rpc UpdateSurveyQuestion (UpdateSurveyQuestionRequest) returns (SurveyQuestion) {
+    option (google.api.http) = {
+      put: "/v1/questions/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSurveyQuestion (DeleteSurveyQuestionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/questions/{id}"
+    };
+  }
+
+  rpc ReorderSurveyQuestions (ReorderSurveyQuestionsRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/v1/sections/{section_id}/questions/reorder"
       body: "*"
     };
   }
@@ -144,6 +184,26 @@ service SurveyService {
       body: "*"
     };
   }
+
+  rpc UpdateSurveyQuestionOption (UpdateSurveyQuestionOptionRequest) returns (SurveyQuestionOption) {
+    option (google.api.http) = {
+      put: "/v1/options/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteSurveyQuestionOption (DeleteSurveyQuestionOptionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/options/{id}"
+    };
+  }
+
+  rpc ListSurveyQuestionOptions (ListSurveyQuestionOptionsRequest) returns (ListSurveyQuestionOptionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/questions/{question_id}/options"
+    };
+  }
+
   // ===== SECTIONS & QUESTIONS =====
   rpc ListSurveySections (ListSurveySectionsRequest) returns (ListSurveySectionsResponse) {
     option (google.api.http) = {
@@ -154,6 +214,12 @@ service SurveyService {
   rpc ListSurveyQuestions (ListSurveyQuestionsRequest) returns (ListSurveyQuestionsResponse) {
     option (google.api.http) = {
       get: "/v1/sections/{section_id}/questions"
+    };
+  }
+
+  rpc DeleteSurveyTemplate (DeleteSurveyTemplateRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/admin/survey-templates/{id}"
     };
   }
 }
@@ -389,4 +455,63 @@ message CreateSurveyQuestionOptionRequest {
   string question_id = 1;
   string option_text = 2;
   string option_value = 3;
+}
+
+message UpdateSurveySectionRequest {
+  string id = 1;
+  string section_name = 2;
+  int32 sequence = 3;
+}
+
+message DeleteSurveySectionRequest {
+  string id = 1;
+}
+
+message ReorderSurveySectionsRequest {
+  string template_id = 1;
+  repeated OrderItem sections = 2;
+}
+
+message UpdateSurveyQuestionRequest {
+  string id = 1;
+  string question_text = 2;
+  string answer_type = 3;
+  int32 sequence = 4;
+  bool is_required = 5;
+}
+
+message DeleteSurveyQuestionRequest {
+  string id = 1;
+}
+
+message ReorderSurveyQuestionsRequest {
+  string section_id = 1;
+  repeated OrderItem questions = 2;
+}
+
+message UpdateSurveyQuestionOptionRequest {
+  string id = 1;
+  string option_text = 2;
+  string option_value = 3;
+}
+
+message DeleteSurveyQuestionOptionRequest {
+  string id = 1;
+}
+
+message ListSurveyQuestionOptionsRequest {
+  string question_id = 1;
+}
+
+message ListSurveyQuestionOptionsResponse {
+  repeated SurveyQuestionOption options = 1;
+}
+
+message OrderItem {
+  string id = 1;
+  int32 sequence = 2;
+}
+
+message DeleteSurveyTemplateRequest {
+  string id = 1;
 }

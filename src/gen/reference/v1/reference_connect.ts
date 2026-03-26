@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { Empty, MethodKind } from "@bufbuild/protobuf";
-import { AttributeCategory, CreateAttributeCategoryRequest, CreateAttributeRegistryRequest, DeleteAttributeCategoryRequest, DeleteAttributeRegistryRequest, GetAttributeCategoryRequest, GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeCategoriesResponse, ListAttributeRegistryByCategoryRequest, ListAttributeRegistryResponse, ListBranchesResponse, ListCitiesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListProvincesResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct, UpdateAttributeCategoryRequest, UpdateAttributeRegistryRequest } from "./reference_pb";
+import { AttributeCategory, AttributeChoice, CreateAttributeCategoryRequest, CreateAttributeChoiceRequest, CreateAttributeRegistryRequest, DeleteAttributeCategoryRequest, DeleteAttributeChoiceRequest, DeleteAttributeRegistryRequest, GetAttributeCategoryRequest, GetLoanProductRequest, ListApplicationStatusesResponse, ListAttributeCategoriesResponse, ListAttributeRegistryByCategoryRequest, ListAttributeRegistryResponse, ListBranchesResponse, ListCitiesResponse, ListFinancialGLAccountsResponse, ListLoanOfficersRequest, ListLoanOfficersResponse, ListLoanProductsResponse, ListProvincesResponse, ListSurveyTemplatesRequest, ListSurveyTemplatesResponse, LoanProduct, UpdateAttributeCategoryRequest, UpdateAttributeChoiceRequest, UpdateAttributeRegistryRequest } from "./reference_pb";
 
 /**
  * @generated from service api.reference.v1.ReferenceService
@@ -197,6 +197,35 @@ export const ReferenceService = {
       name: "ListCities",
       I: Empty,
       O: ListCitiesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * ---- Attribute Choices ----
+     *
+     * @generated from rpc api.reference.v1.ReferenceService.CreateAttributeChoice
+     */
+    createAttributeChoice: {
+      name: "CreateAttributeChoice",
+      I: CreateAttributeChoiceRequest,
+      O: AttributeChoice,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.reference.v1.ReferenceService.UpdateAttributeChoice
+     */
+    updateAttributeChoice: {
+      name: "UpdateAttributeChoice",
+      I: UpdateAttributeChoiceRequest,
+      O: AttributeChoice,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.reference.v1.ReferenceService.DeleteAttributeChoice
+     */
+    deleteAttributeChoice: {
+      name: "DeleteAttributeChoice",
+      I: DeleteAttributeChoiceRequest,
+      O: Empty,
       kind: MethodKind.Unary,
     },
   }
