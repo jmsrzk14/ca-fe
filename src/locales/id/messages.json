@@ -353,7 +353,7 @@
   "entri": "entri",
   "lama berusaha (Tahun)": "Lama Berusaha (Tahun)",
   "of": "dari",
-  "Diajukan {0}": "Diajukan {0}",
+  "Diajukan": "Diajukan",
   "Kembali ke Detail Pinjaman": "Kembali ke Detail Pinjaman",
   "Informasi Pengajuan": "Informasi Pengajuan",
   "Tanggal Pengajuan": "Tanggal Pengajuan",
@@ -374,5 +374,5 @@
   "4. Sistem akan otomatis memproses dan mencocokkan data ke debitur terkait": "4. Sistem akan otomatis memproses dan mencocokkan data ke debitur terkait",
   "Credit Bureau (SLIK OJK)": "Credit Bureau (SLIK OJK)",
   "Upload file teks SLIK OJK secara bulk untuk pemrosesan data riwayat kredit debitur": "Upload file teks SLIK OJK secara bulk untuk pemrosesan data riwayat kredit debitur",
-  "CODE: {0}": "KODE: {0}"
+  "CODE:": "KODE:"
 }
