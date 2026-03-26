@@ -15,3 +15,24 @@ export function formatThousands(value?: string | number): string {
 export function parseThousands(value: string): string {
   return value.replace(/,/g, '');
 }
+
+/**
+ * Robustly parses a timestamp from the REST/gRPC response.
+ */
+export function parseTimestamp(ts: any): string | undefined {
+  if (!ts) return undefined;
+  if (typeof ts === 'string') return ts;
+  if (ts.seconds !== undefined) {
+    try {
+      return new Date(Number(ts.seconds) * 1000).toISOString();
+    } catch {
+      return undefined;
+    }
+  }
+  try {
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? undefined : d.toISOString();
+  } catch {
+    return undefined;
+  }
+}

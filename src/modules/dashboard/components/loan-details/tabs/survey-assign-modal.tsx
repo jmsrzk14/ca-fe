@@ -117,9 +117,6 @@ export function SurveyAssignModal({ applicationId, isOpen, onClose }: SurveyAssi
                     surveyPurpose: formData.surveyPurpose
                 };
                 
-                // Log payload to console
-                console.log('Assign Survey Payload:', payload);
-                
                 await surveyService.assignSurvey(applicationId, {
                     templateId,
                     surveyType: formData.surveyType,

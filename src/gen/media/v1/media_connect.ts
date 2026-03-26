@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { Document, GetPresignedUrlRequest, GetPresignedUrlResponse, ListDocumentsRequest, ListDocumentsResponse, UploadDocumentRequest } from "./media_pb";
+import { Document, GetDocumentRequest, GetPresignedUrlRequest, GetPresignedUrlResponse, ListDocumentsRequest, ListDocumentsResponse, UploadDocumentRequest } from "./media_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -37,6 +37,15 @@ export const MediaService = {
       name: "GetPresignedUrl",
       I: GetPresignedUrlRequest,
       O: GetPresignedUrlResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc api.media.v1.MediaService.GetDocument
+     */
+    getDocument: {
+      name: "GetDocument",
+      I: GetDocumentRequest,
+      O: Document,
       kind: MethodKind.Unary,
     },
   }

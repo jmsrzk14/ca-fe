@@ -109,7 +109,7 @@ export function LoanDetailsView({ id: propId }: LoanDetailsViewProps) {
 
         if (activeTab === TABS[0]) return <LoanInfoTab application={application} applicant={applicant} productName={productName} />;
         if (activeTab === TABS[1]) return <DebtHistoryTab />;
-        if (activeTab === TABS[2]) return <DocumentCompletenessTab />;
+        if (activeTab === TABS[2]) return <DocumentCompletenessTab applicationId={id} />;
         if (activeTab === TABS[3]) return <FinancialInfoTab />;
         if (activeTab === TABS[4]) return <CRRTab />;
         if (activeTab === TABS[5]) return <SurveyTab applicationId={id} />;

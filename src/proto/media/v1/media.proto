@@ -20,13 +20,19 @@ service MediaService {
 
   rpc ListDocuments (ListDocumentsRequest) returns (ListDocumentsResponse) {
     option (google.api.http) = {
-      get: "/v1/media/documents"
+      get: "/v1/media/applications/{application_id}"
     };
   }
 
   rpc GetPresignedUrl (GetPresignedUrlRequest) returns (GetPresignedUrlResponse) {
     option (google.api.http) = {
       get: "/v1/media/presigned-url"
+    };
+  }
+
+  rpc GetDocument (GetDocumentRequest) returns (Document) {
+    option (google.api.http) = {
+      get: "/v1/media/documents/{document_id}"
     };
   }
 }
@@ -61,8 +67,7 @@ message ListDocumentsResponse {
 }
 
 message GetPresignedUrlRequest {
-  // @required
-  string application_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string application_id = 1;
   // @required
   string file_name = 2 [(google.api.field_behavior) = REQUIRED];
   // Hanya pdf, png, jpeg
@@ -73,4 +78,9 @@ message GetPresignedUrlRequest {
 message GetPresignedUrlResponse {
   string upload_url = 1;
   string file_url = 2; // Final URL after successful upload
+}
+
+message GetDocumentRequest {
+  // @required
+  string document_id = 1 [(google.api.field_behavior) = REQUIRED];
 }
