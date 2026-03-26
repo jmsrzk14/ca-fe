@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Input } from '@/shared/ui/input';
+import { NumericInput } from '@/shared/ui/numeric-input';
 import { Label } from '@/shared/ui/label';
 import { SearchableSelect } from '@/shared/ui/searchable-select';
 import { AttributeRegistry } from '@/shared/types/api';
@@ -122,22 +123,14 @@ export function DynamicField({ field, value, onChange, error, inputClass = 'h-9 
 
     // NUMBER
     if (dataType === 'NUMBER') {
-        const displayValue = formatThousands(value);
         return (
             <div key={id} className="space-y-1.5">
                 {labelContent}
-                <Input
+                <NumericInput
                     id={id}
                     name={id}
-                    type="text"
-                    inputMode="numeric"
-                    value={displayValue}
-                    onChange={(e) => {
-                        const raw = parseThousands(e.target.value);
-                        if (raw === '' || /^\d+$/.test(raw)) {
-                            onChange(id, raw);
-                        }
-                    }}
+                    value={value || ''}
+                    onValueChange={(v) => onChange(id, v)}
                     className={inputClass}
                     disabled={disabled}
                     placeholder="0"

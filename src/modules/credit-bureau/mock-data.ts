@@ -203,10 +203,13 @@ export const mockSurveyDebts: DebtEntry[] = [
     },
 ];
 
+import { formatThousands } from '@/shared/lib/utils';
+
 export function formatRupiah(value: string): string {
-    const num = parseInt(value.replace(/\./g, ''), 10);
-    if (isNaN(num)) return value;
-    return 'Rp ' + num.toLocaleString('id-ID');
+    if (!value) return 'Rp 0';
+    const num = value.replace(/[^\d.-]/g, '');
+    if (isNaN(Number(num))) return value;
+    return 'Rp ' + formatThousands(num);
 }
 
 export function slikToDebtEntries(slik: SlikData): DebtEntry[] {

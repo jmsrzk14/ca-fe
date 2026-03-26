@@ -34,10 +34,11 @@ import {
     DialogFooter,
 } from '@/shared/ui/dialog';
 import { Input } from '@/shared/ui/input';
+import { NumericInput } from '@/shared/ui/numeric-input';
 import { Label } from '@/shared/ui/label';
 import { SearchableSelect } from '@/shared/ui/searchable-select';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { cn } from '@/shared/lib/utils';
+import { cn, formatThousands } from '@/shared/lib/utils';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { t } from '@/shared/lib/t';
@@ -489,13 +490,10 @@ function RelatedPartiesView({ applicantId, applicantType }: { applicantId: strin
                         {form.roleCode === 'SHAREHOLDER' && (
                             <div className="space-y-1.5">
                                 <Label>{t`Persentase Kepemilikan`}</Label>
-                                <Input
-                                    type="number"
-                                    min={0}
-                                    max={100}
-                                    step={0.01}
+                                <NumericInput
                                     value={form.ownershipPct || ''}
-                                    onChange={(e) => setForm((f) => ({ ...f, ownershipPct: parseFloat(e.target.value) || 0 }))}
+                                    onValueChange={(v) => setForm((f) => ({ ...f, ownershipPct: parseFloat(v) || 0 }))}
+                                    allowDecimals
                                     placeholder="0.00"
                                 />
                             </div>
@@ -582,7 +580,7 @@ function LoansListView({ isLoading, applications }: { isLoading: boolean; applic
                             <TableCell>
                                 <Link href={`/loans/${app.id}`} className="text-xs font-semibold text-primary hover:underline">
                                     {app.loanAmount
-                                        ? `Rp ${Number(app.loanAmount).toLocaleString('id-ID')}`
+                                        ? `Rp ${formatThousands(app.loanAmount)}`
                                         : '-'}
                                 </Link>
                             </TableCell>

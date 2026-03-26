@@ -39,6 +39,7 @@ import { applicantService } from '@/core/api';
 import { ApplicantType } from '@/shared/types/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
+import { NumericInput } from '@/shared/ui/numeric-input';
 import { Label } from '@/shared/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { cn } from '@/shared/lib/utils';
@@ -301,19 +302,19 @@ export function ApplicantForm({ onSuccess, onCancel }: ApplicantFormProps) {
                         />
                     </div>
                 );
-            case 'NUMBER':
+        case 'NUMBER':
                 return (
                     <div key={attributeCode} className="space-y-2">
                         <Label htmlFor={attributeCode} className="text-sm font-medium">
                             {labelText} {isRequired && <span className="text-destructive">*</span>}
                         </Label>
-                        <Input
+                        <NumericInput
                             id={attributeCode}
                             name={attributeCode}
-                            type="number"
                             value={formData[attributeCode] || ''}
-                            onChange={handleInputChange}
+                            onValueChange={(v) => handleInputChange({ target: { name: attributeCode, value: v } } as any)}
                             required={isRequired}
+                            placeholder="0"
                             className="rounded-xl h-11"
                         />
                     </div>

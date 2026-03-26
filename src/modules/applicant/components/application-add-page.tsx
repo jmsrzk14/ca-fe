@@ -21,6 +21,7 @@ import { applicationService, referenceService, applicantService } from '@/core/a
 import { AttributeRegistry } from '@/shared/types/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
+import { NumericInput } from '@/shared/ui/numeric-input';
 import { Label } from '@/shared/ui/label';
 import { Card, CardContent } from '@/shared/ui/card';
 import { cn } from '@/shared/lib/utils';
@@ -416,11 +417,11 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                         <Label className="text-xs font-medium text-muted-foreground">
                                             {t`Nilai Pinjaman`} <span className="text-destructive">*</span>
                                         </Label>
-                                        <Input
-                                            {...step1Form.register('loanAmount')}
-                                            type="number"
+                                        <NumericInput
+                                            value={step1Form.watch('loanAmount')}
+                                            onValueChange={v => step1Form.setValue('loanAmount', v, { shouldValidate: true })}
                                             className={inputClass}
-                                            placeholder="e.g. 50000000"
+                                            placeholder="e.g. 50,000,000"
                                         />
                                         {step1Form.formState.errors.loanAmount && (
                                             <p className="text-[10px] text-destructive mt-0.5">{step1Form.formState.errors.loanAmount.message}</p>
@@ -430,13 +431,22 @@ export function ApplicationAddPage({ redirectTo = '/loans' }: ApplicationAddPage
                                     {/* Tenor */}
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-medium text-muted-foreground">{t`Tenor (Bulan)`}</Label>
-                                        <Input {...step1Form.register('tenorMonths')} type="number" className={inputClass} />
+                                        <NumericInput 
+                                            value={step1Form.watch('tenorMonths')}
+                                            onValueChange={v => step1Form.setValue('tenorMonths', v)}
+                                            className={inputClass} 
+                                        />
                                     </div>
 
                                     {/* Interest Rate */}
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-medium text-muted-foreground">{t`Suku Bunga (%)`}</Label>
-                                        <Input {...step1Form.register('interestRate')} type="number" step="0.01" className={inputClass} />
+                                        <NumericInput 
+                                            value={step1Form.watch('interestRate')}
+                                            onValueChange={v => step1Form.setValue('interestRate', v)}
+                                            allowDecimals
+                                            className={inputClass} 
+                                        />
                                     </div>
 
                                     {/* Interest Type */}

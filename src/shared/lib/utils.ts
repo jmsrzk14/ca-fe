@@ -7,9 +7,13 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatThousands(value?: string | number): string {
   if (value === undefined || value === null || value === '') return '';
-  const str = typeof value === 'number' ? value.toString() : value.replace(/,/g, '');
+  let str = typeof value === 'number' ? value.toString() : value.replace(/,/g, '');
+  
   if (isNaN(Number(str))) return str;
-  return str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  const parts = str.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
 }
 
 export function parseThousands(value: string): string {
