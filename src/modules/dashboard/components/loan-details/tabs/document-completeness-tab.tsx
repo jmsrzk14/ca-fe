@@ -86,9 +86,6 @@ export function DocumentCompletenessTab({ applicationId }: DocumentCompletenessT
                         <span className="w-1.5 h-5 bg-gradient-to-b from-primary to-primary/60 rounded-full"></span>
                         {t`Kelengkapan Dokumen`}
                     </h2>
-                    <p className="text-[10px] text-muted-foreground ml-3.5 uppercase tracking-wider font-semibold">
-                        {documents.length} {t`Ditemukan`}
-                    </p>
                 </div>
             </div>
             
@@ -152,17 +149,8 @@ export function DocumentCompletenessTab({ applicationId }: DocumentCompletenessT
                                                 <DialogTitle className="text-base font-bold truncate">
                                                     {doc.documentName}
                                                 </DialogTitle>
-                                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                                                    {isPdf(doc) ? t`Dokumen PDF` : t`Berkas Citra`}
-                                                </span>
                                             </div>
                                         </div>
-                                        <Button variant="ghost" size="sm" asChild className="h-9 px-3 shrink-0 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors">
-                                            <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
-                                                <ExternalLink className="h-4 w-4 mr-2" />
-                                                <span className="font-bold">{t`Buka Baru`}</span>
-                                            </a>
-                                        </Button>
                                     </DialogHeader>
                                     <div className="flex-1 bg-zinc-100 dark:bg-zinc-950 overflow-hidden relative">
                                         {isPdf(doc) ? (
@@ -185,9 +173,6 @@ export function DocumentCompletenessTab({ applicationId }: DocumentCompletenessT
                                         <p className="text-[10px] text-muted-foreground font-medium">
                                             Dokumen ini dikelola secara aman oleh sistem CA.
                                         </p>
-                                        <Badge variant="outline" className="text-[9px] font-bold bg-emerald-500/5 text-emerald-600 border-emerald-500/20">
-                                            TERVERIFIKASI
-                                        </Badge>
                                     </div>
                                 </DialogContent>
                             </Dialog>

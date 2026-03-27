@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "lingui compile && next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "eslint",
     "gen-proto": "npx @bufbuild/buf export buf.build/dots-credit-analytics/credit-analytics --output src/proto && npx @bufbuild/buf generate",
     "gen-proto-debug": "npx @bufbuild/buf generate src/proto",

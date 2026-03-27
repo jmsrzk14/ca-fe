@@ -396,6 +396,7 @@ export function AttributeManagementView() {
     const queryClient = useQueryClient();
     const [isAddOpen, setIsAddOpen] = React.useState(false);
     const [editingAttr, setEditingAttr] = React.useState<typeof EMPTY_FIELD | null>(null);
+    const [deletingAttr, setDeletingAttr] = React.useState<any>(null);
 
     const { data: registry, isLoading } = useQuery({
         queryKey: ['attribute-registry'],
@@ -415,7 +416,27 @@ export function AttributeManagementView() {
         setEditingAttr(prev => prev ? { ...prev, ...patch } : prev);
 
     const createMutation = useMutation({
-        mutationFn: (data: any) => referenceService.createAttributeRegistry(data),
+        mutationFn: async (data: any) => {
+            await referenceService.createAttributeRegistry(data);
+            
+            // If it's a SELECT type and has choices, we need to send them
+            // Since createAttributeRegistry returns void (Empty), we have to find the created ID
+            if (data.valueType === 'SELECT' && data.choices?.length > 0) {
+                const { attributes } = await referenceService.getAttributeRegistry();
+                const created = attributes.find((a: any) => a.attributeCode === data.attributeCode);
+                
+                if (created) {
+                    for (const choice of data.choices) {
+                        await referenceService.createAttributeChoice({
+                            attributeId: created.id,
+                            code: choice.code,
+                            value: choice.value,
+                            displayOrder: choice.displayOrder || 0,
+                        });
+                    }
+                }
+            }
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['attribute-registry'] });
             toast.success(t`Field baru berhasil didaftarkan!`);
@@ -426,7 +447,44 @@ export function AttributeManagementView() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: (data: any) => referenceService.updateAttributeRegistry(data),
+        mutationFn: async (data: any) => {
+            await referenceService.updateAttributeRegistry(data);
+
+            if (data.valueType === 'SELECT' && data.choices) {
+                // Get current registry to find deletions (from the cached data before invalidation)
+                const { attributes } = registry || { attributes: [] };
+                const oldAttribute = attributes.find((a: any) => a.id === data.id);
+                const oldChoices = oldAttribute?.choices || [];
+
+                // Identify choices to delete (in old but not in new)
+                const currentIds = data.choices.map((c: any) => c.id).filter(Boolean);
+                for (const old of oldChoices) {
+                    if (!currentIds.includes(old.id)) {
+                        await referenceService.deleteAttributeChoice(old.id);
+                    }
+                }
+
+                // Create or update current choices
+                for (const choice of data.choices) {
+                    if (choice.id) {
+                        await referenceService.updateAttributeChoice({
+                            id: choice.id,
+                            code: choice.code,
+                            value: choice.value,
+                            displayOrder: choice.displayOrder || 0,
+                            isActive: true,
+                        });
+                    } else {
+                        await referenceService.createAttributeChoice({
+                            attributeId: data.id,
+                            code: choice.code,
+                            value: choice.value,
+                            displayOrder: choice.displayOrder || 0,
+                        });
+                    }
+                }
+            }
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['attribute-registry'] });
             toast.success(t`Field berhasil diperbarui!`);
@@ -438,6 +496,26 @@ export function AttributeManagementView() {
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
         createMutation.mutate(newField);
+    };
+
+    const deleteMutation = useMutation({
+        mutationFn: (id: string) => referenceService.deleteAttributeRegistry(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['attribute-registry'] });
+            toast.success(t`Field berhasil dihapus!`);
+            setDeletingAttr(null);
+        },
+        onError: (err: any) => toast.error(err.message || t`Gagal menghapus field`),
+    });
+
+    const handleDelete = (attr: any) => {
+        setDeletingAttr(attr);
+    };
+
+    const confirmDelete = () => {
+        if (deletingAttr) {
+            deleteMutation.mutate(deletingAttr.id);
+        }
     };
 
     const handleUpdate = (e: React.FormEvent) => {
@@ -525,8 +603,46 @@ export function AttributeManagementView() {
                 <ScopeFilteredRegistryView
                     attributes={registry?.attributes || []}
                     onEdit={openEdit}
+                    onDelete={handleDelete}
+                    deletePending={deleteMutation.isPending}
                 />
             )}
+
+            <Dialog open={!!deletingAttr} onOpenChange={(open) => { if (!open) setDeletingAttr(null); }}>
+                <DialogContent className="sm:max-w-[400px]">
+                    <DialogHeader>
+                        <div className="flex items-center gap-3 text-destructive mb-2">
+                            <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                                <AlertTriangle className="h-5 w-5" />
+                            </div>
+                            <DialogTitle>{t`Konfirmasi Hapus`}</DialogTitle>
+                        </div>
+                        <DialogDescription className="text-base text-foreground/80">
+                            {t`Apakah Anda yakin ingin menghapus field registry`} <span className="font-bold text-foreground">"{deletingAttr?.uiLabel || deletingAttr?.description}"</span>?
+                        </DialogDescription>
+                        <p className="text-xs text-muted-foreground mt-2 italic">
+                            {t`Tindakan ini tidak dapat dibatalkan.`}
+                        </p>
+                    </DialogHeader>
+                    <DialogFooter className="mt-4 gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeletingAttr(null)}
+                            disabled={deleteMutation.isPending}
+                        >
+                            {t`Batal`}
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={confirmDelete}
+                            disabled={deleteMutation.isPending}
+                        >
+                            {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t`Ya, Hapus Field`}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
@@ -536,7 +652,7 @@ const SCOPE_TABS = [
     { value: 'APPLICATION', label: 'Data Pinjaman', icon: FileText, description: 'Field yang melekat pada pengajuan pinjaman' },
 ] as const;
 
-function ScopeFilteredRegistryView({ attributes, onEdit }: { attributes: any[]; onEdit: (attr: any) => void }) {
+function ScopeFilteredRegistryView({ attributes, onEdit, onDelete, deletePending }: { attributes: any[]; onEdit: (attr: any) => void; onDelete: (attr: any) => void; deletePending?: boolean }) {
     const [activeScope, setActiveScope] = React.useState<string>('APPLICANT');
     const [collapsedCategories, setCollapsedCategories] = React.useState<Set<string>>(new Set());
 
@@ -682,14 +798,25 @@ function ScopeFilteredRegistryView({ attributes, onEdit }: { attributes: any[]; 
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="py-2 text-center">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                                            onClick={() => onEdit(attr)}
-                                                        >
-                                                            <Pencil className="h-3 w-3" />
-                                                        </Button>
+                                                        <div className="flex items-center justify-center gap-1">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                onClick={() => onEdit(attr)}
+                                                            >
+                                                                <Pencil className="h-3 w-3" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                onClick={() => onDelete(attr)}
+                                                                disabled={deletePending}
+                                                            >
+                                                                <Trash2 className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}

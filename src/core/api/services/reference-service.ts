@@ -346,4 +346,22 @@ export const referenceService = {
         const r = await client.listCities(new Empty());
         return { cities: (r.cities || []).map((c: any) => ({ code: c.code, value: c.value })) };
     },
+
+    /** Maps to proto: CreateAttributeChoice */
+    createAttributeChoice: async (data: any): Promise<void> => {
+        if (USE_DUMMY_DATA) return;
+        await client.createAttributeChoice(data);
+    },
+
+    /** Maps to proto: UpdateAttributeChoice */
+    updateAttributeChoice: async (data: any): Promise<void> => {
+        if (USE_DUMMY_DATA) return;
+        await client.updateAttributeChoice(data);
+    },
+
+    /** Maps to proto: DeleteAttributeChoice */
+    deleteAttributeChoice: async (id: string): Promise<void> => {
+        if (USE_DUMMY_DATA) return;
+        await client.deleteAttributeChoice({ id });
+    },
 };
